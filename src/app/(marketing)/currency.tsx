@@ -6,13 +6,16 @@ import styles from "./marketing.module.css";
 
 const STORAGE_KEY = "currency";
 
+// The business is based in Northern Ireland, so sterling is the default.
+const DEFAULT_CURRENCY: Currency = "GBP";
+
 const CurrencyContext = createContext<{ currency: Currency; setCurrency: (c: Currency) => void }>({
-  currency: "GBP",
+  currency: DEFAULT_CURRENCY,
   setCurrency: () => {},
 });
 
-// Visitors in Ireland see euro by default, everyone else sterling. A choice made
-// with the switch is remembered on this device.
+// Visitors in the Republic of Ireland see euro by default, everyone else
+// sterling. A choice made with the switch is remembered on this device.
 function detectCurrency(): Currency {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -22,13 +25,13 @@ function detectCurrency(): Currency {
 }
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  // Server render is always GBP; the visitor's currency is applied after hydration.
-  const [currency, setCurrencyState] = useState<Currency>("GBP");
+  // Server render uses the default; the visitor's currency is applied after hydration.
+  const [currency, setCurrencyState] = useState<Currency>(DEFAULT_CURRENCY);
 
   useEffect(() => {
     const detected = detectCurrency();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- must run after hydration to avoid a mismatch
-    if (detected !== "GBP") setCurrencyState(detected);
+    if (detected !== DEFAULT_CURRENCY) setCurrencyState(detected);
   }, []);
 
   const setCurrency = useCallback((c: Currency) => {

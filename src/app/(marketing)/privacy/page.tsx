@@ -22,10 +22,10 @@ export default function PrivacyPage() {
 
       <h2>Who we are</h2>
       <p>
-        Tapfolio is run by [YOUR NAME / COMPANY NAME, company number if any], [ADDRESS]. We are the controller of the
-        personal data described here. We serve customers in Ireland and the United Kingdom, so we follow both the EU
-        GDPR and the UK GDPR. [If based in the UK: ICO registration number [ICO REF]. If based in Ireland and selling
-        to the UK: name your UK representative, if one is required.] Contact us about privacy at [PRIVACY EMAIL].
+        Tapfolio is run by [YOUR NAME / COMPANY NAME, company number if any], [ADDRESS], Northern Ireland. We are the
+        controller of the personal data described here. We serve customers in the United Kingdom and Ireland, so we
+        follow the UK GDPR and, for customers in Ireland, the EU GDPR. ICO registration number: [ICO REF]. [EU
+        representative: name and address, if one is required.] Contact us about privacy at [PRIVACY EMAIL].
       </p>
 
       <h2>What we collect</h2>
@@ -82,9 +82,9 @@ export default function PrivacyPage() {
       <p>
         You can ask to see, correct, delete or move your data, or object to how we use it. Email [PRIVACY EMAIL] and
         we will respond within one month. If you are unhappy with how we handle your data, you can complain to the
-        data protection regulator where you live: in Ireland, the{" "}
-        <a href="https://www.dataprotection.ie/">Data Protection Commission</a>; in the UK (including Northern
-        Ireland), the <a href="https://ico.org.uk/make-a-complaint/">Information Commissioner&apos;s Office</a>.
+        data protection regulator where you live: in the UK (including Northern Ireland), the{" "}
+        <a href="https://ico.org.uk/make-a-complaint/">Information Commissioner&apos;s Office</a>; in Ireland, the{" "}
+        <a href="https://www.dataprotection.ie/">Data Protection Commission</a>.
       </p>
 
       <h2>Cookies</h2>

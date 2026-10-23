@@ -6,8 +6,9 @@ export const CONTACT_EMAIL = "hello@tapfolio.co.uk";
 
 export type Currency = "GBP" | "EUR";
 
-// GBP prices come from the council review; EUR prices are rounded equivalents.
-// Confirm both against supplier quotes and VAT before launch.
+// Suggested prices (GBP is the home currency; EUR are rounded equivalents).
+// Consumer prices must include VAT once registered, so confirm both against
+// supplier quotes and VAT before launch.
 export const PRICES = {
   GBP: { standard: 29, platinum: 69, proMonthly: 4, proYearly: 39, teamCard: 22, teamSeatMonthly: 3 },
   EUR: { standard: 35, platinum: 79, proMonthly: 5, proYearly: 45, teamCard: 25, teamSeatMonthly: 3.5 },

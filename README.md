@@ -32,6 +32,10 @@ npm run dev
 
 Open http://localhost:3000. The landing page and the example profile at `/john-smith` work before Supabase is configured; the order form needs it.
 
+### Hosting regions
+
+The business is based in Northern Ireland and serves the UK and Ireland. Create the Supabase project in **West EU (London)**; `vercel.json` pins the server functions to London (`lhr1`) so every request stays close to the database.
+
 ### Database
 
 Schema lives in `supabase/migrations/`, demo data in `supabase/seed.sql`. To apply them to your Supabase project:
