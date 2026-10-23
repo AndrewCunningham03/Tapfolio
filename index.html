@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tapfolio · Tap-to-share business cards</title>
+<meta name="description" content="NFC and QR business cards. One tap opens your profile, one more saves your contact. Update your details any time without reprinting.">
+<meta name="theme-color" content="#0B1F17">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tapfolio">
+<meta property="og:title" content="Tapfolio · Tap-to-share business cards">
+<meta property="og:description" content="NFC and QR business cards. One tap opens your profile, one more saves your contact. From £29, and your profile is free forever.">
+<meta name="twitter:card" content="summary">
+<!-- TODO once the domain is live: add <link rel="canonical">, og:url and og:image (1200×630 PNG, absolute URL) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1F17'/%3E%3Cpath d='M11 11a7 7 0 0 1 0 10M16 8a11 11 0 0 1 0 16M21 5a15 15 0 0 1 0 22' fill='none' stroke='%23FACC15' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0B1F17;
+    --surface: #12291F;
+    --green: #1F9D55;
+    --yellow: #FACC15;
+    --gold: #E0B84C;
+    --text: #F4F7F5;
+    --muted: #A9B8B0;
+    --platinum: #C9CED6;
+    --line: rgba(201, 206, 214, 0.14);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--yellow); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 10; background: rgba(11, 31, 23, 0.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.02em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--yellow); }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 24px; font-size: 0.95rem; }
+  nav a:hover { color: var(--text); }
+  @media (max-width: 640px) { nav a:not(.btn) { display: none; } }
+
+  .btn {
+    display: inline-block; padding: 12px 22px; border-radius: 999px; border: 0; cursor: pointer;
+    background: var(--yellow); color: #1a1a00; font-weight: 700; text-decoration: none; font-size: 1rem;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  nav .btn { margin-left: 24px; padding: 8px 16px; font-size: 0.9rem; color: #1a1a00; }
+
+  /* Hero */
+  .hero { padding: 80px 0 64px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  @media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; } .hero { padding-top: 48px; } }
+  .eyebrow { color: var(--green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem; }
+  h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.08; letter-spacing: -0.03em; margin: 12px 0 18px; }
+  h1 em { font-style: normal; color: var(--yellow); }
+  .lede { color: var(--muted); font-size: 1.15rem; max-width: 34em; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-note { color: var(--muted); font-size: 0.9rem; margin-top: 16px; }
+  .hero-note strong { color: var(--text); }
+
+  /* Card mockups */
+  .card-stack { position: relative; height: 320px; }
+  .mock {
+    position: absolute; width: 85.6mm; max-width: 88%; aspect-ratio: 85.6 / 54; border-radius: 14px;
+    padding: 22px; display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+  .mock.standard { background: linear-gradient(135deg, #1F9D55, #146b3a); top: 0; left: 0; transform: rotate(-6deg); }
+  .mock.platinum {
+    background: linear-gradient(135deg, #e9ecf0 0%, #b8bec7 40%, #f4f6f8 60%, #9aa1ab 100%);
+    color: #14201a; bottom: 0; right: 0; transform: rotate(4deg); border: 1px solid #fff6;
+  }
+  .mock .brand { font-weight: 800; font-size: 1.15rem; }
+  .mock .row { display: flex; justify-content: space-between; align-items: flex-end; }
+  .mock .who { font-size: 0.85rem; opacity: 0.85; }
+  .nfc { width: 28px; height: 28px; opacity: 0.8; }
+  .qr {
+    width: 52px; height: 52px; border-radius: 6px; background:
+      conic-gradient(from 90deg at 30% 30%, #000 25%, #fff 0) 0 0 / 10px 10px, #fff;
+    border: 4px solid #fff;
+  }
+
+  /* Sections */
+  section { padding: 72px 0; scroll-margin-top: 64px; }
+  section.alt { background: var(--surface); border-block: 1px solid var(--line); }
+  h2 { font-size: clamp(1.7rem, 3.5vw, 2.3rem); letter-spacing: -0.02em; margin: 0 0 12px; }
+  .sub { color: var(--muted); max-width: 40em; margin: 0 0 40px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .step .num {
+    width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    background: #178046; font-weight: 800; margin-bottom: 14px;
+  }
+  .step h3 { margin: 0 0 6px; font-size: 1.1rem; }
+  .step p { margin: 0; color: var(--muted); }
+
+  .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .tiers { grid-template-columns: 1fr; } }
+  .tier { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; display: flex; flex-direction: column; }
+  .tier.premium { border-color: var(--platinum); box-shadow: inset 0 0 0 1px rgba(201, 206, 214, 0.25); }
+  .tier .tag { align-self: flex-start; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 999px; background: rgba(31, 157, 85, 0.2); color: #6fdc9c; }
+  .tier.premium .tag { background: rgba(201, 206, 214, 0.15); color: var(--platinum); }
+  .tier h3 { font-size: 1.5rem; margin: 14px 0 4px; }
+  .price { font-size: 1.1rem; color: var(--muted); margin-bottom: 18px; }
+  .price strong { color: var(--text); font-size: 1.8rem; }
+  .price small { display: block; font-size: 0.85rem; }
+
+  .promise {
+    display: flex; gap: 14px; align-items: center; margin-bottom: 32px; padding: 16px 20px;
+    border-radius: 12px; background: rgba(250, 204, 21, 0.08); border: 1px solid rgba(250, 204, 21, 0.35);
+  }
+  .promise svg { flex: none; width: 26px; height: 26px; color: var(--yellow); }
+  .promise p { margin: 0; }
+
+  .pro { margin-top: 24px; padding: 24px 28px; border-radius: var(--radius); border: 1px dashed var(--line); display: grid; gap: 6px; }
+  .pro h3 { margin: 0; font-size: 1.15rem; }
+  .pro p { margin: 0; color: var(--muted); }
+  .tier ul { list-style: none; padding: 0; margin: 0 0 28px; flex: 1; }
+  .tier li { padding: 8px 0 8px 28px; position: relative; border-bottom: 1px solid var(--line); }
+  .tier li::before { content: ""; position: absolute; left: 4px; top: 15px; width: 10px; height: 6px; border-left: 2px solid var(--green); border-bottom: 2px solid var(--green); transform: rotate(-45deg); }
+  .tier.premium li::before { border-color: var(--platinum); }
+
+  .faq details { border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .faq summary { cursor: pointer; font-weight: 600; font-size: 1.05rem; }
+  .faq p { color: var(--muted); margin: 10px 0 0; }
+
+  /* Form */
+  form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 760px; }
+  @media (max-width: 640px) { form { grid-template-columns: 1fr; } }
+  .full { grid-column: 1 / -1; }
+  label { display: block; font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font: inherit;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+  textarea { min-height: 110px; resize: vertical; }
+  .form-note { color: var(--muted); font-size: 0.85rem; }
+  .thanks, .form-error { display: none; padding: 16px 20px; border-radius: 12px; max-width: 760px; }
+  .thanks { background: rgba(31, 157, 85, 0.15); border: 1px solid var(--green); }
+  .form-error { background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; margin-top: 16px; }
+  button[disabled] { opacity: 0.6; cursor: progress; }
+
+  footer { padding: 32px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#">Tap<span>folio</span></a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#cards">Cards</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn" href="#order">Order</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">NFC + QR business cards</div>
+        <h1>One tap. <em>Contact saved.</em></h1>
+        <p class="lede">Tap your card on any phone and your profile opens straight away, with a button to save your details to their contacts. No app needed. Change your details whenever you like and the same card keeps working.</p>
+        <div class="cta-row">
+          <a class="btn" href="#order">Order your cards</a>
+          <a class="btn ghost" href="/john-smith">See an example profile</a>
+        </div>
+        <p class="hero-note"><strong>From £29, paid once.</strong> Your profile is free forever. No app, no contract.</p>
+      </div>
+      <div class="card-stack" aria-hidden="true">
+        <div class="mock standard">
+          <div class="row"><span class="brand">Smith Plumbing</span>
+            <svg class="nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8.5a6 6 0 0 1 0 7"/><path d="M10 6a10 10 0 0 1 0 12"/><path d="M14 3.5a14 14 0 0 1 0 17"/></svg>
+          </div>
+          <div class="row"><span class="who">John Smith<br>Tap or scan</span><span class="qr"></span></div>
+        </div>
+        <div class="mock platinum">
+          <div class="row"><span class="brand">Platinum</span>
+            <svg class="nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8.5a6 6 0 0 1 0 7"/><path d="M10 6a10 10 0 0 1 0 12"/><path d="M14 3.5a14 14 0 0 1 0 17"/></svg>
+          </div>
+          <div class="row"><span class="who">Metal finish<br>Tap or scan</span><span class="qr"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="how" class="alt">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="sub">Every card links to your own page, at an address that never changes. The card stays the same, and you can change what's on the page whenever you like.</p>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h3>Activate your card</h3><p>Scan the activation code that comes with your card, create an account and add your details. Your card goes live straight away.</p></div>
+        <div class="step"><div class="num">2</div><h3>Tap or scan</h3><p>Hold the card near a phone, or let them scan the QR code on the front. Your profile opens in their browser.</p></div>
+        <div class="step"><div class="num">3</div><h3>Saved to their phone</h3><p>One button adds your name, number, email, website and address to their contacts. Update your details online any time.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cards">
+    <div class="wrap">
+      <h2>Choose your card</h2>
+      <p class="sub">Both cards include design, setup, your profile page, a QR code for phones without NFC, and unlimited updates to your details.</p>
+      <div class="promise">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <p><strong>Your card works forever.</strong> Pay once and your profile stays live, with no monthly fee to keep it working.</p>
+      </div>
+      <!-- Prices from the council review; confirm against supplier quotes before launch -->
+      <div class="tiers">
+        <div class="tier">
+          <span class="tag">Standard</span>
+          <h3>Tapfolio Card</h3>
+          <div class="price"><strong>£29</strong> per card, one-off<small>Includes setup and your profile, free forever</small></div>
+          <ul>
+            <li>Printed PVC card, standard bank-card size</li>
+            <li>Built-in NFC chip and printed QR code</li>
+            <li>Your logo and branding, full colour</li>
+            <li>Profile page with a Save contact button</li>
+            <li>Edit your details online any time</li>
+          </ul>
+          <a class="btn" href="#order" data-tier="Standard">Order Standard</a>
+        </div>
+        <div class="tier premium">
+          <span class="tag">Platinum</span>
+          <h3>Tapfolio Platinum</h3>
+          <div class="price"><strong>£69</strong> per card, one-off<small>Includes setup and your profile, free forever</small></div>
+          <ul>
+            <li>Premium metal or metallic-finish card</li>
+            <li>Tested with iPhone and Android, with a phone case on</li>
+            <li>Engraved or printed logo</li>
+            <li>Everything in Standard</li>
+            <li>Priority setup support</li>
+          </ul>
+          <a class="btn" href="#order" data-tier="Platinum">Order Platinum</a>
+        </div>
+      </div>
+      <div class="pro">
+        <h3>Optional Pro: £4 a month or £39 a year</h3>
+        <p>Add your logo and photo, see how often your card is tapped, collect enquiries from your profile, and add a Google review button. Cancel any time and your card keeps working with your basic profile.</p>
+      </div>
+      <div class="pro">
+        <h3>Ordering for a team of 5 or more?</h3>
+        <p>£22 per Standard card, plus £3 per person a month for shared branding and one place to manage everyone's details. <a href="#order">Ask for a quote</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="alt">
+    <div class="wrap faq">
+      <h2>Questions</h2>
+      <details><summary>Is there a monthly fee?</summary><p>No. Your card and profile page are included in the one-off price and keep working for good. Pro is an optional extra at £4 a month or £39 a year. If you cancel it, your card keeps working with your basic profile.</p></details>
+      <details><summary>Do people need an app?</summary><p>No. Most modern iPhones and Android phones read NFC cards straight away. Phones without NFC can scan the QR code with the camera.</p></details>
+      <details><summary>What if my phone number or job changes?</summary><p>Log in and update your details. The change goes live straight away, so your cards keep working and never need reprinting.</p></details>
+      <details><summary>Can I order cards for my whole team?</summary><p>Yes. Each person gets their own card and profile page. Get in touch with the number of cards you need and we'll send a quote.</p></details>
+      <details><summary>Does the metal card really work?</summary><p>Yes. Platinum cards are built so the chip can still be read through the metal, and we test them on iPhone and Android before sending.</p></details>
+    </div>
+  </section>
+
+  <section id="order">
+    <div class="wrap">
+      <h2>Order or enquire</h2>
+      <p class="sub">Tell us what you need and we'll reply within one working day with a proof and a quote.</p>
+      <!-- Works as-is on Netlify (data-netlify). On other hosts, point action= at Formspree or your own endpoint. -->
+      <form id="orderForm" name="order" method="POST" data-netlify="true" netlify-honeypot="company_url">
+        <input type="hidden" name="form-name" value="order">
+        <p hidden><label>Leave this empty <input name="company_url"></label></p>
+        <div><label for="name">Your name</label><input id="name" name="name" required autocomplete="name"></div>
+        <div><label for="business">Business name</label><input id="business" name="business" autocomplete="organization"></div>
+        <div><label for="email">Email</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+        <div><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
+        <div><label for="tier">Card</label>
+          <select id="tier" name="tier">
+            <option>Standard</option>
+            <option>Platinum</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div><label for="qty">Number of cards</label>
+          <select id="qty" name="quantity">
+            <option>1</option><option>2–5</option><option>6–20</option><option>21–50</option><option>50+</option>
+          </select>
+        </div>
+        <div class="full"><label for="msg">Anything else?</label><textarea id="msg" name="message" placeholder="Team size, design ideas, deadlines…"></textarea></div>
+        <div class="full"><button class="btn" type="submit">Send enquiry</button></div>
+        <p class="form-note full">We only use your details to reply to this enquiry. See our <a href="/privacy.html">privacy policy</a>.</p>
+      </form>
+      <div class="thanks" id="thanks" role="status">Thanks, we've got your enquiry and will be in touch shortly.</div>
+      <div class="form-error" id="formError" role="alert">Sorry, your enquiry didn't send. Please try again, or email us at <a id="errorMail" href="#"></a>.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> Tapfolio</span>
+    <span><a href="#order">Contact</a> · <a href="/privacy.html">Privacy</a></span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // "Order Standard / Platinum" buttons preselect the tier in the form
+  document.querySelectorAll('[data-tier]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      document.getElementById('tier').value = el.dataset.tier;
+    });
+  });
+
+  // TODO: replace with a mailbox you own once the domain is registered
+  var CONTACT_EMAIL = 'hello@tapfolio.co.uk';
+
+  // Submit via fetch so the visitor stays on the page (Netlify Forms compatible).
+  // Only show "thanks" on a 2xx response; otherwise keep the form and offer email instead.
+  var form = document.getElementById('orderForm');
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var errorBox = document.getElementById('formError');
+  var errorMail = document.getElementById('errorMail');
+  errorMail.textContent = CONTACT_EMAIL;
+  errorMail.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Card enquiry');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    errorBox.style.display = 'none';
+    var body = new URLSearchParams(new FormData(form)).toString();
+    fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        form.style.display = 'none';
+        document.getElementById('thanks').style.display = 'block';
+      })
+      .catch(function () {
+        errorBox.style.display = 'block';
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+      });
+  });
+</script>
+</body>
+</html>
