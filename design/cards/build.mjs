@@ -56,6 +56,7 @@ const SAMPLE_URL = "HTTPS://TAPFOLIO.CO.UK/C/7KQ2XMP";
 const C = {
   ink: { hex: "#0B1F17", cmyk: [80, 30, 65, 80] }, // card background
   wave: { hex: "#163A2A", cmyk: [80, 25, 65, 60] }, // background pattern
+  green: { hex: "#1F9D55", cmyk: [80, 0, 80, 10] }, // "Tap" in the wordmark
   yellow: { hex: "#FACC15", cmyk: [0, 20, 95, 0] },
   paper: { hex: "#F4F7F5", cmyk: [3, 0, 3, 0] },
   platinum: { hex: "#C9CED6", cmyk: [20, 12, 8, 0] },
@@ -178,7 +179,7 @@ const DESIGNS = {
         color: (i) => (i === 0 ? C.yellow.hex : C.wave.hex),
       }) +
       text("TAP TO CONNECT", { font: FONT.semibold, size: 2.1, x: MARGIN, y: 10, fill: C.platinum.hex, tracking: 0.2 }) +
-      wordmark({ x: MARGIN, y: TRIM.h - 7, size: 6.4, tap: C.paper.hex, folio: C.yellow.hex }),
+      wordmark({ x: MARGIN, y: TRIM.h - 7, size: 6.4, tap: C.green.hex, folio: C.yellow.hex }),
   },
 
   "plastic-back": {
@@ -186,7 +187,7 @@ const DESIGNS = {
     material: "plastic",
     draw: ({ sample }) =>
       rect({ x: -BLEED, y: -BLEED, w: TRIM.w + 2 * BLEED, h: TRIM.h + 2 * BLEED, fill: C.ink.hex }) +
-      backCopy({ heading: C.paper.hex, body: C.platinum.hex, icon: C.yellow.hex, tap: C.paper.hex, folio: C.yellow.hex }) +
+      backCopy({ heading: C.paper.hex, body: C.platinum.hex, icon: C.yellow.hex, tap: C.green.hex, folio: C.yellow.hex }) +
       rect({ x: PANEL.x, y: PANEL.y, w: PANEL.size, h: PANEL.size, r: PANEL.r, fill: C.white.hex }) +
       (sample ? qrCode(SAMPLE_URL, { ...QR, fill: C.black.hex }) : ""),
   },
