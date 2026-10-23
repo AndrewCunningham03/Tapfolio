@@ -1,15 +1,24 @@
-// Business details shown across the marketing site. Prices come from the
-// council review; confirm against supplier quotes before launch.
+// Business details shown across the marketing site.
 export const SITE_NAME = "Tapfolio";
 
 // TODO: replace with a mailbox you own once the domain is registered
 export const CONTACT_EMAIL = "hello@tapfolio.co.uk";
 
+export type Currency = "GBP" | "EUR";
+
+// GBP prices come from the council review; EUR prices are rounded equivalents.
+// Confirm both against supplier quotes and VAT before launch.
 export const PRICES = {
-  standard: 29,
-  platinum: 69,
-  proMonthly: 4,
-  proYearly: 39,
-  teamCard: 22,
-  teamSeatMonthly: 3,
-} as const;
+  GBP: { standard: 29, platinum: 69, proMonthly: 4, proYearly: 39, teamCard: 22, teamSeatMonthly: 3 },
+  EUR: { standard: 35, platinum: 79, proMonthly: 5, proYearly: 45, teamCard: 25, teamSeatMonthly: 3.5 },
+} as const satisfies Record<Currency, Record<string, number>>;
+
+export type PriceKey = keyof (typeof PRICES)["GBP"];
+
+export function formatPrice(amount: number, currency: Currency): string {
+  return new Intl.NumberFormat(currency === "EUR" ? "en-IE" : "en-GB", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+  }).format(amount);
+}

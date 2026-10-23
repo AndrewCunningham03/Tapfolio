@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 import { submitEnquiry, type EnquiryState } from "./actions";
+import { COUNTRIES } from "./countries";
 import { CONTACT_EMAIL } from "@/lib/site";
 import styles from "./marketing.module.css";
 
@@ -53,6 +54,17 @@ export function OrderForm() {
         <div>
           <label htmlFor="phone">Phone</label>
           <input id="phone" name="phone" type="tel" autoComplete="tel" />
+        </div>
+        <div className={styles.full}>
+          <label htmlFor="country">Where should we deliver?</label>
+          <select id="country" name="country" required defaultValue="">
+            <option value="" disabled>
+              Choose…
+            </option>
+            {COUNTRIES.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="tier">Card</label>

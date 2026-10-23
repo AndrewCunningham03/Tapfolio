@@ -1,7 +1,7 @@
 -- Demo data for development. Mirrors the sample profile in src/lib/profiles.ts.
 
 insert into public.profiles
-  (slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, socials)
+  (slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials)
 values (
   'john-smith',
   'John Smith',
@@ -14,6 +14,7 @@ values (
   '12 High Street',
   'York',
   'YO1 7HU',
+  'United Kingdom',
   '{"facebook": "https://www.facebook.com/", "instagram": "https://www.instagram.com/", "linkedin": "https://www.linkedin.com/", "whatsapp": "https://wa.me/447700900123"}'
 );
 

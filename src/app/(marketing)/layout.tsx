@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CurrencyProvider } from "./currency";
 import styles from "./marketing.module.css";
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
@@ -20,7 +21,9 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
         </div>
       </header>
 
-      <main>{children}</main>
+      <main>
+        <CurrencyProvider>{children}</CurrencyProvider>
+      </main>
 
       <footer className={styles.footer}>
         <div className={styles.wrap}>

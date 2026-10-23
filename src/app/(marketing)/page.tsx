@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { CurrencySwitch, Price } from "./currency";
 import { OrderForm } from "./order-form";
-import { PRICES } from "@/lib/site";
 import styles from "./marketing.module.css";
 
 function NfcIcon() {
@@ -13,10 +13,20 @@ function NfcIcon() {
   );
 }
 
-const FAQ = [
+const FAQ: { q: string; a: React.ReactNode }[] = [
   {
     q: "Is there a monthly fee?",
-    a: `No. Your card and profile page are included in the one-off price and keep working for good. Pro is an optional extra at £${PRICES.proMonthly} a month or £${PRICES.proYearly} a year. If you cancel it, your card keeps working with your basic profile.`,
+    a: (
+      <>
+        No. Your card and profile page are included in the one-off price and keep working for good. Pro is an
+        optional extra at <Price of="proMonthly" /> a month or <Price of="proYearly" /> a year. If you cancel it, your
+        card keeps working with your basic profile.
+      </>
+    ),
+  },
+  {
+    q: "Do you deliver to Ireland and the UK?",
+    a: "Yes. We deliver across Ireland, Northern Ireland and Great Britain, with prices in euro or sterling.",
   },
   {
     q: "Do people need an app?",
@@ -59,7 +69,10 @@ export default function HomePage() {
               </Link>
             </div>
             <p className={styles.heroNote}>
-              <strong>From £{PRICES.standard}, paid once.</strong> Your profile is free forever. No app, no contract.
+              <strong>
+                From <Price of="standard" />, paid once.
+              </strong>{" "}
+              Your profile is free forever. No app, no contract.
             </p>
           </div>
           <div className={styles.cardStack} aria-hidden="true">
@@ -139,12 +152,16 @@ export default function HomePage() {
               keep it working.
             </p>
           </div>
+          <CurrencySwitch />
           <div className={styles.tiers}>
             <div className={styles.tier}>
               <span className={styles.tag}>Standard</span>
               <h3>Tapfolio Card</h3>
               <div className={styles.price}>
-                <strong>£{PRICES.standard}</strong> per card, one-off
+                <strong>
+                  <Price of="standard" />
+                </strong>{" "}
+                per card, one-off
                 <small>Includes setup and your profile, free forever</small>
               </div>
               <ul>
@@ -162,7 +179,10 @@ export default function HomePage() {
               <span className={styles.tag}>Platinum</span>
               <h3>Tapfolio Platinum</h3>
               <div className={styles.price}>
-                <strong>£{PRICES.platinum}</strong> per card, one-off
+                <strong>
+                  <Price of="platinum" />
+                </strong>{" "}
+                per card, one-off
                 <small>Includes setup and your profile, free forever</small>
               </div>
               <ul>
@@ -179,7 +199,7 @@ export default function HomePage() {
           </div>
           <div className={styles.pro}>
             <h3>
-              Optional Pro: £{PRICES.proMonthly} a month or £{PRICES.proYearly} a year
+              Optional Pro: <Price of="proMonthly" /> a month or <Price of="proYearly" /> a year
             </h3>
             <p>
               Add your logo and photo, see how often your card is tapped, collect enquiries from your profile, and add
@@ -189,8 +209,8 @@ export default function HomePage() {
           <div className={styles.pro}>
             <h3>Ordering for a team of 5 or more?</h3>
             <p>
-              £{PRICES.teamCard} per Standard card, plus £{PRICES.teamSeatMonthly} per person a month for shared
-              branding and one place to manage everyone&apos;s details. <a href="#order">Ask for a quote</a>.
+              <Price of="teamCard" /> per Standard card, plus <Price of="teamSeatMonthly" /> per person a month for
+              shared branding and one place to manage everyone&apos;s details. <a href="#order">Ask for a quote</a>.
             </p>
           </div>
         </div>

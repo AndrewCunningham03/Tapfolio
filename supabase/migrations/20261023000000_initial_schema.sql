@@ -51,8 +51,8 @@ create table public.profiles (
   website       text check (length(website) <= 300),
   street        text check (length(street) <= 200),
   city          text check (length(city) <= 100),
-  postcode      text check (length(postcode) <= 20),
-  country       text not null default 'United Kingdom',
+  postcode      text check (length(postcode) <= 20),  -- UK postcode or Irish Eircode
+  country       text check (length(country) <= 60),   -- e.g. 'Ireland', 'United Kingdom'
   socials       jsonb not null default '{}'::jsonb check (jsonb_typeof(socials) = 'object'),
   photo_path    text,                                   -- path in the "profile-photos" storage bucket
   hidden_fields text[] not null default '{}',           -- e.g. {'street','postcode'}: kept but not shown
@@ -158,6 +158,7 @@ create table public.enquiries (
   email       text not null,
   business    text,
   phone       text,
+  country     text,                          -- delivery region chosen on the form
   tier        text,
   quantity    text,
   message     text,
