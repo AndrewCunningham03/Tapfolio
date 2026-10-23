@@ -1,0 +1,17 @@
+{
+  "name": "tapfolio-card-artwork",
+  "private": true,
+  "type": "module",
+  "description": "Generates print-ready card artwork (PDF + SVG) and PNG previews",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "@expo-google-fonts/manrope": "0.4.2",
+    "@resvg/resvg-js": "2.6.2",
+    "opentype.js": "2.0.0",
+    "pdfkit": "0.20.2",
+    "qrcode": "1.5.4",
+    "svg-to-pdfkit": "0.1.8"
+  }
+}

@@ -56,6 +56,7 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 | `src/app/[slug]/` | Public profile page and `/<slug>/vcard` contact download |
 | `src/lib/` | Profiles, vCard builder, card ID / claim code helpers, slug rules |
 | `supabase/` | Migrations and seed data |
+| `design/cards/` | Card artwork generator, print files and supplier spec (`cd design/cards && npm install && npm run build`) |
 
 ## Milestones
 
