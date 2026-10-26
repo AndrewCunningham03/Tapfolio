@@ -2,7 +2,7 @@
 // list in supabase/migrations/20261023000000_initial_schema.sql.
 export const RESERVED_SLUGS = new Set([
   "about", "account", "admin", "api", "app", "auth", "billing", "c", "card", "cards", "claim",
-  "contact", "dashboard", "help", "login", "logout", "order", "p", "pricing", "privacy", "pro",
+  "contact", "dashboard", "design", "help", "login", "logout", "order", "p", "pricing", "privacy", "pro",
   "profile", "register", "settings", "signin", "signup", "static", "support", "tapfolio", "terms", "www",
 ]);
 

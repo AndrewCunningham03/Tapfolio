@@ -44,6 +44,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   return <CurrencyContext.Provider value={{ currency, setCurrency }}>{children}</CurrencyContext.Provider>;
 }
 
+export function useCurrency(): Currency {
+  return useContext(CurrencyContext).currency;
+}
+
 export function Price({ of }: { of: PriceKey }) {
   const { currency } = useContext(CurrencyContext);
   return <>{formatPrice(PRICES[currency][of], currency)}</>;

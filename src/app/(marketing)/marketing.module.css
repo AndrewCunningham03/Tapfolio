@@ -252,6 +252,80 @@
 .contactLine { margin-top: 28px; color: var(--muted); }
 .contactLine a { color: var(--text); font-weight: 700; }
 
+/* Card designer ------------------------------------------------------------ */
+.designSection { padding-top: 56px; }
+.designTitle { margin-top: 0 !important; }
+.designer { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; margin-top: 16px; }
+@media (max-width: 960px) { .designer { grid-template-columns: 1fr; gap: 28px; } }
+
+.previewCol { position: sticky; top: 92px; }
+@media (max-width: 960px) {
+  /* On phones the preview stays pinned under the header while you scroll the options. */
+  .previewCol { top: 68px; z-index: 5; background: var(--bg); padding: 12px 0; margin: 0 -24px; padding-inline: 24px; border-bottom: 1px solid var(--line); }
+}
+.previewStage {
+  display: grid; gap: 18px; padding: 28px; border-radius: 24px;
+  background: radial-gradient(120% 90% at 30% 10%, #1b1c20, #0c0c0d);
+  border: 1px solid var(--line);
+}
+/* Compact on phones: two small cards side by side, so the options stay visible below. */
+@media (max-width: 960px) {
+  .previewStage { grid-template-columns: repeat(2, minmax(0, 150px)); justify-content: center; gap: 10px; padding: 10px; border-radius: 16px; }
+}
+.previewCard svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55)); }
+.previewNote { color: var(--muted); font-size: 0.85rem; margin: 14px 0 0; }
+@media (max-width: 960px) { .previewNote { display: none; } }
+
+.designForm { display: grid; gap: 14px; }
+.designForm fieldset { border: 1px solid var(--line); border-radius: 20px; padding: 22px; margin: 0; min-width: 0; }
+.designForm legend { padding: 0 8px; margin-left: -8px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+.designForm legend span {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--text); color: #0a0a0b; font-size: 0.8rem;
+}
+
+.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 560px) { .swatches { grid-template-columns: 1fr 1fr; } }
+.swatch, .layoutOption {
+  position: relative; display: grid; gap: 6px; padding: 12px; border-radius: 14px; cursor: pointer;
+  border: 1px solid var(--line-strong); background: var(--raised);
+}
+.swatch input, .layoutOption input { position: absolute; opacity: 0; pointer-events: none; }
+.swatch[data-checked="true"], .layoutOption[data-checked="true"] { border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); }
+.swatch:has(input:focus-visible), .layoutOption:has(input:focus-visible) { outline: 2px solid var(--steel); outline-offset: 2px; }
+.swatchChip { height: 34px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.swatchLabel { font-weight: 700; font-size: 0.92rem; }
+.swatchPrice { color: var(--muted); font-size: 0.85rem; }
+
+.layouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 560px) { .layouts { grid-template-columns: 1fr; } }
+.layoutOption strong { font-size: 0.95rem; }
+.layoutOption span { color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+
+.logoRow { display: flex; align-items: center; gap: 10px; }
+.logoRow input[type="file"] { padding: 10px; font-size: 0.9rem; }
+.logoRow input[type="file"]::file-selector-button {
+  font: inherit; font-weight: 700; border: 0; border-radius: 999px; padding: 7px 14px; margin-right: 12px;
+  background: var(--text); color: #0a0a0b; cursor: pointer;
+}
+.check { display: flex !important; align-items: center; gap: 10px; margin: 12px 0 0 !important; color: var(--text) !important; cursor: pointer; }
+.check input { width: 18px !important; height: 18px; accent-color: var(--green); }
+.fieldHint { color: var(--muted); font-size: 0.82rem; margin: 8px 0 0; }
+.fieldError { color: #fca5a5; font-size: 0.85rem; margin: 8px 0 0; }
+
+.orderSummary {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  padding: 22px; border-radius: 20px; background: var(--raised); border: 1px solid var(--line-strong);
+}
+.orderSummary strong { font-size: 1.6rem; letter-spacing: -0.03em; }
+.orderSummary span { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.orderDone { max-width: 640px; display: grid; gap: 12px; padding: 32px; }
+.orderDone h2 { font-size: 1.8rem; margin: 0; }
+.orderDone p { margin: 0; color: var(--steel); }
+.orderDone .btn { justify-self: start; }
+.doneCards { max-width: 360px; margin: 8px 0; }
+.doneCards svg { width: 100%; height: auto; display: block; }
+
 /* Legal and notice pages */
 .legal { padding: 72px 0 112px; line-height: 1.7; }
 .legal h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin: 0 0 8px; }
