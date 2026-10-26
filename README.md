@@ -62,6 +62,8 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 
 1. ✅ Foundations: Next.js app, V1 pages ported, database schema and seed
 2. ✅ Card links (`/C/<ID>`) with tap counting; profiles and vCards read from the database
+   - ✅ Pay me on profiles (Revolut, PayPal, Monzo, card link, UK/IE bank details)
+   - ✅ Card designer at `/design`: black, silver, gold, rose gold; name, title, logo, layout, back line; orders saved to `card_orders`, logos to the private `card-logos` bucket
 3. Batch command: generate card IDs + claim codes, supplier CSV
 4. Claim flow and logins
 5. Customer dashboard
