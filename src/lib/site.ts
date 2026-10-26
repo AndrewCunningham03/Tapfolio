@@ -6,15 +6,18 @@ export const CONTACT_EMAIL = "hello@tapfolio.co.uk";
 
 export type Currency = "GBP" | "EUR";
 
-// Suggested prices (GBP is the home currency; EUR are rounded equivalents).
-// Consumer prices must include VAT once registered, so confirm both against
-// supplier quotes and VAT before launch.
+// One product: a metal card bought once, then a monthly subscription that
+// keeps the profile live. EUR prices are rounded equivalents. Consumer prices
+// must include VAT once registered.
 export const PRICES = {
-  GBP: { standard: 29, platinum: 69, proMonthly: 4, proYearly: 39, teamCard: 22, teamSeatMonthly: 3 },
-  EUR: { standard: 35, platinum: 79, proMonthly: 5, proYearly: 45, teamCard: 25, teamSeatMonthly: 3.5 },
+  GBP: { card: 25, monthly: 10 },
+  EUR: { card: 29, monthly: 12 },
 } as const satisfies Record<Currency, Record<string, number>>;
 
 export type PriceKey = keyof (typeof PRICES)["GBP"];
+
+/** Days a card keeps working after a failed payment, before it pauses. */
+export const GRACE_DAYS = 14;
 
 export function formatPrice(amount: number, currency: Currency): string {
   return new Intl.NumberFormat(currency === "EUR" ? "en-IE" : "en-GB", {

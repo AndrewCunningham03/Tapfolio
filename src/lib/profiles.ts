@@ -6,6 +6,17 @@ export type SocialNetwork = "facebook" | "instagram" | "linkedin" | "tiktok" | "
 
 export type Socials = Partial<Record<SocialNetwork, string>>;
 
+export type PayMethod = "revolut" | "paypal" | "monzo" | "card";
+export type PayLinks = Partial<Record<PayMethod, string>>;
+
+export type BankDetails = {
+  accountName?: string;
+  sortCode?: string; // formatted 12-34-56
+  accountNumber?: string;
+  iban?: string; // formatted in groups of four
+  bic?: string;
+};
+
 // A profile as the public page sees it. Fields the owner has hidden are
 // already removed by the time a Profile reaches the page or the vCard.
 export type Profile = {
@@ -23,6 +34,8 @@ export type Profile = {
   postcode?: string;
   country?: string;
   socials: Socials;
+  payLinks: PayLinks;
+  bank?: BankDetails;
   photoUrl?: string;
   plan: "free" | "pro";
 };
@@ -42,13 +55,15 @@ type ProfileRow = {
   postcode: string | null;
   country: string | null;
   socials: Record<string, unknown> | null;
+  pay_links: Record<string, unknown> | null;
+  bank: Record<string, unknown> | null;
   photo_path: string | null;
   hidden_fields: string[];
   plan: "free" | "pro";
 };
 
 const PROFILE_COLUMNS =
-  "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, photo_path, hidden_fields, plan";
+  "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, pay_links, bank, photo_path, hidden_fields, plan";
 
 const SOCIAL_NETWORKS: SocialNetwork[] = ["facebook", "instagram", "linkedin", "tiktok", "x", "whatsapp"];
 
@@ -65,6 +80,45 @@ export function safeUrl(value: unknown): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+// Named pay links must point at that service, so a profile can't dress up
+// another site as "Revolut". The card link may be any https payment page.
+const PAY_HOSTS: Record<Exclude<PayMethod, "card">, RegExp> = {
+  revolut: /^(www\.)?revolut\.me$/,
+  paypal: /^(www\.)?paypal\.(me|com)$/,
+  monzo: /^(www\.)?monzo\.me$/,
+};
+
+function payLinks(raw: Record<string, unknown> | null): PayLinks {
+  const links: PayLinks = {};
+  for (const method of ["revolut", "paypal", "monzo", "card"] as const) {
+    const url = safeUrl(raw?.[method]);
+    if (!url || !url.startsWith("https:")) continue;
+    if (method !== "card" && !PAY_HOSTS[method].test(new URL(url).hostname)) continue;
+    links[method] = url;
+  }
+  return links;
+}
+
+function text(value: unknown, max: number): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim().slice(0, max) : undefined;
+}
+
+function bankDetails(raw: Record<string, unknown> | null): BankDetails | undefined {
+  const digits = (v: unknown) => (typeof v === "string" ? v.replace(/\D/g, "") : "");
+  const sort = digits(raw?.sort_code);
+  const account = digits(raw?.account_number);
+  const iban = typeof raw?.iban === "string" ? raw.iban.replace(/\s/g, "").toUpperCase() : "";
+  const details: BankDetails = {
+    accountName: text(raw?.account_name, 70),
+    sortCode: sort.length === 6 ? sort.replace(/(\d{2})(\d{2})(\d{2})/, "$1-$2-$3") : undefined,
+    accountNumber: account.length === 8 ? account : undefined,
+    iban: /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(iban) ? iban.replace(/(.{4})(?=.)/g, "$1 ") : undefined,
+    bic: text(raw?.bic, 11)?.toUpperCase(),
+  };
+  const usable = (details.sortCode && details.accountNumber) || details.iban;
+  return usable ? details : undefined;
 }
 
 function photoUrl(path: string | null): string | undefined {
@@ -98,6 +152,8 @@ function toProfile(row: ProfileRow): Profile {
     postcode: show("postcode"),
     country: show("country"),
     socials,
+    payLinks: payLinks(row.pay_links),
+    bank: bankDetails(row.bank),
     photoUrl: photoUrl(row.photo_path),
     plan: row.plan,
   };
