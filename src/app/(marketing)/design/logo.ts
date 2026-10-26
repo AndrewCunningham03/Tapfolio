@@ -16,6 +16,23 @@ function readImage(file: File): Promise<HTMLImageElement> {
   });
 }
 
+/** A stored logo (e.g. a signed Supabase Storage URL), as a canvas. */
+export function loadLogoFromUrl(url: string): Promise<HTMLCanvasElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // so the canvas can be read back for the mask
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      canvas.getContext("2d")!.drawImage(img, 0, 0);
+      resolve(canvas);
+    };
+    img.onerror = () => reject(new Error("Could not load the logo."));
+    img.src = url;
+  });
+}
+
 /** The logo scaled down to at most MAX_SIDE, as a canvas. */
 export async function loadLogo(file: File): Promise<HTMLCanvasElement> {
   if (!ACCEPTED_TYPES.includes(file.type)) throw new Error("Please upload a PNG, JPG or WebP image.");

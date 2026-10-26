@@ -326,6 +326,50 @@
 .doneCards { max-width: 360px; margin: 8px 0; }
 .doneCards svg { width: 100%; height: auto; display: block; }
 
+/* Sign in -------------------------------------------------------------------- */
+.loginForm { grid-template-columns: 1fr; max-width: 460px; margin-top: 28px; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Admin ---------------------------------------------------------------------- */
+.adminPage { padding-top: 48px; padding-bottom: 96px; }
+.adminHead { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+.adminHead h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin: 0; letter-spacing: -0.03em; }
+.adminCounts { color: var(--muted); margin: 12px 0 28px; }
+.adminList { display: grid; gap: 16px; }
+.orderRow {
+  display: grid; grid-template-columns: 300px 1fr; gap: 28px; padding: 22px;
+  border: 1px solid var(--line-strong); border-radius: 20px; background: var(--raised);
+}
+@media (max-width: 820px) { .orderRow { grid-template-columns: 1fr; } }
+.orderPreview { display: grid; gap: 10px; align-content: start; }
+.orderPreview svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5)); }
+.orderTitle { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.orderTitle h2 { font-size: 1.25rem; margin: 0; letter-spacing: -0.01em; }
+.statusPill { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: var(--steel); }
+.statusPill[data-status="paid"], .statusPill[data-status="in_production"] { background: rgba(250, 204, 21, 0.14); color: var(--yellow); }
+.statusPill[data-status="shipped"] { background: rgba(31, 157, 85, 0.18); color: #6fdc9c; }
+.statusPill[data-status="cancelled"] { background: rgba(239, 68, 68, 0.14); color: #fca5a5; }
+.orderFacts { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 20px; margin: 16px 0; }
+.orderFacts dt { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+.orderFacts dd { margin: 2px 0 0; font-size: 0.95rem; word-break: break-word; }
+.orderFacts a { color: var(--steel); }
+.orderMessage { grid-column: 1 / -1; }
+.adminActions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.adminActions select {
+  padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: inherit; font-weight: 700; font-size: 0.9rem;
+}
+.adminOk { color: #6fdc9c; font-size: 0.88rem; margin: 10px 0 0; }
+
+/* Customer dashboard ----------------------------------------------------------- */
+.statRow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0; }
+@media (max-width: 760px) { .statRow { grid-template-columns: 1fr 1fr; } }
+.statRow div { padding: 18px; border: 1px solid var(--line-strong); border-radius: 18px; background: var(--raised); }
+.statRow strong { display: block; font-size: 2rem; letter-spacing: -0.03em; line-height: 1.1; }
+.statRow span { color: var(--muted); font-size: 0.85rem; }
+.checkGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 4px 16px; margin-top: 8px; }
+.checkGrid .check { margin: 6px 0 0 !important; }
+.saveTitle { font-size: 1.1rem !important; letter-spacing: 0 !important; }
+
 /* Legal and notice pages */
 .legal { padding: 72px 0 112px; line-height: 1.7; }
 .legal h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin: 0 0 8px; }

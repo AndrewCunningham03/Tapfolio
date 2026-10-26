@@ -4,6 +4,13 @@ export const SITE_NAME = "Tapfolio";
 // TODO: replace with a mailbox you own once the domain is registered
 export const CONTACT_EMAIL = "hello@tapfolio.co.uk";
 
+/**
+ * What every card's chip and QR code open. Always the live domain, whatever
+ * site is running, because it is engraved into the card for good. Upper case
+ * keeps the QR code small.
+ */
+export const CARD_URL_BASE = "HTTPS://TAPFOLIO.CO.UK/C/";
+
 export type Currency = "GBP" | "EUR";
 
 // One product: a personalised metal card bought once, then a monthly

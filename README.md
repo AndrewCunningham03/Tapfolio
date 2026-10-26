@@ -64,8 +64,14 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 2. ✅ Card links (`/C/<ID>`) with tap counting; profiles and vCards read from the database
    - ✅ Pay me on profiles (Revolut, PayPal, Monzo, card link, UK/IE bank details)
    - ✅ Card designer at `/design`: black, silver, gold, rose gold; name, title, logo, layout, back line; orders saved to `card_orders`, logos to the private `card-logos` bucket
-3. Batch command: generate card IDs + claim codes, supplier CSV
-4. Claim flow and logins
-5. Customer dashboard
-6. Admin: batch QA, disable/reassign cards, tap counts
-7. Stripe for Pro, then launch on the real domain
+3. Batch command: generate card IDs + claim codes, supplier CSV (only needed for blank stock; designed cards get their code when the order is turned into a card)
+4. ✅ Sign-in: email link (`/login`), no public sign-up; accounts are created from the admin page
+5. ✅ Customer dashboard (`/dashboard`): edit profile, Pay me, socials, hidden fields, profile address; tap counts; "Edit my card" on their own profile
+6. ✅ Admin (`/admin`, emails in `ADMIN_EMAILS`): orders with design preview, status, "Create card + account", engraving SVGs with the real QR code
+   - To do: disable/reassign cards, photo uploads
+7. Stripe for the card + £10/month subscription (grace period, then pause), then launch on the real domain
+
+## Accounts and email
+
+- Sign-in emails come from Supabase's built-in sender, which (on the free plan) only delivers to members of your Supabase organisation and can't use a custom template. Before real customers sign in, connect an SMTP provider such as Resend (Supabase → Authentication → Emails → SMTP), then enable the 6-digit code template in `supabase/templates/magic_link.html` via `supabase/config.toml`.
+- Auth settings live in `supabase/config.toml`; apply them with `supabase config push`.
