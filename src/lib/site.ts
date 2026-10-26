@@ -6,12 +6,13 @@ export const CONTACT_EMAIL = "hello@tapfolio.co.uk";
 
 export type Currency = "GBP" | "EUR";
 
-// One product: a metal card bought once, then a monthly subscription that
-// keeps the profile live. EUR prices are rounded equivalents. Consumer prices
-// must include VAT once registered.
+// One product: a personalised metal card bought once, then a monthly
+// subscription that keeps the profile live. Black and silver cost `card`;
+// gold and rose gold cost `goldCard`. EUR prices are rounded equivalents.
+// Consumer prices must include VAT once registered.
 export const PRICES = {
-  GBP: { card: 25, monthly: 10 },
-  EUR: { card: 29, monthly: 12 },
+  GBP: { card: 25, goldCard: 35, monthly: 10 },
+  EUR: { card: 29, goldCard: 39, monthly: 12 },
 } as const satisfies Record<Currency, Record<string, number>>;
 
 export type PriceKey = keyof (typeof PRICES)["GBP"];
