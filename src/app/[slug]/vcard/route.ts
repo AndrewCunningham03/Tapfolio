@@ -1,5 +1,6 @@
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { getProfileBySlug } from "@/lib/profiles";
+import { recordTap } from "@/lib/taps";
 import { buildVCard, vCardFilename } from "@/lib/vcard";
 
 // Generated from the same record as the profile page, so the two never disagree.
@@ -7,6 +8,9 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/[slug]/vcard">) 
   const { slug } = await ctx.params;
   const profile = await getProfileBySlug(slug);
   if (!profile) return new Response("Not found", { status: 404 });
+
+  const userAgent = req.headers.get("user-agent");
+  after(() => recordTap({ userAgent, source: "vcard", profileId: profile.id }));
 
   const profileUrl = `${req.nextUrl.origin}/${profile.slug}`;
   return new Response(buildVCard(profile, profileUrl), {
