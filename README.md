@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tapfolio
 
-## Getting Started
+NFC + QR business cards. Each card opens a profile page with a **Save contact** button; customers edit their details online and the card never needs reprogramming.
 
-First, run the development server:
+## How card links work
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Every card is encoded with a permanent random ID, never a name:
+
+```
+HTTPS://TAPFOLIO.CO.UK/C/7KQ2XMP   (chip + printed QR)
+        │
+        ├─ unclaimed  → activation page (needs the one-time claim code from the insert)
+        ├─ active     → 302 redirect to the profile, e.g. /john-smith
+        └─ disabled   → "card deactivated" page
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The profile address (`/john-smith`) can change without breaking any card. Lost cards can be disabled and cards reassigned.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16** (App Router, Cache Components) on **Vercel**
+- **Supabase**: Postgres, logins, photo storage
+- **Stripe Billing** for Pro (later milestone)
 
-## Learn More
+## Getting started
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+cp .env.example .env.local   # then fill in the Supabase values
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open http://localhost:3000. The landing page and the example profile at `/john-smith` work before Supabase is configured; the order form needs it.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Hosting regions
 
-## Deploy on Vercel
+The business is based in Northern Ireland and serves the UK and Ireland. Create the Supabase project in **West EU (London)**; `vercel.json` pins the server functions to London (`lhr1`) so every request stays close to the database.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Database
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Schema lives in `supabase/migrations/`, demo data in `supabase/seed.sql`. To apply them to your Supabase project:
+
+```bash
+supabase login
+supabase link --project-ref <your-project-ref>
+supabase db push --include-seed
+```
+
+Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (unclaimed, claim code `TEST-K3YS-2026`).
+
+## Project layout
+
+| Path | What |
+|---|---|
+| `src/app/(marketing)/` | Landing page, order form, privacy policy |
+| `src/app/[slug]/` | Public profile page and `/<slug>/vcard` contact download |
+| `src/lib/` | Profiles, vCard builder, card ID / claim code helpers, slug rules |
+| `supabase/` | Migrations and seed data |
+| `design/cards/` | Card artwork generator, print files and supplier spec (`cd design/cards && npm install && npm run build`) |
+
+## Milestones
+
+1. ✅ Foundations: Next.js app, V1 pages ported, database schema and seed
+2. Card links (`/C/<ID>`) and profiles read from the database
+3. Batch command: generate card IDs + claim codes, supplier CSV
+4. Claim flow and logins
+5. Customer dashboard
+6. Admin: batch QA, disable/reassign cards, tap counts
+7. Stripe for Pro, then launch on the real domain
