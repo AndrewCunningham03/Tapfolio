@@ -30,7 +30,7 @@ cp .env.example .env.local   # then fill in the Supabase values
 npm run dev
 ```
 
-Open http://localhost:3000. The landing page and the example profile at `/john-smith` work before Supabase is configured; the order form needs it.
+Open http://localhost:3000. The landing page works on its own; profiles, card links and the order form need Supabase configured.
 
 ### Hosting regions
 
@@ -61,7 +61,7 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 ## Milestones
 
 1. ✅ Foundations: Next.js app, V1 pages ported, database schema and seed
-2. Card links (`/C/<ID>`) and profiles read from the database
+2. ✅ Card links (`/C/<ID>`) with tap counting; profiles and vCards read from the database
 3. Batch command: generate card IDs + claim codes, supplier CSV
 4. Claim flow and logins
 5. Customer dashboard
