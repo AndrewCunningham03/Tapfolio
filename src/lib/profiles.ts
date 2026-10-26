@@ -2,6 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { PAY_METHODS, SOCIAL_NETWORKS, type HideableField, type PayMethod, type SocialNetwork } from "./profile-fields";
 import { getAdminClient } from "./supabase/admin";
+import { normaliseTheme, type ThemeChoice } from "./themes";
 
 export type { PayMethod, SocialNetwork } from "./profile-fields";
 
@@ -36,8 +37,13 @@ export type Profile = {
   payLinks: PayLinks;
   bank?: BankDetails;
   photoUrl?: string;
+  coverUrl?: string;
+  theme: ThemeChoice;
+  media: MediaItem[];
   plan: "free" | "pro";
 };
+
+export type MediaItem = { id: number; kind: "photo" | "video"; url: string; width: number | null; height: number | null };
 
 /** A profiles table row, as stored. */
 export type ProfileRow = {
@@ -58,12 +64,14 @@ export type ProfileRow = {
   pay_links: Record<string, unknown> | null;
   bank: Record<string, unknown> | null;
   photo_path: string | null;
+  cover_path: string | null;
+  theme: Record<string, unknown> | null;
   hidden_fields: string[];
   plan: "free" | "pro";
 };
 
 export const PROFILE_COLUMNS =
-  "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, pay_links, bank, photo_path, hidden_fields, plan";
+  "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, pay_links, bank, photo_path, cover_path, theme, hidden_fields, plan";
 
 /** Only allow http(s) links, so a profile can never carry a javascript: or data: URL. */
 export function safeUrl(value: unknown): string | undefined {
@@ -142,13 +150,18 @@ export function cleanBankForSave(raw: Record<string, string>): { bank: Record<st
   return { bank };
 }
 
-function photoUrl(path: string | null): string | undefined {
+export const MEDIA_BUCKET = "profile-media";
+
+/** Public URL of a file in the profile-media bucket. */
+export function mediaUrl(path: string | null): string | undefined {
   if (!path) return undefined;
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return base ? `${base}/storage/v1/object/public/profile-photos/${encodeURI(path)}` : undefined;
+  return base ? `${base}/storage/v1/object/public/${MEDIA_BUCKET}/${encodeURI(path)}` : undefined;
 }
 
-function toProfile(row: ProfileRow): Profile {
+type MediaRow = { id: number; kind: "photo" | "video"; path: string; width: number | null; height: number | null };
+
+function toProfile(row: ProfileRow, media: MediaRow[]): Profile {
   const hidden = new Set(row.hidden_fields);
   const show = (field: HideableField) => (hidden.has(field) ? undefined : row[field] || undefined);
 
@@ -175,7 +188,10 @@ function toProfile(row: ProfileRow): Profile {
     socials,
     payLinks: cleanPayLinks(row.pay_links),
     bank: bankDetails(row.bank),
-    photoUrl: photoUrl(row.photo_path),
+    photoUrl: mediaUrl(row.photo_path),
+    coverUrl: mediaUrl(row.cover_path),
+    theme: normaliseTheme(row.theme),
+    media: media.map((m) => ({ id: m.id, kind: m.kind, url: mediaUrl(m.path)!, width: m.width, height: m.height })),
     plan: row.plan,
   };
 }
@@ -198,7 +214,16 @@ export async function getProfileBySlug(slug: string): Promise<Profile | null> {
 
   const { data, error } = await db.from("profiles").select(PROFILE_COLUMNS).eq("slug", normalised).maybeSingle<ProfileRow>();
   if (error) throw new Error(`Could not load profile: ${error.message}`);
-  return data ? toProfile(data) : null;
+  if (!data) return null;
+
+  const { data: media } = await db
+    .from("profile_media")
+    .select("id, kind, path, width, height")
+    .eq("profile_id", data.id)
+    .order("position")
+    .order("id")
+    .returns<MediaRow[]>();
+  return toProfile(data, media ?? []);
 }
 
 export function formatAddress(p: Profile): string | undefined {
