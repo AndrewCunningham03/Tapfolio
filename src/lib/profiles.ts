@@ -1,12 +1,11 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
+import { PAY_METHODS, SOCIAL_NETWORKS, type HideableField, type PayMethod, type SocialNetwork } from "./profile-fields";
 import { getAdminClient } from "./supabase/admin";
 
-export type SocialNetwork = "facebook" | "instagram" | "linkedin" | "tiktok" | "x" | "whatsapp";
+export type { PayMethod, SocialNetwork } from "./profile-fields";
 
 export type Socials = Partial<Record<SocialNetwork, string>>;
-
-export type PayMethod = "revolut" | "paypal" | "monzo" | "card";
 export type PayLinks = Partial<Record<PayMethod, string>>;
 
 export type BankDetails = {
@@ -40,7 +39,8 @@ export type Profile = {
   plan: "free" | "pro";
 };
 
-type ProfileRow = {
+/** A profiles table row, as stored. */
+export type ProfileRow = {
   id: string;
   slug: string;
   full_name: string;
@@ -62,14 +62,8 @@ type ProfileRow = {
   plan: "free" | "pro";
 };
 
-const PROFILE_COLUMNS =
+export const PROFILE_COLUMNS =
   "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, pay_links, bank, photo_path, hidden_fields, plan";
-
-const SOCIAL_NETWORKS: SocialNetwork[] = ["facebook", "instagram", "linkedin", "tiktok", "x", "whatsapp"];
-
-// Fields an owner may hide from their public page (names match hidden_fields values).
-type HideableField =
-  | "job_title" | "organisation" | "about" | "phone" | "email" | "website" | "street" | "city" | "postcode" | "country";
 
 /** Only allow http(s) links, so a profile can never carry a javascript: or data: URL. */
 export function safeUrl(value: unknown): string | undefined {
@@ -90,9 +84,10 @@ const PAY_HOSTS: Record<Exclude<PayMethod, "card">, RegExp> = {
   monzo: /^(www\.)?monzo\.me$/,
 };
 
-function payLinks(raw: Record<string, unknown> | null): PayLinks {
+/** Valid pay links only (also used to clean what an owner saves). */
+export function cleanPayLinks(raw: Record<string, unknown> | null): PayLinks {
   const links: PayLinks = {};
-  for (const method of ["revolut", "paypal", "monzo", "card"] as const) {
+  for (const method of PAY_METHODS) {
     const url = safeUrl(raw?.[method]);
     if (!url || !url.startsWith("https:")) continue;
     if (method !== "card" && !PAY_HOSTS[method].test(new URL(url).hostname)) continue;
@@ -119,6 +114,32 @@ function bankDetails(raw: Record<string, unknown> | null): BankDetails | undefin
   };
   const usable = (details.sortCode && details.accountNumber) || details.iban;
   return usable ? details : undefined;
+}
+
+/**
+ * Bank details as stored: digits only for UK numbers, IBAN without spaces.
+ * Returns a message instead when something the owner typed isn't valid.
+ */
+export function cleanBankForSave(raw: Record<string, string>): { bank: Record<string, string> } | { error: string } {
+  const digits = (v = "") => v.replace(/\D/g, "");
+  const sort = digits(raw.sort_code);
+  const account = digits(raw.account_number);
+  const iban = (raw.iban ?? "").replace(/\s/g, "").toUpperCase();
+  const bic = (raw.bic ?? "").replace(/\s/g, "").toUpperCase();
+  if (sort && sort.length !== 6) return { error: "A UK sort code has 6 digits." };
+  if (account && account.length !== 8) return { error: "A UK account number has 8 digits." };
+  if (Boolean(sort) !== Boolean(account)) return { error: "Add both the sort code and the account number, or neither." };
+  if (iban && !/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(iban)) return { error: "That IBAN doesn't look right." };
+  if (bic && !/^[A-Z0-9]{8}([A-Z0-9]{3})?$/.test(bic)) return { error: "A BIC has 8 or 11 letters and numbers." };
+
+  const bank: Record<string, string> = {};
+  const name = (raw.account_name ?? "").trim().slice(0, 70);
+  if (name) bank.account_name = name;
+  if (sort) bank.sort_code = sort;
+  if (account) bank.account_number = account;
+  if (iban) bank.iban = iban;
+  if (bic) bank.bic = bic;
+  return { bank };
 }
 
 function photoUrl(path: string | null): string | undefined {
@@ -152,7 +173,7 @@ function toProfile(row: ProfileRow): Profile {
     postcode: show("postcode"),
     country: show("country"),
     socials,
-    payLinks: payLinks(row.pay_links),
+    payLinks: cleanPayLinks(row.pay_links),
     bank: bankDetails(row.bank),
     photoUrl: photoUrl(row.photo_path),
     plan: row.plan,

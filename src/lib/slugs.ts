@@ -14,6 +14,7 @@ export function slugify(text: string): string {
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
+    .replace(/['’]/g, "") // "Mary's" → "marys", not "mary-s"
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 40)
