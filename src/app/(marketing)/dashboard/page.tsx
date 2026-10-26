@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { isAdmin, requireUser } from "@/lib/auth";
-import { PROFILE_COLUMNS, type ProfileRow } from "@/lib/profiles";
+import { mediaUrl, PROFILE_COLUMNS, type ProfileRow } from "@/lib/profiles";
+import { normaliseTheme } from "@/lib/themes";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { getServerClient } from "@/lib/supabase/server";
+import { PageDesigner, type DesignerMedia } from "./page-designer";
 import { ProfileEditor } from "./profile-editor";
 import styles from "../marketing.module.css";
 
@@ -57,6 +59,20 @@ async function tapCounts(profileId: string) {
   return { taps, recentTaps, saves };
 }
 
+/** The customer's gallery. Only called with a profile id that row-level security already returned to them. */
+async function galleryFor(profileId: string): Promise<DesignerMedia[]> {
+  const db = getAdminClient();
+  if (!db) return [];
+  const { data } = await db
+    .from("profile_media")
+    .select("id, kind, path")
+    .eq("profile_id", profileId)
+    .order("position")
+    .order("id")
+    .returns<{ id: number; kind: "photo" | "video"; path: string }[]>();
+  return (data ?? []).map((m) => ({ id: m.id, kind: m.kind, url: mediaUrl(m.path)! }));
+}
+
 async function Dashboard() {
   await connection(); // always per request: private, live data
   const user = await requireUser("/dashboard");
@@ -77,9 +93,10 @@ async function Dashboard() {
     );
   }
 
-  const [{ data: cards }, stats] = await Promise.all([
+  const [{ data: cards }, stats, media] = await Promise.all([
     supabase.from("cards").select("id, status").eq("profile_id", profile.id).returns<{ id: string; status: string }[]>(),
     tapCounts(profile.id),
+    galleryFor(profile.id),
   ]);
 
   return (
@@ -99,6 +116,15 @@ async function Dashboard() {
           </div>
         </div>
       )}
+      <h2 className={styles.dashSectionTitle}>Design your page</h2>
+      <PageDesigner
+        theme={normaliseTheme(profile.theme)}
+        photoUrl={mediaUrl(profile.photo_path)}
+        coverUrl={mediaUrl(profile.cover_path)}
+        media={media}
+        name={profile.full_name}
+      />
+      <h2 className={styles.dashSectionTitle}>Your details</h2>
       <ProfileEditor
         profile={{
           id: profile.id,
