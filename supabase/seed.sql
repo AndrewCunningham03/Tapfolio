@@ -18,6 +18,12 @@ values (
   '{"facebook": "https://www.facebook.com/", "instagram": "https://www.instagram.com/", "linkedin": "https://www.linkedin.com/", "whatsapp": "https://wa.me/447700900123"}'
 );
 
+-- Demo "Pay me" details (fake: the IBAN is the standard documentation example).
+update public.profiles set
+  pay_links = '{"revolut": "https://revolut.me/johnsmith-demo", "card": "https://pay.sumup.com/b2c/QDEMO1234"}',
+  bank = '{"account_name": "J Smith Plumbing Ltd", "sort_code": "000000", "account_number": "12345678", "iban": "IE29AIBK93115212345678", "bic": "AIBKIE2D"}'
+where slug = 'john-smith';
+
 insert into public.batches (label, supplier, tier, quantity, notes)
 values ('Demo batch', 'none', 'standard', 2, 'Seed data for local testing');
 

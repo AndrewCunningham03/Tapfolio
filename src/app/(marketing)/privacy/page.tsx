@@ -40,8 +40,9 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Your account and profile:</strong> your login email, and the details you choose to publish on your
-          card&apos;s profile page, such as your name, job title, phone, email, website, address, social links and
-          photo or logo.
+          card&apos;s profile page, such as your name, job title, phone, email, website, address, social links,
+          photo or logo, and any payment links or bank details you add so customers can pay you. We never take or
+          handle payments ourselves.
         </li>
         <li>
           <strong>Card taps:</strong> when someone taps or scans a card we record the time and the type of device
