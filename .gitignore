@@ -42,3 +42,6 @@ next-env.d.ts
 
 # keep the template that documents required env vars
 !.env.example
+
+# local Claude Code launch config
+/.claude/
