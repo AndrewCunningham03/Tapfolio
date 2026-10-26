@@ -1,45 +1,46 @@
-/* Light profile theme: readable on any phone, green dominant, yellow sparingly. */
+/* Public profile page. Every colour comes from the owner's chosen theme
+   (src/lib/themes.ts), set as custom properties on .shell; these defaults are
+   the Classic theme, used while the page loads. */
 .shell {
   --bg: #f4f7f5;
   --card: #ffffff;
-  --green: #1f9d55;
-  --green-strong: #178046; /* text and white-on-green: meets WCAG AA 4.5:1 */
-  --green-dark: #146b3a;
-  --green-soft: #e6f4ec;
-  --text: #0b1f17;
-  --muted: #5b6b63;
-  --line: #e1e8e4;
-  --yellow: #facc15;
+  --text: #121614;
+  --muted: #5f6662;
+  --line: #e3e6e4;
+  --soft: #eef1ef;
+  --accent: #178046;
+  --accent-text: #ffffff;
+  --accent-soft: #dcefe4;
+  --banner-to: #0f532e;
 
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
-  color-scheme: light;
 }
-.shell a:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.shell a:focus-visible, .shell button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-.page { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--card); box-shadow: 0 0 40px rgba(11, 31, 23, 0.06); }
+.page { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--card); box-shadow: 0 0 40px rgba(0, 0, 0, 0.08); }
 
-.banner { height: 120px; background: linear-gradient(135deg, var(--green), var(--green-dark)); position: relative; }
-.banner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--yellow); opacity: 0.9; }
+.banner { height: 132px; background: linear-gradient(135deg, var(--accent), var(--banner-to)); position: relative; overflow: hidden; }
+.banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .avatar {
   width: 112px; height: 112px; border-radius: 50%; margin: -56px auto 0; position: relative; z-index: 1;
-  background: var(--green-soft); border: 4px solid var(--card); display: grid; place-items: center;
-  font-size: 2.4rem; font-weight: 800; color: var(--green); overflow: hidden;
+  background: var(--accent-soft); border: 4px solid var(--card); display: grid; place-items: center;
+  font-size: 2.4rem; font-weight: 800; color: var(--text); overflow: hidden;
 }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .intro { text-align: center; padding: 14px 24px 8px; }
 .intro h1 { margin: 0; font-size: 1.6rem; letter-spacing: -0.02em; }
 .role { color: var(--muted); margin: 2px 0 0; }
-.org { color: var(--green-strong); font-weight: 700; margin: 2px 0 0; }
+.org { font-weight: 700; margin: 2px 0 0; }
 
 .save {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   margin: 20px 24px 8px; padding: 16px; border-radius: 14px;
-  background: var(--green-strong); color: #fff; font-weight: 700; font-size: 1.1rem; text-decoration: none;
-  box-shadow: 0 6px 18px rgba(23, 128, 70, 0.35);
+  background: var(--accent); color: var(--accent-text); font-weight: 700; font-size: 1.1rem; text-decoration: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 .save:active { transform: translateY(1px); }
 .save svg { width: 22px; height: 22px; }
@@ -47,7 +48,7 @@
 .quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; padding: 12px 24px 4px; }
 .quick a {
   display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px;
-  border-radius: 12px; background: var(--green-soft); color: var(--green-dark); text-decoration: none; font-size: 0.8rem; font-weight: 600;
+  border-radius: 12px; background: var(--soft); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 600;
 }
 .quick svg { width: 22px; height: 22px; }
 
@@ -55,13 +56,13 @@
 
 /* Pay me */
 .pay { margin: 20px 24px 4px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; }
-.pay h2 { margin: 0 0 12px; font-size: 1.05rem; letter-spacing: -0.01em; }
+.pay h2, .gallery h2 { margin: 0 0 12px; font-size: 1.05rem; letter-spacing: -0.01em; }
 .payLinks { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
 .payLinks a {
   display: block; text-align: center; padding: 12px 10px; border-radius: 12px; text-decoration: none;
-  font-weight: 700; color: var(--text); background: var(--bg); border: 1px solid var(--line);
+  font-weight: 700; color: var(--text); background: var(--soft); border: 1px solid var(--line);
 }
-.payLinks a.payPrimary { background: var(--text); color: #fff; border-color: var(--text); }
+.payLinks a.payPrimary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 .bank { margin: 14px 0 0; padding: 0; }
 .bank div { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; padding: 9px 0; border-top: 1px solid var(--line); }
 .bank div:first-child { border-top: 0; }
@@ -69,16 +70,25 @@
 /* Long values (an IBAN) drop onto their own line instead of breaking mid-group. */
 .bank dd { margin: 0 0 0 auto; display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 .copy {
-  flex: none; border: 1px solid var(--line); background: var(--card); color: var(--green-strong);
+  flex: none; border: 1px solid var(--line); background: var(--card); color: var(--text);
   font: inherit; font-size: 0.75rem; font-weight: 700; padding: 4px 9px; border-radius: 999px; cursor: pointer;
 }
-.copy:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 .payNote { margin: 12px 0 0; font-size: 0.75rem; color: var(--muted); }
+
+/* Photos and videos */
+.gallery { margin: 20px 24px 4px; }
+.galleryGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.galleryGrid > * { border-radius: 12px; overflow: hidden; background: var(--soft); aspect-ratio: 1; }
+.galleryGrid a, .galleryGrid img { display: block; width: 100%; height: 100%; }
+.galleryGrid img { object-fit: cover; }
+.galleryGrid video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
+/* Videos play best full width. */
+.galleryGrid .wide { grid-column: 1 / -1; aspect-ratio: 16 / 10; }
 
 .details { list-style: none; margin: 16px 24px; padding: 0; border-top: 1px solid var(--line); }
 .details li { border-bottom: 1px solid var(--line); }
 .details a { display: flex; gap: 14px; align-items: center; padding: 14px 4px; color: var(--text); text-decoration: none; }
-.ico { flex: none; width: 38px; height: 38px; border-radius: 10px; background: var(--green-soft); color: var(--green); display: grid; place-items: center; }
+.ico { flex: none; width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--text); display: grid; place-items: center; }
 .ico svg { width: 18px; height: 18px; }
 .details small { display: block; color: var(--muted); font-size: 0.78rem; }
 .details span { word-break: break-word; }
@@ -88,13 +98,13 @@
 .socials svg { width: 20px; height: 20px; }
 
 .footer { text-align: center; padding: 16px 24px 28px; font-size: 0.8rem; color: var(--muted); }
-.footer a { color: var(--green-strong); font-weight: 700; text-decoration: none; }
+.footer a { color: var(--text); font-weight: 700; text-decoration: none; }
 
-.skeleton { height: 60vh; }
+.skeleton { min-height: 100vh; background: var(--bg); }
 
 /* Only the signed-in owner sees this. */
 .ownerBar {
   position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 10;
-  padding: 12px 22px; border-radius: 999px; background: var(--text); color: #fff; font-weight: 700;
-  text-decoration: none; box-shadow: 0 10px 30px rgba(11, 31, 23, 0.35);
+  padding: 12px 22px; border-radius: 999px; background: var(--text); color: var(--card); font-weight: 700;
+  text-decoration: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
