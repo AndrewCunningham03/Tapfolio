@@ -67,8 +67,9 @@ create trigger profiles_set_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
 
+-- security definer: customers have no access to reserved_slugs themselves.
 create function public.profiles_check_reserved_slug() returns trigger
-language plpgsql as $$
+language plpgsql security definer set search_path = '' as $$
 begin
   if exists (select 1 from public.reserved_slugs r where r.slug = new.slug) then
     raise exception 'The address "%" is reserved', new.slug using errcode = 'check_violation';
@@ -192,12 +193,6 @@ create policy "Owners can update their profiles"
   using (user_id = (select auth.uid()))
   with check (user_id = (select auth.uid()));
 
--- Customers may edit content fields only, never ownership or plan.
-revoke update on public.profiles from authenticated;
-grant update (slug, full_name, job_title, organisation, about, phone, email, website,
-              street, city, postcode, country, socials, photo_path, hidden_fields)
-  on public.profiles to authenticated;
-
 create policy "Owners can read their cards"
   on public.cards for select to authenticated
   using (profile_id in (select p.id from public.profiles p where p.user_id = (select auth.uid())));
@@ -206,5 +201,23 @@ create policy "Owners can read their subscription"
   on public.subscriptions for select to authenticated
   using (user_id = (select auth.uid()));
 
--- No anonymous access to any table.
-revoke all on all tables in schema public from anon;
+-- ---------------------------------------------------------------------------
+-- Table privileges
+--
+-- Granted explicitly, so access is the same whether or not the project has
+-- "Automatically expose new tables" switched on. RLS policies above then
+-- decide which rows a signed-in customer can see.
+-- ---------------------------------------------------------------------------
+revoke all on all tables in schema public from anon, authenticated;
+
+-- The server (secret key) manages everything.
+grant all on all tables in schema public to service_role;
+grant usage, select on all sequences in schema public to service_role;
+
+-- Signed-in customers: read their profile, cards and subscription...
+grant select on public.profiles, public.cards, public.subscriptions to authenticated;
+
+-- ...and edit content fields only, never ownership or plan.
+grant update (slug, full_name, job_title, organisation, about, phone, email, website,
+              street, city, postcode, country, socials, photo_path, hidden_fields)
+  on public.profiles to authenticated;
