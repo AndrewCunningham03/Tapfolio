@@ -91,3 +91,10 @@
 .footer a { color: var(--green-strong); font-weight: 700; text-decoration: none; }
 
 .skeleton { height: 60vh; }
+
+/* Only the signed-in owner sees this. */
+.ownerBar {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 10;
+  padding: 12px 22px; border-radius: 999px; background: var(--text); color: #fff; font-weight: 700;
+  text-decoration: none; box-shadow: 0 10px 30px rgba(11, 31, 23, 0.35);
+}

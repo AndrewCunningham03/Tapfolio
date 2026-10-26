@@ -13,6 +13,7 @@ import {
   SOCIAL_ICONS,
   TextIcon,
 } from "./icons";
+import { OwnerBar } from "./owner-bar";
 import { PaySection } from "./pay";
 import styles from "./profile.module.css";
 
@@ -109,6 +110,7 @@ async function ProfileContent({ slug }: { slug: string }) {
         )}
       </div>
 
+      <OwnerBar slug={profile.slug} />
       <PaySection profile={profile} />
 
       {profile.about && <p className={styles.about}>{profile.about}</p>}
