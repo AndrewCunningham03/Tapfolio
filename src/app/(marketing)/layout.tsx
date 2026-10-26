@@ -1,38 +1,48 @@
 import Link from "next/link";
-import { CurrencyProvider } from "./currency";
+import { Manrope } from "next/font/google";
+import { CurrencyProvider, Price } from "./currency";
+import { Wordmark } from "./wordmark";
 import styles from "./marketing.module.css";
+
+// Same typeface as the card artwork.
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className={styles.site}>
-      <header className={styles.header}>
-        <div className={styles.wrap}>
-          <Link className={styles.logo} href="/">
-            Tap<span>folio</span>
-          </Link>
-          <nav className={styles.nav}>
-            <Link href="/#how">How it works</Link>
-            <Link href="/#cards">Cards</Link>
-            <Link href="/#faq">FAQ</Link>
-            <Link className={styles.btn} href="/#order">
-              Order
+    <CurrencyProvider>
+      <div className={`${styles.site} ${manrope.variable}`}>
+        <header className={styles.header}>
+          <div className={styles.wrap}>
+            <Link className={styles.logo} href="/" aria-label="Tapfolio home">
+              <Wordmark />
             </Link>
-          </nav>
-        </div>
-      </header>
+            <nav className={styles.nav} aria-label="Main">
+              <Link href="/#how">How it works</Link>
+              <Link href="/#paid">Get paid</Link>
+              <Link href="/#pricing">Pricing</Link>
+              <Link href="/#faq">FAQ</Link>
+              <Link className={`${styles.btn} ${styles.btnSmall}`} href="/#order">
+                Order · <Price of="card" />
+              </Link>
+            </nav>
+          </div>
+        </header>
 
-      <main>
-        <CurrencyProvider>{children}</CurrencyProvider>
-      </main>
+        <main>{children}</main>
 
-      <footer className={styles.footer}>
-        <div className={styles.wrap}>
-          <span>© Tapfolio</span>
-          <span>
-            <Link href="/#order">Contact</Link> · <Link href="/privacy">Privacy</Link>
-          </span>
-        </div>
-      </footer>
-    </div>
+        <footer className={styles.footer}>
+          <div className={styles.wrap}>
+            <Link className={styles.logo} href="/" aria-label="Tapfolio home">
+              <Wordmark />
+            </Link>
+            <nav aria-label="Footer">
+              <Link href="/#order">Contact</Link>
+              <Link href="/privacy">Privacy</Link>
+            </nav>
+            <span>© Tapfolio · Northern Ireland</span>
+          </div>
+        </footer>
+      </div>
+    </CurrencyProvider>
   );
 }

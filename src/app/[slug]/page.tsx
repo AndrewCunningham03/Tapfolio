@@ -13,6 +13,7 @@ import {
   SOCIAL_ICONS,
   TextIcon,
 } from "./icons";
+import { PaySection } from "./pay";
 import styles from "./profile.module.css";
 
 export async function generateMetadata({ params }: PageProps<"/[slug]">): Promise<Metadata> {
@@ -107,6 +108,8 @@ async function ProfileContent({ slug }: { slug: string }) {
           </a>
         )}
       </div>
+
+      <PaySection profile={profile} />
 
       {profile.about && <p className={styles.about}>{profile.about}</p>}
 
