@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState } from "react";
 import { submitEnquiry, type EnquiryState } from "./actions";
 import { COUNTRIES } from "./countries";
 import { CONTACT_EMAIL } from "@/lib/site";
@@ -11,22 +11,11 @@ const initial: EnquiryState = { status: "idle" };
 
 export function OrderForm() {
   const [state, action, pending] = useActionState(submitEnquiry, initial);
-  const tierRef = useRef<HTMLSelectElement>(null);
-
-  // "Order Standard / Platinum" buttons elsewhere on the page preselect the tier.
-  useEffect(() => {
-    function onClick(e: MouseEvent) {
-      const el = (e.target as HTMLElement).closest<HTMLElement>("[data-tier]");
-      if (el?.dataset.tier && tierRef.current) tierRef.current.value = el.dataset.tier;
-    }
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
-  }, []);
 
   if (state.status === "ok") {
     return (
       <div className={`${styles.notice} ${styles.thanks}`} role="status">
-        Thanks, we&apos;ve got your enquiry and will be in touch shortly.
+        Thanks, we&apos;ve got your order request and will be in touch within one working day.
       </div>
     );
   }
@@ -55,7 +44,7 @@ export function OrderForm() {
           <label htmlFor="phone">Phone</label>
           <input id="phone" name="phone" type="tel" autoComplete="tel" />
         </div>
-        <div className={styles.full}>
+        <div>
           <label htmlFor="country">Where should we deliver?</label>
           <select id="country" name="country" required defaultValue="">
             <option value="" disabled>
@@ -64,14 +53,6 @@ export function OrderForm() {
             {COUNTRIES.map((c) => (
               <option key={c}>{c}</option>
             ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="tier">Card</label>
-          <select id="tier" name="tier" ref={tierRef} defaultValue="Standard">
-            <option>Standard</option>
-            <option>Platinum</option>
-            <option>Not sure yet</option>
           </select>
         </div>
         <div>
@@ -86,11 +67,11 @@ export function OrderForm() {
         </div>
         <div className={styles.full}>
           <label htmlFor="msg">Anything else?</label>
-          <textarea id="msg" name="message" placeholder="Team size, design ideas, deadlines…" />
+          <textarea id="msg" name="message" placeholder="What your business does, team size, anything we should know…" />
         </div>
         <div className={styles.full}>
           <button className={styles.btn} type="submit" disabled={pending}>
-            {pending ? "Sending…" : "Send enquiry"}
+            {pending ? "Sending…" : "Request my card"}
           </button>
         </div>
         <p className={`${styles.formNote} ${styles.full}`}>

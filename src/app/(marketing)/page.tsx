@@ -1,239 +1,260 @@
 import Link from "next/link";
+import { GRACE_DAYS } from "@/lib/site";
+import { CardShowcase } from "./card-showcase";
 import { CurrencySwitch, Price } from "./currency";
 import { OrderForm } from "./order-form";
 import styles from "./marketing.module.css";
 
-function NfcIcon() {
-  return (
-    <svg className={styles.nfc} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-      <path d="M6 8.5a6 6 0 0 1 0 7" />
-      <path d="M10 6a10 10 0 0 1 0 12" />
-      <path d="M14 3.5a14 14 0 0 1 0 17" />
-    </svg>
-  );
-}
+const TRADES = [
+  "Window cleaners",
+  "Plumbers",
+  "Electricians",
+  "Barbers",
+  "Salons",
+  "Mechanics",
+  "Estate agents",
+  "Personal trainers",
+  "Dog groomers",
+  "Cleaners",
+  "Builders",
+  "Photographers",
+];
 
 const FAQ: { q: string; a: React.ReactNode }[] = [
   {
-    q: "Is there a monthly fee?",
+    q: "What does it cost?",
     a: (
       <>
-        No. Your card and profile page are included in the one-off price and keep working for good. Pro is an
-        optional extra at <Price of="proMonthly" /> a month or <Price of="proYearly" /> a year. If you cancel it, your
-        card keeps working with your basic profile.
+        <Price of="card" /> for the metal card, then <Price of="monthly" /> a month to keep your profile live. No
+        contract: cancel whenever you like.
       </>
     ),
   },
   {
+    q: "What happens if I stop paying?",
+    a: `We'll remind you before anything changes. If a payment fails, your card keeps working for ${GRACE_DAYS} days. After that it pauses until you restart, and your details are kept, so it comes back exactly as it was.`,
+  },
+  {
+    q: "Do you take a cut when customers pay me?",
+    a: "No. The payment buttons take your customer straight to your own Revolut, PayPal, Monzo or card payment page, or show your bank details. The money goes directly to you. We never touch it.",
+  },
+  {
+    q: "Do people need an app to use it?",
+    a: "No. Most iPhones and Android phones read the card with a tap. Phones that can't scan the QR code on the back with their camera instead.",
+  },
+  {
+    q: "Does a metal card really work with phones?",
+    a: "Yes. The chip is built into the card so it can be read through the metal. Hold it near the top of the phone.",
+  },
+  {
+    q: "What if my number or prices change?",
+    a: "Change your details online and they update straight away. The card itself never needs reprinting.",
+  },
+  {
     q: "Do you deliver to Ireland and the UK?",
-    a: "Yes. We deliver across Ireland, Northern Ireland and Great Britain, with prices in euro or sterling.",
+    a: "Yes, across Northern Ireland, Great Britain and the Republic of Ireland, with prices in sterling or euro.",
   },
   {
-    q: "Do people need an app?",
-    a: "No. Most modern iPhones and Android phones read NFC cards straight away. Phones without NFC can scan the QR code with the camera.",
-  },
-  {
-    q: "What if my phone number or job changes?",
-    a: "Log in and update your details. The change goes live straight away, so your cards keep working and never need reprinting.",
-  },
-  {
-    q: "Can I order cards for my whole team?",
-    a: "Yes. Each person gets their own card and profile page. Get in touch with the number of cards you need and we'll send a quote.",
-  },
-  {
-    q: "Does the metal card really work?",
-    a: "Yes. Platinum cards are built so the chip can still be read through the metal, and we test them on iPhone and Android before sending.",
+    q: "Can I get cards for my whole team?",
+    a: "Yes. Each person gets their own card and profile. Use the form below and tell us how many you need.",
   },
 ];
 
 export default function HomePage() {
   return (
     <>
-      <div className={styles.hero}>
-        <div className={styles.wrap}>
+      <section className={styles.hero}>
+        <div className={`${styles.wrap} ${styles.heroGrid}`}>
           <div>
-            <div className={styles.eyebrow}>NFC + QR business cards</div>
+            <span className={styles.kicker}>Solid metal NFC business card</span>
             <h1>
-              One tap. <em>Contact saved.</em>
+              The last business card <span className={styles.metalText}>you&apos;ll ever buy.</span>
             </h1>
             <p className={styles.lede}>
-              Tap your card on any phone and your profile opens straight away, with a button to save your details to
-              their contacts. No app needed. Change your details whenever you like and the same card keeps working.
+              Tap it on any phone and your details come up, ready to save, call, or pay you. Change your number or
+              prices whenever you like. The card never needs reprinting.
             </p>
             <div className={styles.ctaRow}>
               <Link className={styles.btn} href="#order">
-                Order your cards
+                Order your card · <Price of="card" />
               </Link>
-              <Link className={`${styles.btn} ${styles.ghost}`} href="/john-smith">
-                See an example profile
+              <Link className={`${styles.btn} ${styles.ghost}`} href="#how">
+                See how it works
               </Link>
             </div>
-            <p className={styles.heroNote}>
+            <p className={styles.priceNote}>
               <strong>
-                From <Price of="standard" />, paid once.
-              </strong>{" "}
-              Your profile is free forever. No app, no contract.
+                <Price of="card" /> card
+              </strong>
+              , then <Price of="monthly" /> a month. Cancel any time.
             </p>
           </div>
-          <div className={styles.cardStack} aria-hidden="true">
-            <div className={`${styles.mock} ${styles.mockStandard}`}>
-              <div className={styles.mockRow}>
-                <span className={styles.mockBrand}>Smith Plumbing</span>
-                <NfcIcon />
-              </div>
-              <div className={styles.mockRow}>
-                <span className={styles.mockWho}>
-                  John Smith
-                  <br />
-                  Tap or scan
-                </span>
-                <span className={styles.qr} />
-              </div>
-            </div>
-            <div className={`${styles.mock} ${styles.mockPlatinum}`}>
-              <div className={styles.mockRow}>
-                <span className={styles.mockBrand}>Platinum</span>
-                <NfcIcon />
-              </div>
-              <div className={styles.mockRow}>
-                <span className={styles.mockWho}>
-                  Metal finish
-                  <br />
-                  Tap or scan
-                </span>
-                <span className={styles.qr} />
+          <CardShowcase />
+        </div>
+        <div className={`${styles.wrap} ${styles.facts}`}>
+          <ul>
+            <li>Stainless steel</li>
+            <li>Tap or scan, no app</li>
+            <li>Works on iPhone and Android</li>
+            <li>Take payments</li>
+            <li>UK and Ireland</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="how" className={styles.section}>
+        <div className={`${styles.wrap} ${styles.how}`}>
+          <div>
+            <div className={styles.phone}>
+              <div className={styles.screen}>
+                <iframe src="/john-smith" title="A live example Tapfolio profile" loading="lazy" />
               </div>
             </div>
+            <p className={styles.phoneCaption}>A real profile. Scroll it.</p>
+          </div>
+          <div>
+            <p className={styles.eyebrow}>How it works</p>
+            <h2>Hand it over. They tap. You&apos;re in their phone.</h2>
+            <p className={styles.sub}>No fumbling for a pen, no card that ends up in a drawer.</p>
+            <ol className={styles.steps}>
+              <li>
+                <span className={styles.stepNum}>01</span>
+                <div>
+                  <h3>Tap</h3>
+                  <p>They hold your card to their phone, or scan the code on the back. Your page opens instantly.</p>
+                </div>
+              </li>
+              <li>
+                <span className={styles.stepNum}>02</span>
+                <div>
+                  <h3>Save</h3>
+                  <p>One button puts your name, number, email and address straight into their contacts.</p>
+                </div>
+              </li>
+              <li>
+                <span className={styles.stepNum}>03</span>
+                <div>
+                  <h3>Get paid</h3>
+                  <p>Finished the job? They can pay you there and then, by Revolut, PayPal, card or bank transfer.</p>
+                </div>
+              </li>
+            </ol>
           </div>
         </div>
-      </div>
+      </section>
 
-      <section id="how" className={`${styles.section} ${styles.alt}`}>
-        <div className={styles.wrap}>
-          <h2>How it works</h2>
-          <p className={styles.sub}>
-            Every card links to your own page, at an address that never changes. The card stays the same, and you can
-            change what&apos;s on the page whenever you like.
-          </p>
-          <div className={styles.steps}>
-            <div className={styles.step}>
-              <div className={styles.stepNum}>1</div>
-              <h3>Activate your card</h3>
-              <p>Scan the activation code that comes with your card, create an account and add your details. Your card goes live straight away.</p>
+      <section id="paid" className={`${styles.section} ${styles.paid}`}>
+        <div className={`${styles.wrap} ${styles.paidGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>Get paid</p>
+            <h2>Your card is now how customers pay you.</h2>
+            <p className={styles.sub}>
+              Add your Revolut, PayPal or Monzo link, a card payment link from SumUp or Stripe, and your bank details.
+              Customers pay you in a couple of taps, with nothing to type out or get wrong.
+            </p>
+            <div className={styles.zero}>
+              <strong>0%</strong>
+              <span>commission. The money goes straight to you.</span>
             </div>
-            <div className={styles.step}>
-              <div className={styles.stepNum}>2</div>
-              <h3>Tap or scan</h3>
-              <p>Hold the card near a phone, or let them scan the QR code on the front. Your profile opens in their browser.</p>
+          </div>
+          <div className={styles.payPanel} aria-hidden="true">
+            <h3>Pay Smith Plumbing &amp; Heating</h3>
+            <div className={styles.payMethods}>
+              <span>Revolut</span>
+              <span>PayPal</span>
+              <span>Monzo</span>
+              <span>Pay by card</span>
+              <span>Bank transfer</span>
             </div>
-            <div className={styles.step}>
-              <div className={styles.stepNum}>3</div>
-              <h3>Saved to their phone</h3>
-              <p>One button adds your name, number, email, website and address to their contacts. Update your details online any time.</p>
+            <div className={styles.payBank}>
+              <div>
+                Sort code <b>00-00-00</b>
+              </div>
+              <div>
+                Account <b>12345678</b>
+              </div>
+              <div>
+                IBAN <b>IE29 AIBK 9311 …</b>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="cards" className={styles.section}>
+      <section className={styles.section}>
         <div className={styles.wrap}>
-          <h2>Choose your card</h2>
-          <p className={styles.sub}>
-            Both cards include design, setup, your profile page, a QR code for phones without NFC, and unlimited
-            updates to your details.
-          </p>
-          <div className={styles.promise}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            <p>
-              <strong>Your card works forever.</strong> Pay once and your profile stays live, with no monthly fee to
-              keep it working.
-            </p>
-          </div>
+          <p className={styles.eyebrow}>Who it&apos;s for</p>
+          <h2>Made for people who are out on the job.</h2>
+          <p className={styles.sub}>Built in Northern Ireland for small businesses across the UK and Ireland.</p>
+          <ul className={styles.trades}>
+            {TRADES.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="pricing" className={styles.section}>
+        <div className={styles.wrap}>
+          <p className={styles.eyebrow}>Pricing</p>
+          <h2>One card. One simple price.</h2>
           <CurrencySwitch />
-          <div className={styles.tiers}>
-            <div className={styles.tier}>
-              <span className={styles.tag}>Standard</span>
-              <h3>Tapfolio Card</h3>
-              <div className={styles.price}>
-                <strong>
-                  <Price of="standard" />
-                </strong>{" "}
-                per card, one-off
-                <small>Includes setup and your profile, free forever</small>
+          <div className={styles.priceCard}>
+            <div className={styles.priceMain}>
+              <div className={styles.priceBig}>
+                <Price of="card" />
               </div>
-              <ul>
-                <li>Printed PVC card, standard bank-card size</li>
-                <li>Built-in NFC chip and printed QR code</li>
-                <li>Your logo and branding, full colour</li>
-                <li>Profile page with a Save contact button</li>
-                <li>Edit your details online any time</li>
-              </ul>
-              <a className={styles.btn} href="#order" data-tier="Standard">
-                Order Standard
-              </a>
+              <p className={styles.priceThen}>
+                then <Price of="monthly" /> a month
+              </p>
+              <p className={styles.priceSmall}>For the metal card, then your live profile. Cancel any time.</p>
+              <Link className={styles.btn} href="#order">
+                Order your card
+              </Link>
             </div>
-            <div className={`${styles.tier} ${styles.premium}`}>
-              <span className={styles.tag}>Platinum</span>
-              <h3>Tapfolio Platinum</h3>
-              <div className={styles.price}>
-                <strong>
-                  <Price of="platinum" />
-                </strong>{" "}
-                per card, one-off
-                <small>Includes setup and your profile, free forever</small>
-              </div>
-              <ul>
-                <li>Premium metal or metallic-finish card</li>
-                <li>Tested with iPhone and Android, with a phone case on</li>
-                <li>Engraved or printed logo</li>
-                <li>Everything in Standard</li>
-                <li>Priority setup support</li>
-              </ul>
-              <a className={styles.btn} href="#order" data-tier="Platinum">
-                Order Platinum
-              </a>
-            </div>
+            <ul className={styles.includes}>
+              <li>Solid stainless steel card, laser engraved</li>
+              <li>Tap-to-share chip and a QR code on the back</li>
+              <li>Your own profile page with Save contact</li>
+              <li>Pay buttons: Revolut, PayPal, Monzo, card and bank transfer</li>
+              <li>Change your details any time, live instantly</li>
+              <li>See how often your card is tapped</li>
+            </ul>
           </div>
-          <div className={styles.pro}>
-            <h3>
-              Optional Pro: <Price of="proMonthly" /> a month or <Price of="proYearly" /> a year
-            </h3>
-            <p>
-              Add your logo and photo, see how often your card is tapped, collect enquiries from your profile, and add
-              a Google review button. Cancel any time and your card keeps working with your basic profile.
-            </p>
-          </div>
-          <div className={styles.pro}>
-            <h3>Ordering for a team of 5 or more?</h3>
-            <p>
-              <Price of="teamCard" /> per Standard card, plus <Price of="teamSeatMonthly" /> per person a month for
-              shared branding and one place to manage everyone&apos;s details. <a href="#order">Ask for a quote</a>.
-            </p>
-          </div>
+          <p className={styles.terms}>
+            Prices include everything above. If a payment fails we&apos;ll remind you, and your card keeps working for{" "}
+            {GRACE_DAYS} days.
+          </p>
         </div>
       </section>
 
-      <section id="faq" className={`${styles.section} ${styles.alt}`}>
-        <div className={`${styles.wrap} ${styles.faq}`}>
-          <h2>Questions</h2>
-          {FAQ.map(({ q, a }) => (
-            <details key={q}>
-              <summary>{q}</summary>
-              <p>{a}</p>
-            </details>
-          ))}
+      <section id="faq" className={`${styles.section} ${styles.paid}`}>
+        <div className={`${styles.wrap} ${styles.faqGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>Questions</p>
+            <h2>Good to know.</h2>
+          </div>
+          <div className={styles.faq}>
+            {FAQ.map(({ q, a }) => (
+              <details key={q}>
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
       <section id="order" className={styles.section}>
-        <div className={styles.wrap}>
-          <h2>Order or enquire</h2>
-          <p className={styles.sub}>
-            Tell us what you need and we&apos;ll reply within one working day with a proof and a quote.
-          </p>
+        <div className={`${styles.wrap} ${styles.orderGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>Order</p>
+            <h2>Get your card.</h2>
+            <p className={styles.sub}>
+              Tell us where to send it. We&apos;ll be in touch within one working day to set up your profile and take
+              payment.
+            </p>
+          </div>
           <OrderForm />
         </div>
       </section>
