@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local Claude Code launch config
 /.claude/
+
+# Card batches: supplier spreadsheets (made by npm run batch)
+/batches/

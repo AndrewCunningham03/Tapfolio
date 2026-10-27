@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { newCardId } from "./ids";
+import { isCardId, newCardId, normalise } from "./ids";
 import { slugify, slugProblem } from "./slugs";
 
 export type OrderStatus = "requested" | "paid" | "in_production" | "shipped" | "cancelled";
@@ -16,8 +16,9 @@ export type CardOrder = {
   country: string;
   quantity: string | null;
   message: string | null;
-  finish: "black" | "silver" | "gold" | "rose_gold";
-  layout: "logo" | "name" | "minimal";
+  // Only set for orders made with the card designer; standard-card orders have none.
+  finish: "black" | "silver" | "gold" | "rose_gold" | null;
+  layout: "logo" | "name" | "minimal" | null;
   name_on_card: string | null;
   title_on_card: string | null;
   back_text: string | null;
@@ -113,5 +114,40 @@ export async function createCardForOrder(db: SupabaseClient, orderId: number) {
 
   const { error: linkError } = await db.from("card_orders").update({ card_id: cardId }).eq("id", order.id);
   if (linkError) throw new Error(`Card ${cardId} was made but not linked to the order: ${linkError.message}`);
+  return { cardId, slug: profile.slug, alreadyExisted: false };
+}
+
+/**
+ * Fulfil an order with a card from stock: the pre-programmed card in your hand.
+ * Links that card to the customer's account and profile (created if new).
+ */
+export async function assignStockCard(db: SupabaseClient, orderId: number, rawCardId: string) {
+  const cardId = normalise(rawCardId);
+  if (!isCardId(cardId)) {
+    throw new Error(`"${rawCardId}" isn't a card code. It's the 7 characters after /C/ in the card's link.`);
+  }
+
+  const { data: order, error } = await db.from("card_orders").select("*").eq("id", orderId).single<CardOrder>();
+  if (error || !order) throw new Error("Order not found.");
+  if (order.card_id) return { cardId: order.card_id, alreadyExisted: true };
+
+  const { data: card } = await db.from("cards").select("id, status").eq("id", cardId).maybeSingle<{ id: string; status: string }>();
+  if (!card) throw new Error(`Card ${cardId} doesn't exist. Check the code in the card's link.`);
+  if (card.status !== "unclaimed") throw new Error(`Card ${cardId} is already in use (${card.status}).`);
+
+  const userId = await findOrCreateUser(db, order.email);
+  const profile = await findOrCreateProfile(db, userId, order);
+
+  // Only claim it while it's still unclaimed, so two orders can't take the same card.
+  const { data: claimed, error: claimError } = await db
+    .from("cards")
+    .update({ status: "active", profile_id: profile.id, claimed_at: new Date().toISOString() })
+    .eq("id", cardId)
+    .eq("status", "unclaimed")
+    .select("id");
+  if (claimError || !claimed?.length) throw new Error(`Card ${cardId} was taken a moment ago. Try another.`);
+
+  const { error: linkError } = await db.from("card_orders").update({ card_id: cardId }).eq("id", order.id);
+  if (linkError) throw new Error(`Card ${cardId} is active but not linked to the order: ${linkError.message}`);
   return { cardId, slug: profile.slug, alreadyExisted: false };
 }

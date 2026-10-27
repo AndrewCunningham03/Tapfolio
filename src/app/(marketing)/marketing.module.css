@@ -359,6 +359,16 @@
   padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: inherit; font-weight: 700; font-size: 0.9rem;
 }
 .adminOk { color: #6fdc9c; font-size: 0.88rem; margin: 10px 0 0; }
+.stockCard {
+  aspect-ratio: 85.6 / 53.98; border-radius: 14px; display: grid; place-content: center; gap: 4px; text-align: center;
+  background: linear-gradient(135deg, #1d1f22, #2b2e33); border: 1px solid var(--line-strong);
+}
+.stockCard span { color: var(--muted); font-size: 0.85rem; }
+.assignForm { display: flex; gap: 8px; flex-wrap: wrap; }
+.assignForm input {
+  padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 0.9rem; width: 210px; text-transform: uppercase;
+}
 
 /* Customer dashboard ----------------------------------------------------------- */
 .statRow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0; }
