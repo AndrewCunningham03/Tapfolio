@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { getUser, isAdmin } from "@/lib/auth";
-import { createCardForOrder, ORDER_STATUSES, type OrderStatus } from "@/lib/orders";
+import { assignStockCard, createCardForOrder, ORDER_STATUSES, type OrderStatus } from "@/lib/orders";
 import { getAdminClient } from "@/lib/supabase/admin";
 
 export type AdminResult = { ok: boolean; message: string };
@@ -21,6 +21,19 @@ export async function setOrderStatus(orderId: number, status: OrderStatus): Prom
   if (error) return { ok: false, message: error.message };
   refresh();
   return { ok: true, message: "Status updated." };
+}
+
+export async function assignCard(orderId: number, cardId: string): Promise<AdminResult> {
+  try {
+    const db = await adminDb();
+    const result = await assignStockCard(db, orderId, cardId);
+    refresh();
+    return result.alreadyExisted
+      ? { ok: true, message: `This order already has card ${result.cardId}.` }
+      : { ok: true, message: `Card ${result.cardId} is now live and linked to /${result.slug}.` };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : "Something went wrong." };
+  }
 }
 
 export async function makeCard(orderId: number): Promise<AdminResult> {
