@@ -64,13 +64,25 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 2. ✅ Card links (`/C/<ID>`) with tap counting; profiles and vCards read from the database
    - ✅ Pay me on profiles (Revolut, PayPal, Monzo, card link, UK/IE bank details)
    - ✅ Card designer at `/design`: black, silver, gold, rose gold; name, title, logo, layout, back line; orders saved to `card_orders`, logos to the private `card-logos` bucket
-3. Batch command: generate card IDs + claim codes, supplier CSV (only needed for blank stock; designed cards get their code when the order is turned into a card)
+3. ✅ Batch command for stock cards (see "Making cards" below); admin assigns a stock card to an order by its code
 4. ✅ Sign-in: email link (`/login`), no public sign-up; accounts are created from the admin page
 5. ✅ Customer dashboard (`/dashboard`): edit profile, Pay me, socials, hidden fields, profile address; tap counts; "Edit my card" on their own profile
    - ✅ Design your page: six colour themes or any custom background + button colour (text contrast automatic), profile photo/logo, cover photo, gallery of up to 12 photos and 3 videos (50 MB each), stored in the public `profile-media` bucket via signed uploads
 6. ✅ Admin (`/admin`, emails in `ADMIN_EMAILS`): orders with design preview, status, "Create card + account", engraving SVGs with the real QR code
    - To do: disable/reassign cards, photo uploads
 7. Stripe for the card + £10/month subscription (grace period, then pause), then launch on the real domain
+
+## Making cards
+
+Every card is the standard Tapfolio design (`design/cards/`), with its own code on the chip and the QR on the back. The card designer at `/design` is switched off for now (see `redirects` in `next.config.ts`).
+
+1. Create a batch of blank cards and the supplier spreadsheet:
+   ```bash
+   npm run batch -- --qty 50 --material plastic --label "First run" --supplier "Card Co"
+   ```
+   This adds the cards to the database as unclaimed and writes `batches/<date>-<material>-<label>.csv` (`card_id,url,material`). `batches/` is git-ignored.
+2. Send the supplier that CSV with the print files in `design/cards/out/print/` and `design/cards/SPEC.md`. They encode each `url` on the chip, lock it, and print the same `url` as the card's QR code.
+3. When an order comes in, open `/admin`, type the code of a card from stock (the 7 characters after `/C/`) and press **Assign card + create account**.
 
 ## Accounts and email
 
