@@ -6,7 +6,7 @@ import type { CardOrder, OrderStatus } from "@/lib/orders";
 import { CARD_URL_BASE, formatPrice } from "@/lib/site";
 import { CardBack, CardFront } from "../design/card-preview";
 import { loadLogoFromUrl, makeMask, tint } from "../design/logo";
-import { makeCard, setOrderStatus, type AdminResult } from "./actions";
+import { assignCard, makeCard, setOrderStatus, type AdminResult } from "./actions";
 import styles from "../marketing.module.css";
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
@@ -29,24 +29,29 @@ function download(svg: SVGSVGElement | null, filename: string) {
 }
 
 export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?: string; card?: Card }) {
-  const design: CardDesign = {
-    finish: order.finish,
-    layout: order.layout,
-    name: order.name_on_card ?? "",
-    title: order.title_on_card ?? "",
-    backText: order.back_text ?? "",
-    logoInvert: order.logo_invert,
-  };
+  // Only orders from the (currently hidden) card designer carry a custom design.
+  const design: CardDesign | null =
+    order.finish && order.layout
+      ? {
+          finish: order.finish,
+          layout: order.layout,
+          name: order.name_on_card ?? "",
+          title: order.title_on_card ?? "",
+          backText: order.back_text ?? "",
+          logoInvert: order.logo_invert,
+        }
+      : null;
 
   // Rebuild the engraving mask from the stored logo: tinted for the preview, black for production.
   const [logo, setLogo] = useState<{ preview: string; engrave: string } | null>(null);
   useEffect(() => {
-    if (!logoUrl) return;
+    if (!logoUrl || !order.finish) return;
+    const finish = order.finish;
     let cancelled = false;
     loadLogoFromUrl(logoUrl)
       .then((canvas) => {
         const mask = makeMask(canvas, order.logo_invert);
-        if (!cancelled && mask) setLogo({ preview: tint(mask, FINISHES[order.finish].engrave), engrave: tint(mask, "#000000") });
+        if (!cancelled && mask) setLogo({ preview: tint(mask, FINISHES[finish].engrave), engrave: tint(mask, "#000000") });
       })
       .catch(() => {});
     return () => {
@@ -56,6 +61,7 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
 
   const [pending, start] = useTransition();
   const [result, setResult] = useState<AdminResult | null>(null);
+  const [stockId, setStockId] = useState("");
   const run = (fn: () => Promise<AdminResult>) => start(async () => setResult(await fn()));
 
   const frontRef = useRef<HTMLDivElement>(null);
@@ -65,8 +71,17 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
   return (
     <article className={styles.orderRow}>
       <div className={styles.orderPreview}>
-        <CardFront design={design} logo={logo?.preview} />
-        <CardBack design={design} qrUrl={cardUrl} />
+        {design ? (
+          <>
+            <CardFront design={design} logo={logo?.preview} />
+            <CardBack design={design} qrUrl={cardUrl} />
+          </>
+        ) : (
+          <div className={styles.stockCard}>
+            <strong>Standard Tapfolio card</strong>
+            <span>{card ? `Card ${card.id}` : "Pick one from stock"}</span>
+          </div>
+        )}
       </div>
 
       <div className={styles.orderInfo}>
@@ -83,7 +98,13 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
           <div><dt>Email</dt><dd><a href={`mailto:${order.email}`}>{order.email}</a></dd></div>
           {order.phone && <div><dt>Phone</dt><dd>{order.phone}</dd></div>}
           <div><dt>Deliver to</dt><dd>{order.country}</dd></div>
-          <div><dt>Card</dt><dd>{FINISHES[order.finish].label}, {LAYOUTS[order.layout].label.toLowerCase()}{order.quantity && order.quantity !== "1" ? `, ×${order.quantity}` : ""}</dd></div>
+          <div>
+            <dt>Card</dt>
+            <dd>
+              {design ? `${FINISHES[design.finish].label}, ${LAYOUTS[design.layout].label.toLowerCase()}` : "Standard"}
+              {order.quantity && order.quantity !== "1" ? `, ×${order.quantity}` : ""}
+            </dd>
+          </div>
           <div><dt>Price</dt><dd>{formatPrice(Number(order.card_price), order.currency)} + {formatPrice(Number(order.monthly_price), order.currency)}/month</dd></div>
           <div><dt>Ordered</dt><dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</dd></div>
           {order.message && <div className={styles.orderMessage}><dt>Message</dt><dd>{order.message}</dd></div>}
@@ -115,17 +136,40 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
                   /{card.slug}
                 </a>
               )}
-              <button type="button" className={`${styles.btn} ${styles.btnSmall}`} onClick={() => download(frontRef.current?.querySelector("svg") ?? null, `tapfolio-${order.id}-${card.id}-front.svg`)}>
-                Engraving: front
-              </button>
-              <button type="button" className={`${styles.btn} ${styles.btnSmall}`} onClick={() => download(backRef.current?.querySelector("svg") ?? null, `tapfolio-${order.id}-${card.id}-back.svg`)}>
-                Engraving: back
-              </button>
+              {design && (
+                <>
+                  <button type="button" className={`${styles.btn} ${styles.btnSmall}`} onClick={() => download(frontRef.current?.querySelector("svg") ?? null, `tapfolio-${order.id}-${card.id}-front.svg`)}>
+                    Engraving: front
+                  </button>
+                  <button type="button" className={`${styles.btn} ${styles.btnSmall}`} onClick={() => download(backRef.current?.querySelector("svg") ?? null, `tapfolio-${order.id}-${card.id}-back.svg`)}>
+                    Engraving: back
+                  </button>
+                </>
+              )}
             </>
           ) : (
-            <button type="button" className={`${styles.btn} ${styles.btnSmall}`} disabled={pending} onClick={() => run(() => makeCard(order.id))}>
-              {pending ? "Working…" : "Create card + account"}
-            </button>
+            <>
+              <form
+                className={styles.assignForm}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  run(() => assignCard(order.id, stockId));
+                }}
+              >
+                <label>
+                  <span className={styles.srOnly}>Card code for order {order.id}</span>
+                  <input value={stockId} onChange={(e) => setStockId(e.target.value)} placeholder="Card code, e.g. 1WEP578" maxLength={20} required />
+                </label>
+                <button type="submit" className={`${styles.btn} ${styles.btnSmall}`} disabled={pending}>
+                  {pending ? "Working…" : "Assign card + create account"}
+                </button>
+              </form>
+              {design && (
+                <button type="button" className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`} disabled={pending} onClick={() => run(() => makeCard(order.id))}>
+                  Make a new custom card
+                </button>
+              )}
+            </>
           )}
         </div>
         {result && (
@@ -136,7 +180,7 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
       </div>
 
       {/* Production files: black = engrave, real size, the card's own QR code. */}
-      {card && (
+      {card && design && (
         <div hidden>
           <div ref={frontRef}>
             <CardFront design={design} logo={logo?.engrave} variant="engrave" />

@@ -29,7 +29,8 @@ PDFs are vector with all text converted to outlines. Matching SVGs are included 
 | Dark green | Background | 80 | 30 | 65 | 80 |
 | Pattern green | Front arcs | 80 | 25 | 65 | 60 |
 | Yellow | Accent arc, "folio", icon | 0 | 20 | 95 | 0 |
-| Off-white | "Tap", heading | 3 | 0 | 3 | 0 |
+| Off-white | Heading, www.tapfolio.co.uk | 3 | 0 | 3 | 0 |
+| Green | "Tap" in the front logo | 80 | 0 | 80 | 10 |
 | Platinum | Small text | 20 | 12 | 8 | 0 |
 | White | QR panel | 0 | 0 | 0 | 0 |
 | Black | QR code | 0 | 0 | 0 | 100 |

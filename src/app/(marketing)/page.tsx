@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CONTACT_EMAIL, GRACE_DAYS } from "@/lib/site";
 import { CardShowcase } from "./card-showcase";
 import { CurrencySwitch, Price } from "./currency";
+import { OrderForm } from "./order-form";
 import styles from "./marketing.module.css";
 
 const TRADES = [
@@ -24,14 +25,14 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "What does it cost?",
     a: (
       <>
-        <Price of="card" /> for a black or silver card, or <Price of="goldCard" /> for gold or rose gold. Then{" "}
-        <Price of="monthly" /> a month to keep your profile live. No contract: cancel whenever you like.
+        <Price of="card" /> for the card, then <Price of="monthly" /> a month to keep your profile live. No contract:
+        cancel whenever you like.
       </>
     ),
   },
   {
-    q: "Can I design my own card?",
-    a: "Yes. Pick your metal and layout, add your name, job title and logo, and see it live as you go. We email you a proof to approve before anything is engraved.",
+    q: "Can I make the page my own?",
+    a: "Yes. Choose your colours, add your logo, a cover photo, and photos and videos of your work from your dashboard. Change them whenever you like.",
   },
   {
     q: "What happens if I stop paying?",
@@ -59,7 +60,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Can I get cards for my whole team?",
-    a: "Yes. Each person gets their own card and profile. Design one card, tell us how many you need, and we'll set up the rest.",
+    a: "Yes. Each person gets their own card and profile. Tell us how many you need in the order form and we'll set them all up.",
   },
 ];
 
@@ -78,8 +79,8 @@ export default function HomePage() {
               prices whenever you like. The card never needs reprinting.
             </p>
             <div className={styles.ctaRow}>
-              <Link className={styles.btn} href="/design">
-                Design your card
+              <Link className={styles.btn} href="#order">
+                Order your card · <Price of="card" />
               </Link>
               <Link className={`${styles.btn} ${styles.ghost}`} href="#how">
                 See how it works
@@ -87,7 +88,7 @@ export default function HomePage() {
             </div>
             <p className={styles.priceNote}>
               <strong>
-                From <Price of="card" />
+                <Price of="card" /> card
               </strong>
               , then <Price of="monthly" /> a month. Cancel any time.
             </p>
@@ -96,7 +97,7 @@ export default function HomePage() {
         </div>
         <div className={`${styles.wrap} ${styles.facts}`}>
           <ul>
-            <li>Black, silver, gold or rose gold</li>
+            <li>Your page, your colours</li>
             <li>Tap or scan, no app</li>
             <li>Works on iPhone and Android</li>
             <li>Take payments</li>
@@ -210,17 +211,16 @@ export default function HomePage() {
               <p className={styles.priceThen}>
                 then <Price of="monthly" /> a month
               </p>
-              <p className={styles.priceSmall}>
-                Black or silver card. Gold or rose gold <Price of="goldCard" />. Cancel any time.
-              </p>
-              <Link className={styles.btn} href="/design">
-                Design your card
+              <p className={styles.priceSmall}>For the card, then your live profile. Cancel any time.</p>
+              <Link className={styles.btn} href="#order">
+                Order your card
               </Link>
             </div>
             <ul className={styles.includes}>
-              <li>Solid metal card with your name and logo, laser engraved</li>
-              <li>Tap-to-share chip and a QR code on the back</li>
-              <li>Your own profile page with Save contact</li>
+              <li>Your Tapfolio card with a tap-to-share chip</li>
+              <li>Your own QR code on the back, for phones that can&apos;t tap</li>
+              <li>Your own profile page with Save contact, in your colours</li>
+              <li>Your logo, cover photo, and a gallery of photos and videos</li>
               <li>Pay buttons: Revolut, PayPal, Monzo, card and bank transfer</li>
               <li>Change your details any time, live instantly</li>
               <li>See how often your card is tapped</li>
@@ -254,22 +254,15 @@ export default function HomePage() {
         <div className={`${styles.wrap} ${styles.orderGrid}`}>
           <div>
             <p className={styles.eyebrow}>Order</p>
-            <h2>Design yours in two minutes.</h2>
-          </div>
-          <div>
+            <h2>Get your card.</h2>
             <p className={styles.sub}>
-              Choose your metal, add your name and logo, and watch your card come together. We email a proof to approve
-              before anything is engraved, and there&apos;s nothing to pay until you&apos;re happy.
+              Tell us where to send it. We&apos;ll email you a payment link, set up your profile, and post your card.
             </p>
-            <div className={styles.ctaRow}>
-              <Link className={styles.btn} href="/design">
-                Design your card
-              </Link>
-            </div>
             <p className={styles.contactLine}>
-              Ordering for a team or have a question? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+              Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
           </div>
+          <OrderForm />
         </div>
       </section>
     </>

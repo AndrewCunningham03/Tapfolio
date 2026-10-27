@@ -154,13 +154,16 @@ function qrCode(url, { x, y, size, fill }) {
 
 const BODY_SIZE = 2.3; // ≈ 6.5 pt, the smallest text on the card
 
-function backCopy({ heading, body, icon, tap, folio }) {
+const WEBSITE = "www.tapfolio.co.uk";
+
+function backCopy({ heading, body, icon, website }) {
   return (
     contactless({ x: MARGIN - 1.5, y: 9, height: 7, color: icon, weight: 2.2 }) +
     text("Tap or scan", { font: FONT.bold, size: 4.4, x: MARGIN, y: 24.5, fill: heading }) +
     text("Hold near the top of a phone,", { font: FONT.medium, size: BODY_SIZE, x: MARGIN, y: 30, fill: body }) +
     text("or scan the code with the camera.", { font: FONT.medium, size: BODY_SIZE, x: MARGIN, y: 33.6, fill: body }) +
-    wordmark({ x: MARGIN, y: TRIM.h - 7, size: 3.4, tap, folio })
+    // Our address in the bottom-left corner: every card advertises Tapfolio.
+    text(WEBSITE, { font: FONT.semibold, size: 2.6, x: MARGIN, y: TRIM.h - 7, fill: website })
   );
 }
 
@@ -187,7 +190,7 @@ const DESIGNS = {
     material: "plastic",
     draw: ({ sample }) =>
       rect({ x: -BLEED, y: -BLEED, w: TRIM.w + 2 * BLEED, h: TRIM.h + 2 * BLEED, fill: C.ink.hex }) +
-      backCopy({ heading: C.paper.hex, body: C.platinum.hex, icon: C.yellow.hex, tap: C.green.hex, folio: C.yellow.hex }) +
+      backCopy({ heading: C.paper.hex, body: C.platinum.hex, icon: C.yellow.hex, website: C.paper.hex }) +
       rect({ x: PANEL.x, y: PANEL.y, w: PANEL.size, h: PANEL.size, r: PANEL.r, fill: C.white.hex }) +
       (sample ? qrCode(SAMPLE_URL, { ...QR, fill: C.black.hex }) : ""),
   },
@@ -208,7 +211,7 @@ const DESIGNS = {
     // The QR panel is engraved solid (bright); the QR modules are left unengraved
     // (dark), so phones read dark-on-light like a printed code.
     draw: ({ sample }) =>
-      backCopy({ heading: C.black.hex, body: C.black.hex, icon: C.black.hex, tap: C.black.hex, folio: C.black.hex }) +
+      backCopy({ heading: C.black.hex, body: C.black.hex, icon: C.black.hex, website: C.black.hex }) +
       rect({ x: PANEL.x, y: PANEL.y, w: PANEL.size, h: PANEL.size, r: PANEL.r, fill: C.black.hex }) +
       (sample ? qrCode(SAMPLE_URL, { ...QR, fill: C.white.hex }) : ""),
   },
