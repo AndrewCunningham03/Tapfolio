@@ -14,6 +14,9 @@ export function LoginForm({ next, linkError }: { next: string; linkError: boolea
       <div className={`${styles.notice} ${styles.thanks}`} role="status">
         <strong>Check your email.</strong> If {state.email} has a Tapfolio card, we&apos;ve sent a sign-in link to it.
         Open it on this device. It works once and expires in 10 minutes.
+        <br />
+        Nothing after a couple of minutes? Check your spam folder, and make sure this is the email address you ordered
+        your card with.
       </div>
     );
   }

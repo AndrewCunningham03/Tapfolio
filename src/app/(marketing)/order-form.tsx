@@ -76,10 +76,10 @@ export function OrderForm() {
         <div className={`${styles.full} ${styles.orderSummary}`}>
           <div>
             <strong>
-              <Price of="card" />
+              <Price of="monthly" />
             </strong>{" "}
-            card, then <Price of="monthly" /> a month
-            <span>No payment now. We email you a payment link first. Cancel any time.</span>
+            a month, card included
+            <span>Nothing to pay now. We email you a link to start your subscription. Cancel any time.</span>
           </div>
           <button className={styles.btn} type="submit" disabled={pending}>
             {pending ? "Sending…" : "Order my card"}
