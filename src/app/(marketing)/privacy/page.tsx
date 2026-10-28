@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CONTACT_EMAIL } from "@/lib/site";
 import styles from "../marketing.module.css";
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default function PrivacyPage() {
         Tapfolio is run by [YOUR NAME / COMPANY NAME, company number if any], [ADDRESS], Northern Ireland. We are the
         controller of the personal data described here. We are based in the United Kingdom and also serve customers in
         Ireland and elsewhere, so we follow the UK GDPR and, for customers in the EU, the EU GDPR. ICO registration number: [ICO REF]. [EU
-        representative: name and address, if one is required.] Contact us about privacy at [PRIVACY EMAIL].
+        representative: name and address, if one is required.] Contact us about privacy at {CONTACT_EMAIL}.
       </p>
 
       <h2>What we collect</h2>
@@ -81,7 +82,7 @@ export default function PrivacyPage() {
 
       <h2>Your rights</h2>
       <p>
-        You can ask to see, correct, delete or move your data, or object to how we use it. Email [PRIVACY EMAIL] and
+        You can ask to see, correct, delete or move your data, or object to how we use it. Email {CONTACT_EMAIL} and
         we will respond within one month. If you are unhappy with how we handle your data, you can complain to the
         data protection regulator where you live: in the UK (including Northern Ireland), the{" "}
         <a href="https://ico.org.uk/make-a-complaint/">Information Commissioner&apos;s Office</a>; in Ireland, the{" "}
