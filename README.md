@@ -64,7 +64,7 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 2. ✅ Card links (`/C/<ID>`) with tap counting; profiles and vCards read from the database
    - ✅ Pay me on profiles (Revolut, PayPal, Monzo, card link, UK/IE bank details)
    - ✅ Card designer at `/design`: black, silver, gold, rose gold; name, title, logo, layout, back line; orders saved to `card_orders`, logos to the private `card-logos` bucket
-3. ✅ Batch command for stock cards (see "Making cards" below); admin assigns a stock card to an order by its code
+3. ✅ Stock cards (see "Making cards" below): make batches of card links in `/admin` and download the supplier pack; admin assigns a stock card to an order by its code
 4. ✅ Sign-in: email link (`/login`), no public sign-up; accounts are created from the admin page
 5. ✅ Customer dashboard (`/dashboard`): edit profile, Pay me, socials, hidden fields, profile address; tap counts; "Edit my card" on their own profile
    - ✅ Design your page: six colour themes or any custom background + button colour (text contrast automatic), profile photo/logo, cover photo, gallery of up to 12 photos and 3 videos (50 MB each), stored in the public `profile-media` bucket via signed uploads
@@ -76,13 +76,11 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
 
 Every card is the standard Tapfolio design (`design/cards/`), with its own code on the chip and the QR on the back. The card designer at `/design` is switched off for now (see `redirects` in `next.config.ts`).
 
-1. Create a batch of blank cards and the supplier spreadsheet:
-   ```bash
-   npm run batch -- --qty 50 --material plastic --label "First run" --supplier "Card Co"
-   ```
-   This adds the cards to the database as unclaimed and writes `batches/<date>-<material>-<label>.csv` (`card_id,url,material`). `batches/` is git-ignored.
-2. Send the supplier that CSV with the print files in `design/cards/out/print/` and `design/cards/SPEC.md`. They encode each `url` on the chip, lock it, and print the same `url` as the card's QR code.
+1. In `/admin` → **Card stock**, enter how many metal and plastic cards to order and press **Make card links**. This adds the cards to the database as unclaimed (one batch per supplier order; a batch can mix materials).
+2. Download the batch's **Supplier pack (.zip)** and send it to the supplier. It holds the Excel sheet and CSV of links (`card_id,url,material`), `design/cards/SPEC.md` and the print artwork for the materials in the batch. They encode each `url` on the chip, lock it, and print the same `url` as the card's QR code. The pack is rebuilt from the database on every download, so it can be downloaded again at any time.
 3. When an order comes in, open `/admin`, type the code of a card from stock (the 7 characters after `/C/`) and press **Assign card + create account**.
+
+Card stock per batch comes from the `batch_stock` view. From the command line, `npm run batch -- --qty 50 --material plastic --label "First run"` makes a single-material batch and writes its CSV to the git-ignored `batches/` folder.
 
 ## Accounts and email
 

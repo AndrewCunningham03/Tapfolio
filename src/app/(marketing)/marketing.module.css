@@ -369,6 +369,36 @@
   padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text);
   font: inherit; font-size: 0.9rem; width: 210px; text-transform: uppercase;
 }
+.adminSection .dashSectionTitle { margin-top: 36px; }
+.adminSection .adminCounts { margin-top: 0; }
+
+/* Card stock: make links for a supplier order, list batches with downloads */
+.batchForm {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 22px; margin-bottom: 16px;
+  border: 1px solid var(--line-strong); border-radius: 20px; background: var(--raised);
+}
+@media (max-width: 820px) { .batchForm { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .batchForm { grid-template-columns: 1fr; } }
+.batchForm label { display: grid; gap: 6px; font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+.batchForm input {
+  padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 0.95rem; font-weight: 500; min-width: 0;
+}
+.batchForm input:focus { outline: 2px solid var(--steel); outline-offset: 1px; }
+.optional { font-weight: 500; }
+.batchSubmit { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.batchSubmit p { margin: 0; }
+.batchSubmit a { color: inherit; font-weight: 700; }
+.batchList { display: grid; gap: 10px; }
+.batchRow {
+  display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px 24px; padding: 16px 22px;
+  border: 1px solid var(--line-strong); border-radius: 16px; background: var(--raised);
+}
+@media (max-width: 820px) { .batchRow { grid-template-columns: 1fr; } }
+.batchRow h3 { font-size: 1.05rem; margin: 0; letter-spacing: -0.01em; }
+.batchRow p { margin: 4px 0 0; color: var(--muted); font-size: 0.88rem; }
+.batchCounts { display: flex; gap: 16px; }
+.batchCounts strong { color: var(--text); font-size: 1.1rem; }
 
 /* Customer dashboard ----------------------------------------------------------- */
 .statRow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0; }
