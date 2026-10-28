@@ -34,7 +34,7 @@ Open http://localhost:3000. The landing page works on its own; profiles, card li
 
 ### Hosting regions
 
-The business is based in Northern Ireland and serves the UK and Ireland. Create the Supabase project in **West EU (London)**; `vercel.json` pins the server functions to London (`lhr1`) so every request stays close to the database.
+The business is based in Northern Ireland and serves the UK and Ireland. The Supabase project is in **EU North (Stockholm)**, and `vercel.json` pins the server functions to Stockholm (`arn1`) so every request stays close to the database. The live site is https://tapfolio.co.uk (www redirects to it); card chips and QR codes use `HTTPS://TAPFOLIO.CO.UK/C/<ID>`.
 
 ### Database
 
