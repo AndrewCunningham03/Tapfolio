@@ -105,7 +105,13 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
               {order.quantity && order.quantity !== "1" ? `, ×${order.quantity}` : ""}
             </dd>
           </div>
-          <div><dt>Price</dt><dd>{formatPrice(Number(order.card_price), order.currency)} + {formatPrice(Number(order.monthly_price), order.currency)}/month</dd></div>
+          <div>
+            <dt>Price</dt>
+            <dd>
+              {Number(order.card_price) > 0 && `${formatPrice(Number(order.card_price), order.currency)} + `}
+              {formatPrice(Number(order.monthly_price), order.currency)}/month
+            </dd>
+          </div>
           <div><dt>Ordered</dt><dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</dd></div>
           {order.message && <div className={styles.orderMessage}><dt>Message</dt><dd>{order.message}</dd></div>}
         </dl>
