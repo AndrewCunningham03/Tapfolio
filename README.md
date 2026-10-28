@@ -70,7 +70,7 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (un
    - ✅ Design your page: six colour themes or any custom background + button colour (text contrast automatic), profile photo/logo, cover photo, gallery of up to 12 photos and 3 videos (50 MB each), stored in the public `profile-media` bucket via signed uploads
 6. ✅ Admin (`/admin`, emails in `ADMIN_EMAILS`): orders with design preview, status, "Create card + account", engraving SVGs with the real QR code
    - To do: disable/reassign cards, photo uploads
-7. Stripe for the £10/month subscription, card included with no upfront cost (grace period, then pause)
+7. Stripe for the £10/month subscription, card included; delivery (£3.50 UK, €6 Ireland, £6/€7 elsewhere, by Royal Mail) is a one-off charge with the first month (grace period, then pause)
 
 ## Making cards
 
