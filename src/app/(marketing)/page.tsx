@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CONTACT_EMAIL, GRACE_DAYS } from "@/lib/site";
+import { CONTACT_EMAIL, formatPrice, GRACE_DAYS, PRICES } from "@/lib/site";
 import { CardShowcase } from "./card-showcase";
 import { CurrencySwitch, Price } from "./currency";
 import { OrderForm } from "./order-form";
@@ -25,8 +25,8 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "What does it cost?",
     a: (
       <>
-        <Price of="monthly" /> a month, and that includes your card. Nothing to pay upfront and no contract: cancel
-        whenever you like, and your card simply stops showing your page.
+        <Price of="monthly" /> a month, and that includes your card. The only other cost is delivery, paid once with
+        your first month. No contract: cancel whenever you like, and your card simply stops showing your page.
       </>
     ),
   },
@@ -55,8 +55,8 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     a: "Change your details online and they update straight away. The card itself never needs reprinting.",
   },
   {
-    q: "Do you deliver to Ireland and the UK?",
-    a: "Yes, across Northern Ireland, Great Britain and the Republic of Ireland, with prices in sterling or euro.",
+    q: "Where do you deliver?",
+    a: `Anywhere. We post every card by Royal Mail: ${formatPrice(PRICES.GBP.delivery, "GBP")} across the UK (tracked), ${formatPrice(PRICES.EUR.delivery, "EUR")} to the Republic of Ireland, and ${formatPrice(PRICES.GBP.worldDelivery, "GBP")} or ${formatPrice(PRICES.EUR.worldDelivery, "EUR")} anywhere else, paid once with your first month. Outside the UK and EU, your country may charge import fees when it arrives.`,
   },
   {
     q: "Can I get cards for my whole team?",
@@ -90,7 +90,7 @@ export default function HomePage() {
               <strong>
                 <Price of="monthly" /> a month
               </strong>
-              , card included. No upfront cost, cancel any time.
+              , card included. Just <Price of="delivery" /> delivery, then cancel any time.
             </p>
           </div>
           <CardShowcase />
@@ -101,7 +101,7 @@ export default function HomePage() {
             <li>Tap or scan, no app</li>
             <li>Works on iPhone and Android</li>
             <li>Take payments</li>
-            <li>UK and Ireland</li>
+            <li>Posted worldwide</li>
           </ul>
         </div>
       </section>
@@ -189,7 +189,7 @@ export default function HomePage() {
         <div className={styles.wrap}>
           <p className={styles.eyebrow}>Who it&apos;s for</p>
           <h2>Made for people who are out on the job.</h2>
-          <p className={styles.sub}>Built in Northern Ireland for small businesses across the UK and Ireland.</p>
+          <p className={styles.sub}>Built in Northern Ireland for small businesses across the UK, Ireland and beyond.</p>
           <ul className={styles.trades}>
             {TRADES.map((t) => (
               <li key={t}>{t}</li>
@@ -209,7 +209,9 @@ export default function HomePage() {
                 <Price of="monthly" />
               </div>
               <p className={styles.priceThen}>a month, card included</p>
-              <p className={styles.priceSmall}>Nothing to pay upfront. No contract, cancel any time.</p>
+              <p className={styles.priceSmall}>
+                Plus <Price of="delivery" /> delivery with your first month. No contract, cancel any time.
+              </p>
               <Link className={styles.btn} href="#order">
                 Order your card
               </Link>

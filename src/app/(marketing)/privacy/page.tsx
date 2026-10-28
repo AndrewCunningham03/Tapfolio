@@ -23,8 +23,8 @@ export default function PrivacyPage() {
       <h2>Who we are</h2>
       <p>
         Tapfolio is run by [YOUR NAME / COMPANY NAME, company number if any], [ADDRESS], Northern Ireland. We are the
-        controller of the personal data described here. We serve customers in the United Kingdom and Ireland, so we
-        follow the UK GDPR and, for customers in Ireland, the EU GDPR. ICO registration number: [ICO REF]. [EU
+        controller of the personal data described here. We are based in the United Kingdom and also serve customers in
+        Ireland and elsewhere, so we follow the UK GDPR and, for customers in the EU, the EU GDPR. ICO registration number: [ICO REF]. [EU
         representative: name and address, if one is required.] Contact us about privacy at [PRIVACY EMAIL].
       </p>
 
