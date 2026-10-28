@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { FINISHES, LAYOUTS, type CardDesign } from "@/lib/card-design";
 import type { CardOrder, OrderStatus } from "@/lib/orders";
 import { CARD_URL_BASE, formatPrice } from "@/lib/site";
+import { deliveryPrice } from "../countries";
 import { CardBack, CardFront } from "../design/card-preview";
 import { loadLogoFromUrl, makeMask, tint } from "../design/logo";
 import { assignCard, makeCard, setOrderStatus, type AdminResult } from "./actions";
@@ -110,6 +111,7 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
             <dd>
               {Number(order.card_price) > 0 && `${formatPrice(Number(order.card_price), order.currency)} + `}
               {formatPrice(Number(order.monthly_price), order.currency)}/month
+              {` + ${formatPrice(deliveryPrice(order.country, order.currency), order.currency)} delivery`}
             </dd>
           </div>
           <div><dt>Ordered</dt><dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</dd></div>

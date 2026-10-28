@@ -1,8 +1,8 @@
 "use server";
 
 import { getAdminClient } from "@/lib/supabase/admin";
-import { PRICES, type Currency } from "@/lib/site";
-import { COUNTRIES } from "./countries";
+import { PRICES } from "@/lib/site";
+import { COUNTRIES, orderCurrency } from "./countries";
 
 export type OrderState = { status: "idle" | "ok" | "error"; message?: string };
 
@@ -25,7 +25,7 @@ export async function submitOrder(_prev: OrderState, form: FormData): Promise<Or
   const country = field(form, "country", 40);
   if (!COUNTRIES.includes(country)) return { status: "error", message: "Please choose where we should deliver." };
 
-  const currency: Currency = form.get("currency") === "EUR" ? "EUR" : "GBP";
+  const currency = orderCurrency(country, form.get("currency") === "EUR" ? "EUR" : "GBP");
   const quantity = field(form, "quantity", 10);
 
   const db = getAdminClient();
