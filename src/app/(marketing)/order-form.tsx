@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
-import { CONTACT_EMAIL } from "@/lib/site";
-import { COUNTRIES } from "./countries";
+import { useActionState, useState } from "react";
+import { CONTACT_EMAIL, formatPrice, PRICES } from "@/lib/site";
+import { COUNTRIES, deliveryPrice, orderCurrency } from "./countries";
 import { Price, useCurrency } from "./currency";
 import { submitOrder, type OrderState } from "./order-actions";
 import styles from "./marketing.module.css";
@@ -12,7 +12,10 @@ const initial: OrderState = { status: "idle" };
 
 export function OrderForm() {
   const currency = useCurrency();
+  const [country, setCountry] = useState("");
   const [state, action, pending] = useActionState(submitOrder, initial);
+  // Once they pick where to deliver, show exactly what they'll pay, in that country's currency.
+  const charged = orderCurrency(country, currency);
 
   if (state.status === "ok") {
     return (
@@ -50,7 +53,7 @@ export function OrderForm() {
         </div>
         <div>
           <label htmlFor="country">Where should we deliver?</label>
-          <select id="country" name="country" required defaultValue="">
+          <select id="country" name="country" required value={country} onChange={(e) => setCountry(e.target.value)}>
             <option value="" disabled>
               Choose…
             </option>
@@ -75,11 +78,18 @@ export function OrderForm() {
         </div>
         <div className={`${styles.full} ${styles.orderSummary}`}>
           <div>
-            <strong>
-              <Price of="monthly" />
-            </strong>{" "}
-            a month, card included
-            <span>Nothing to pay now. We email you a link to start your subscription. Cancel any time.</span>
+            <strong>{formatPrice(PRICES[charged].monthly, charged)}</strong> a month, card included
+            <span>
+              {country ? (
+                <>Plus {formatPrice(deliveryPrice(country, charged), charged)} delivery with your first month.</>
+              ) : (
+                <>
+                  Plus delivery with your first month: <Price of="delivery" /> in the{" "}
+                  {currency === "EUR" ? "Republic of Ireland" : "UK"}, <Price of="worldDelivery" /> elsewhere.
+                </>
+              )}{" "}
+              Nothing to pay now. We email you a link to start your subscription. Cancel any time.
+            </span>
           </div>
           <button className={styles.btn} type="submit" disabled={pending}>
             {pending ? "Sending…" : "Order my card"}

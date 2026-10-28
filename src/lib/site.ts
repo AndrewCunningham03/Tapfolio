@@ -14,13 +14,16 @@ export const CARD_URL_BASE = "HTTPS://TAPFOLIO.CO.UK/C/";
 export type Currency = "GBP" | "EUR";
 
 // One product: a monthly subscription that includes the card and keeps the
-// profile live. Nothing to pay upfront, so `card` (the upfront price) is 0.
+// profile live. The card itself is free, so `card` (the upfront price) is 0.
+// Delivery is paid once, with the first month: `delivery` is the home market
+// (UK in sterling, Ireland in euro) and `worldDelivery` is anywhere else.
+// Cards go by Royal Mail: Tracked 48 in the UK, International Standard abroad.
 // `goldCard` is the upfront price of gold and rose gold in the hidden card
 // designer. EUR prices are rounded equivalents.
 // Consumer prices must include VAT once registered.
 export const PRICES = {
-  GBP: { card: 0, goldCard: 35, monthly: 10 },
-  EUR: { card: 0, goldCard: 39, monthly: 12 },
+  GBP: { card: 0, goldCard: 35, monthly: 10, delivery: 3.5, worldDelivery: 6 },
+  EUR: { card: 0, goldCard: 39, monthly: 12, delivery: 6, worldDelivery: 7 },
 } as const satisfies Record<Currency, Record<string, number>>;
 
 export type PriceKey = keyof (typeof PRICES)["GBP"];
