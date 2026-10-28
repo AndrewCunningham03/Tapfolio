@@ -23,7 +23,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
               <Link href="/#faq">FAQ</Link>
               <Link href="/login">Sign in</Link>
               <Link className={`${styles.btn} ${styles.btnSmall}`} href="/#order">
-                Order · <Price of="card" />
+                Order · <Price of="monthly" />/month
               </Link>
             </nav>
           </div>

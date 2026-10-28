@@ -29,8 +29,12 @@ export async function sendSignInLink(_prev: LoginState, form: FormData): Promise
   // Same answer whether or not the email has an account, so nobody can use this
   // page to find out who our customers are.
   if (error && !/signups not allowed|not found|user not found/i.test(error.message)) {
-    if (/rate|seconds|too many/i.test(error.message)) {
+    if (/seconds/i.test(error.message)) {
       return { status: "error", message: "Please wait a minute before asking for another link." };
+    }
+    // Supabase's built-in email sender allows only a few emails an hour in total.
+    if (/rate|too many/i.test(error.message)) {
+      return { status: "error", message: "Too many sign-in emails have gone out in the last hour. Please try again later." };
     }
     console.error("sign-in link failed", error.message);
     return { status: "error", message: "We couldn't send the email just now. Please try again shortly." };
