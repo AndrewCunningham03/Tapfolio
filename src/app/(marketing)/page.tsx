@@ -25,8 +25,8 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "What does it cost?",
     a: (
       <>
-        <Price of="card" /> for the card, then <Price of="monthly" /> a month to keep your profile live. No contract:
-        cancel whenever you like.
+        <Price of="monthly" /> a month, and that includes your card. Nothing to pay upfront and no contract: cancel
+        whenever you like, and your card simply stops showing your page.
       </>
     ),
   },
@@ -80,7 +80,7 @@ export default function HomePage() {
             </p>
             <div className={styles.ctaRow}>
               <Link className={styles.btn} href="#order">
-                Order your card · <Price of="card" />
+                Order your card · <Price of="monthly" />/month
               </Link>
               <Link className={`${styles.btn} ${styles.ghost}`} href="#how">
                 See how it works
@@ -88,9 +88,9 @@ export default function HomePage() {
             </div>
             <p className={styles.priceNote}>
               <strong>
-                <Price of="card" /> card
+                <Price of="monthly" /> a month
               </strong>
-              , then <Price of="monthly" /> a month. Cancel any time.
+              , card included. No upfront cost, cancel any time.
             </p>
           </div>
           <CardShowcase />
@@ -206,18 +206,16 @@ export default function HomePage() {
           <div className={styles.priceCard}>
             <div className={styles.priceMain}>
               <div className={styles.priceBig}>
-                <Price of="card" />
+                <Price of="monthly" />
               </div>
-              <p className={styles.priceThen}>
-                then <Price of="monthly" /> a month
-              </p>
-              <p className={styles.priceSmall}>For the card, then your live profile. Cancel any time.</p>
+              <p className={styles.priceThen}>a month, card included</p>
+              <p className={styles.priceSmall}>Nothing to pay upfront. No contract, cancel any time.</p>
               <Link className={styles.btn} href="#order">
                 Order your card
               </Link>
             </div>
             <ul className={styles.includes}>
-              <li>Your Tapfolio card with a tap-to-share chip</li>
+              <li>Your Tapfolio card with a tap-to-share chip, at no extra cost</li>
               <li>Your own QR code on the back, for phones that can&apos;t tap</li>
               <li>Your own profile page with Save contact, in your colours</li>
               <li>Your logo, cover photo, and a gallery of photos and videos</li>
@@ -256,7 +254,8 @@ export default function HomePage() {
             <p className={styles.eyebrow}>Order</p>
             <h2>Get your card.</h2>
             <p className={styles.sub}>
-              Tell us where to send it. We&apos;ll email you a payment link, set up your profile, and post your card.
+              Tell us where to send it. We&apos;ll email you a link to start your subscription, set up your profile, and
+              post your card.
             </p>
             <p className={styles.contactLine}>
               Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
