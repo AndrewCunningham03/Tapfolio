@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
     // Card orders can include a logo (shrunk to <= 2 MB in the browser).
     serverActions: { bodySizeLimit: "3mb" },
   },
+  // The supplier pack download zips the card artwork from design/cards.
+  outputFileTracingIncludes: {
+    "/admin/batches/*/pack": ["./design/cards/SPEC.md", "./design/cards/out/proof.png", "./design/cards/out/print/*"],
+  },
   async redirects() {
     return [
       // The card designer is switched off for now (every card is the standard
