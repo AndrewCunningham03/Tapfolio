@@ -13,10 +13,17 @@ const LOGO_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
 
 function field(form: FormData, name: string, max: number): string {
-  return String(form.get(name) ?? "").trim().slice(0, max);
+  return String(form.get(name) ?? "")
+    .trim()
+    .slice(0, max);
 }
 
+// The designer is switched off (see redirects in next.config.ts), so refuse orders sent to it directly.
+const DESIGNER_OPEN = false;
+
 export async function submitCardOrder(_prev: OrderState, form: FormData): Promise<OrderState> {
+  if (!DESIGNER_OPEN)
+    return { status: "error", message: "The card designer is closed. Please order from the homepage." };
   // Bots fill the hidden field; pretend success so they don't retry.
   if (field(form, "company_url", 200)) return { status: "ok" };
 

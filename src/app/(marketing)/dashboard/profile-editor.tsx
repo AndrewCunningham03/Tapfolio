@@ -1,7 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
-import { HIDEABLE_FIELDS, PAY_LABELS, PAY_METHODS, SOCIAL_LABELS, SOCIAL_NETWORKS, type HideableField } from "@/lib/profile-fields";
+import { startTransition, useActionState } from "react";
+import {
+  HIDEABLE_FIELDS,
+  PAY_LABELS,
+  PAY_METHODS,
+  SOCIAL_LABELS,
+  SOCIAL_NETWORKS,
+  type HideableField,
+} from "@/lib/profile-fields";
 import { saveProfile, type SaveState } from "./actions";
 import styles from "../marketing.module.css";
 
@@ -27,11 +34,25 @@ export type EditableProfile = {
 
 const initial: SaveState = { status: "idle" };
 
-function Field(props: { name: string; label: string; value: string | null | undefined; type?: string; placeholder?: string; full?: boolean; hint?: string }) {
+function Field(props: {
+  name: string;
+  label: string;
+  value: string | null | undefined;
+  type?: string;
+  placeholder?: string;
+  full?: boolean;
+  hint?: string;
+}) {
   return (
     <div className={props.full ? styles.full : undefined}>
       <label htmlFor={props.name}>{props.label}</label>
-      <input id={props.name} name={props.name} type={props.type ?? "text"} defaultValue={props.value ?? ""} placeholder={props.placeholder} />
+      <input
+        id={props.name}
+        name={props.name}
+        type={props.type ?? "text"}
+        defaultValue={props.value ?? ""}
+        placeholder={props.placeholder}
+      />
       {props.hint && <p className={styles.fieldHint}>{props.hint}</p>}
     </div>
   );
@@ -43,7 +64,16 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
   const hidden = new Set(profile.hidden_fields);
 
   return (
-    <form className={styles.designForm} action={action}>
+    <form
+      className={styles.designForm}
+      onSubmit={(e) => {
+        // Submitted by hand, not through the form's action, so React doesn't reset the
+        // fields: if a save is rejected the customer keeps what they typed.
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => action(data));
+      }}
+    >
       <input type="hidden" name="profile_id" value={profile.id} />
 
       <fieldset>
@@ -54,7 +84,13 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
           <Field name="organisation" label="Business name" value={profile.organisation} full />
           <div className={styles.full}>
             <label htmlFor="about">About (a line or two)</label>
-            <textarea id="about" name="about" defaultValue={profile.about ?? ""} maxLength={600} placeholder="What you do and where you work" />
+            <textarea
+              id="about"
+              name="about"
+              defaultValue={profile.about ?? ""}
+              maxLength={600}
+              placeholder="What you do and where you work"
+            />
           </div>
         </div>
       </fieldset>
@@ -74,15 +110,34 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
 
       <fieldset>
         <legend>Get paid</legend>
-        <p className={styles.fieldHint}>Customers pay you directly. We never touch the money. Leave anything blank to hide it.</p>
+        <p className={styles.fieldHint}>
+          Customers pay you directly. We never touch the money. Leave anything blank to hide it.
+        </p>
         <div className={styles.form}>
           {PAY_METHODS.map((m) => (
-            <Field key={m} name={`pay_${m}`} label={PAY_LABELS[m].label} value={profile.pay_links[m]} placeholder={PAY_LABELS[m].example} full={m === "card"} />
+            <Field
+              key={m}
+              name={`pay_${m}`}
+              label={PAY_LABELS[m].label}
+              value={profile.pay_links[m]}
+              placeholder={PAY_LABELS[m].example}
+              full={m === "card"}
+            />
           ))}
           <Field name="bank_account_name" label="Bank account name" value={profile.bank.account_name} full />
           <Field name="bank_sort_code" label="Sort code (UK)" value={profile.bank.sort_code} placeholder="12-34-56" />
-          <Field name="bank_account_number" label="Account number (UK)" value={profile.bank.account_number} placeholder="12345678" />
-          <Field name="bank_iban" label="IBAN (Ireland)" value={profile.bank.iban} placeholder="IE29 AIBK 9311 5212 3456 78" />
+          <Field
+            name="bank_account_number"
+            label="Account number (UK)"
+            value={profile.bank.account_number}
+            placeholder="12345678"
+          />
+          <Field
+            name="bank_iban"
+            label="IBAN (Ireland)"
+            value={profile.bank.iban}
+            placeholder="IE29 AIBK 9311 5212 3456 78"
+          />
           <Field name="bank_bic" label="BIC (Ireland)" value={profile.bank.bic} placeholder="AIBKIE2D" />
         </div>
       </fieldset>
@@ -91,14 +146,22 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
         <legend>Social links</legend>
         <div className={styles.form}>
           {SOCIAL_NETWORKS.map((n) => (
-            <Field key={n} name={`social_${n}`} label={SOCIAL_LABELS[n]} value={profile.socials[n]} placeholder={n === "whatsapp" ? "https://wa.me/447700900123" : "https://…"} />
+            <Field
+              key={n}
+              name={`social_${n}`}
+              label={SOCIAL_LABELS[n]}
+              value={profile.socials[n]}
+              placeholder={n === "whatsapp" ? "https://wa.me/447700900123" : "https://…"}
+            />
           ))}
         </div>
       </fieldset>
 
       <fieldset>
         <legend>Hide from your card</legend>
-        <p className={styles.fieldHint}>Ticked details stay saved here but don&apos;t show on your public page or in Save contact.</p>
+        <p className={styles.fieldHint}>
+          Ticked details stay saved here but don&apos;t show on your public page or in Save contact.
+        </p>
         <div className={styles.checkGrid}>
           {(Object.keys(HIDEABLE_FIELDS) as HideableField[]).map((f) => (
             <label key={f} className={styles.check}>
@@ -114,7 +177,13 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
         <div className={styles.form}>
           <div className={styles.full}>
             <label htmlFor="slug">tapfolio.co.uk/</label>
-            <input id="slug" name="slug" defaultValue={profile.slug} pattern="[a-z0-9][a-z0-9\-]{1,38}[a-z0-9]" required />
+            <input
+              id="slug"
+              name="slug"
+              defaultValue={profile.slug}
+              pattern="[a-z0-9][a-z0-9\-]{1,38}[a-z0-9]"
+              required
+            />
             <p className={styles.fieldHint}>
               The address people can share. Your card keeps working if you change it, because the card has its own code.
             </p>
@@ -137,7 +206,10 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
         </div>
       </div>
       {state.status !== "idle" && (
-        <p className={`${styles.notice} ${state.status === "ok" ? styles.thanks : styles.formError}`} role={state.status === "ok" ? "status" : "alert"}>
+        <p
+          className={`${styles.notice} ${state.status === "ok" ? styles.thanks : styles.formError}`}
+          role={state.status === "ok" ? "status" : "alert"}
+        >
           {state.message}
         </p>
       )}

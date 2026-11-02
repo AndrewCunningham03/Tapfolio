@@ -114,7 +114,7 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
               {` + ${formatPrice(deliveryPrice(order.country, order.currency), order.currency)} delivery`}
             </dd>
           </div>
-          <div><dt>Ordered</dt><dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</dd></div>
+          <div><dt>Ordered</dt><dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/London" })}</dd></div>
           {order.message && <div className={styles.orderMessage}><dt>Message</dt><dd>{order.message}</dd></div>}
         </dl>
 

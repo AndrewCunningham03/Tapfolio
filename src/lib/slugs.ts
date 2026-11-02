@@ -1,9 +1,9 @@
 // Profile addresses (/<slug>). Rules match the check constraint and reserved
 // list in supabase/migrations/20261023000000_initial_schema.sql.
 export const RESERVED_SLUGS = new Set([
-  "about", "account", "admin", "api", "app", "auth", "billing", "c", "card", "cards", "claim",
+  "about", "account", "admin", "api", "app", "auth", "billing", "c", "card", "cards", "checkout", "claim",
   "contact", "dashboard", "design", "help", "login", "logout", "order", "p", "pricing", "privacy", "pro",
-  "profile", "register", "settings", "signin", "signup", "static", "support", "tapfolio", "terms", "www",
+  "profile", "register", "settings", "signin", "signup", "start", "static", "support", "tapfolio", "terms", "www",
 ]);
 
 const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/;

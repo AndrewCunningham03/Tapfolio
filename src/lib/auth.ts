@@ -33,5 +33,8 @@ export async function requireAdmin(): Promise<User> {
 
 /** Only allow redirects to paths on this site. */
 export function safeNext(value: unknown, fallback = "/dashboard"): string {
-  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : fallback;
+  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) return fallback;
+  // Browsers treat "\\" like "/" and drop tabs and newlines, so "/\\evil.com" would leave the site.
+  if (/[\\\u0000-\u001f\u007f]/.test(value)) return fallback;
+  return value;
 }
