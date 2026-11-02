@@ -113,7 +113,13 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
           )}
           <div>
             <dt>Deliver to</dt>
-            <dd>{order.country}</dd>
+            <dd>
+              {addressLines(order).map((line, i) => (
+                <span key={i} className={styles.addressLine}>
+                  {line}
+                </span>
+              ))}
+            </dd>
           </div>
           <div>
             <dt>Card</dt>
@@ -132,7 +138,13 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
           </div>
           <div>
             <dt>Ordered</dt>
-            <dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/London" })}</dd>
+            <dd>
+              {new Date(order.created_at).toLocaleString("en-GB", {
+                dateStyle: "medium",
+                timeStyle: "short",
+                timeZone: "Europe/London",
+              })}
+            </dd>
           </div>
           {order.message && (
             <div className={styles.orderMessage}>
@@ -263,4 +275,20 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
       )}
     </article>
   );
+}
+
+/** The posting address from Stripe, one line each; older orders only have a region. */
+function addressLines(order: CardOrder): string[] {
+  const a = order.shipping_address?.address;
+  if (!a) return [order.country];
+  const lines = [
+    order.shipping_address?.name,
+    a.line1,
+    a.line2,
+    a.city,
+    a.state,
+    a.postal_code,
+    a.country === "IE" ? "Ireland" : a.country === "GB" ? `United Kingdom (${order.country})` : a.country,
+  ];
+  return lines.filter((l): l is string => Boolean(l && l.trim()));
 }

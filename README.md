@@ -65,7 +65,7 @@ Demo cards from the seed: `/C/7KQ2XMP` (active, Ash & Oak Interiors) and `/C/4RD
    - ✅ Pay me on profiles (Revolut, PayPal, Monzo, card link, UK/IE bank details)
    - ✅ Card designer at `/design`: black, silver, gold, rose gold; name, title, logo, layout, back line; orders saved to `card_orders`, logos to the private `card-logos` bucket
 3. ✅ Stock cards (see "Making cards" below): make batches of card links in `/admin` and download the supplier pack; admin assigns a stock card to an order by its code
-4. ✅ Sign-in: email link (`/login`), no public sign-up; accounts are created from the admin page
+4. ✅ Sign-in: Google only (`/login`, Google's pop-up + Supabase ID-token sign-in). New sign-ups must be switched on in Supabase before customers can order
 5. ✅ Customer dashboard (`/dashboard`): edit profile, Pay me, socials, hidden fields, profile address; tap counts; "Edit my card" on their own profile
    - ✅ Design your page: six colour themes or any custom background + button colour (text contrast automatic), profile photo/logo, cover photo, gallery of up to 12 photos and 3 videos (50 MB each), stored in the public `profile-media` bucket via signed uploads
 6. ✅ Admin (`/admin`, emails in `ADMIN_EMAILS`): orders with design preview, status, "Create card + account", engraving SVGs with the real QR code

@@ -25,7 +25,13 @@ const pence = (amount: number) => Math.round(amount * 100);
  * One checkout: the first payment (card, delivery and first month) is taken now, the
  * subscription then waits out that first month and bills the monthly price from then on.
  */
-export async function createCheckout(opts: { userId: string; email: string; country: string; origin: string }) {
+export async function createCheckout(opts: {
+  userId: string;
+  email: string;
+  country: string;
+  origin: string;
+  customerId?: string | null;
+}) {
   const stripe = getStripe();
   const shipTo = SHIP_TO[opts.country];
   if (!stripe || !shipTo) return null;
@@ -36,7 +42,7 @@ export async function createCheckout(opts: { userId: string; email: string; coun
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    customer_email: opts.email,
+    ...(opts.customerId ? { customer: opts.customerId } : { customer_email: opts.email }),
     line_items: [
       {
         quantity: 1,

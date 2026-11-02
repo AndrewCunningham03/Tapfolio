@@ -60,7 +60,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Can I get cards for my whole team?",
-    a: "Yes. Each person gets their own card and profile. Tell us how many you need in the order form and we'll set them all up.",
+    a: "Yes. Each person gets their own card and profile. Email us with how many you need and we'll set them all up.",
   },
 ];
 

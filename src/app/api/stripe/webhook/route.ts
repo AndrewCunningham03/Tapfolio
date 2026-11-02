@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { PRICES, type Currency } from "@/lib/site";
 import { getStripe } from "@/lib/stripe";
+import { ensureProfileForOrder, type CardOrder } from "@/lib/orders";
 import { getAdminClient } from "@/lib/supabase/admin";
 
 // Stripe calls this when someone pays, a payment fails, or a subscription changes.
@@ -22,7 +23,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    if (event.type === "checkout.session.completed") {
+    // Card payments arrive with "completed"; delayed ones (direct debit) with "async_payment_succeeded".
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       await recordOrder(stripe, db, event.data.object);
     } else if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
       await recordSubscription(db, event.data.object);
@@ -86,6 +88,14 @@ async function recordOrder(stripe: Stripe, db: Db, session: Stripe.Checkout.Sess
     { onConflict: "stripe_session_id", ignoreDuplicates: true },
   );
   if (error) throw new Error(error.message);
+
+  // Their page exists from the moment they pay; the card is linked to it when posted.
+  const { data: order } = await db
+    .from("card_orders")
+    .select("*")
+    .eq("stripe_session_id", session.id)
+    .single<CardOrder>();
+  if (order) await ensureProfileForOrder(db, order);
 
   if (typeof session.subscription === "string") {
     await recordSubscription(db, await stripe.subscriptions.retrieve(session.subscription));

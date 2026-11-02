@@ -7,11 +7,22 @@ import { mediaUrl, PROFILE_COLUMNS, type ProfileRow } from "@/lib/profiles";
 import { normaliseTheme } from "@/lib/themes";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { getServerClient } from "@/lib/supabase/server";
+import { openBilling } from "./billing";
+import { DashboardNotices } from "./notices";
 import { PageDesigner, type DesignerMedia } from "./page-designer";
 import { ProfileEditor } from "./profile-editor";
 import styles from "../marketing.module.css";
 
 export const metadata: Metadata = { title: "Your card", robots: { index: false } };
+
+const SUB_LABELS: Record<string, string> = {
+  trialing: "active (first month paid)",
+  active: "active",
+  past_due: "payment overdue",
+  unpaid: "unpaid",
+  canceled: "cancelled",
+  incomplete: "payment not finished",
+};
 
 export default function DashboardPage() {
   return (
@@ -51,7 +62,11 @@ async function tapCounts(profileId: string) {
   if (!db) return null;
   const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
   const count = async (source: string, recent = false) => {
-    let q = db.from("taps").select("id", { count: "exact", head: true }).eq("profile_id", profileId).eq("source", source);
+    let q = db
+      .from("taps")
+      .select("id", { count: "exact", head: true })
+      .eq("profile_id", profileId)
+      .eq("source", source);
     if (recent) q = q.gte("created_at", since);
     return (await q).count ?? 0;
   };
@@ -87,26 +102,57 @@ async function Dashboard() {
         <Head title="No card yet" admin={admin} />
         <p className={styles.sub}>
           You&apos;re signed in as {user.email}, but there&apos;s no card linked to this email yet.{" "}
-          {admin ? "Cards are made from the admin page." : <>Once your card is made it will appear here. <Link href="/design">Design a card</Link>.</>}
+          {admin ? (
+            "Cards are made from the admin page."
+          ) : (
+            <>
+              Once your card is ordered it will appear here. <Link href="/start">Get your card</Link>.
+            </>
+          )}
         </p>
       </>
     );
   }
 
-  const [{ data: cards }, stats, media] = await Promise.all([
-    supabase.from("cards").select("id, status").eq("profile_id", profile.id).returns<{ id: string; status: string }[]>(),
+  const [{ data: cards }, stats, media, { data: sub }] = await Promise.all([
+    supabase
+      .from("cards")
+      .select("id, status")
+      .eq("profile_id", profile.id)
+      .returns<{ id: string; status: string }[]>(),
     tapCounts(profile.id),
     galleryFor(profile.id),
+    supabase.from("subscriptions").select("status").maybeSingle<{ status: string }>(),
   ]);
 
   return (
     <>
       <Head title={`Hi ${profile.full_name.split(/\s+/)[0]}`} admin={admin} />
+      <DashboardNotices />
+      {sub && (
+        <form action={openBilling} className={styles.billingRow}>
+          <span>
+            Subscription: <strong>{SUB_LABELS[sub.status] ?? sub.status}</strong>
+          </span>
+          <button className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`} type="submit">
+            Manage billing
+          </button>
+        </form>
+      )}
       {stats && (
         <div className={styles.statRow}>
-          <div><strong>{stats.recentTaps}</strong><span>taps in the last 30 days</span></div>
-          <div><strong>{stats.taps}</strong><span>taps in total</span></div>
-          <div><strong>{stats.saves}</strong><span>contacts saved</span></div>
+          <div>
+            <strong>{stats.recentTaps}</strong>
+            <span>taps in the last 30 days</span>
+          </div>
+          <div>
+            <strong>{stats.taps}</strong>
+            <span>taps in total</span>
+          </div>
+          <div>
+            <strong>{stats.saves}</strong>
+            <span>contacts saved</span>
+          </div>
           <div>
             <strong>{cards?.length ?? 0}</strong>
             <span>

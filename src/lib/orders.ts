@@ -29,6 +29,22 @@ export type CardOrder = {
   monthly_price: number;
   card_id: string | null;
   created_at: string;
+  // Set for orders paid through Stripe Checkout.
+  user_id: string | null;
+  shipping_address: ShippingDetails | null;
+};
+
+/** Where to post the card, as Stripe Checkout collected it. */
+export type ShippingDetails = {
+  name?: string | null;
+  address?: {
+    line1?: string | null;
+    line2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postal_code?: string | null;
+    country?: string | null;
+  } | null;
 };
 
 const UNIQUE_VIOLATION = "23505";
@@ -54,7 +70,11 @@ function profileCountry(country: string): string | null {
   return null;
 }
 
-async function findOrCreateProfile(db: SupabaseClient, userId: string, order: CardOrder): Promise<{ id: string; slug: string }> {
+async function findOrCreateProfile(
+  db: SupabaseClient,
+  userId: string,
+  order: CardOrder,
+): Promise<{ id: string; slug: string }> {
   const existing = await db.from("profiles").select("id, slug").eq("user_id", userId).limit(1).maybeSingle();
   if (existing.data) return existing.data;
 
@@ -92,7 +112,9 @@ async function findOrCreateProfile(db: SupabaseClient, userId: string, order: Ca
 async function issueCard(db: SupabaseClient, profileId: string): Promise<string> {
   for (let attempt = 0; attempt < 5; attempt++) {
     const id = newCardId();
-    const { error } = await db.from("cards").insert({ id, status: "active", profile_id: profileId, claimed_at: new Date().toISOString() });
+    const { error } = await db
+      .from("cards")
+      .insert({ id, status: "active", profile_id: profileId, claimed_at: new Date().toISOString() });
     if (!error) return id;
     if (error.code !== UNIQUE_VIOLATION) throw new Error(`Could not create the card: ${error.message}`);
   }
@@ -108,7 +130,7 @@ export async function createCardForOrder(db: SupabaseClient, orderId: number) {
   if (error || !order) throw new Error("Order not found.");
   if (order.card_id) return { cardId: order.card_id, alreadyExisted: true };
 
-  const userId = await findOrCreateUser(db, order.email);
+  const userId = order.user_id ?? (await findOrCreateUser(db, order.email));
   const profile = await findOrCreateProfile(db, userId, order);
   const cardId = await issueCard(db, profile.id);
 
@@ -131,11 +153,16 @@ export async function assignStockCard(db: SupabaseClient, orderId: number, rawCa
   if (error || !order) throw new Error("Order not found.");
   if (order.card_id) return { cardId: order.card_id, alreadyExisted: true };
 
-  const { data: card } = await db.from("cards").select("id, status").eq("id", cardId).maybeSingle<{ id: string; status: string }>();
+  const { data: card } = await db
+    .from("cards")
+    .select("id, status")
+    .eq("id", cardId)
+    .maybeSingle<{ id: string; status: string }>();
   if (!card) throw new Error(`Card ${cardId} doesn't exist. Check the code in the card's link.`);
   if (card.status !== "unclaimed") throw new Error(`Card ${cardId} is already in use (${card.status}).`);
 
-  const userId = await findOrCreateUser(db, order.email);
+  // Paid orders belong to the account that signed in and paid; older orders go by email.
+  const userId = order.user_id ?? (await findOrCreateUser(db, order.email));
   const profile = await findOrCreateProfile(db, userId, order);
 
   // Only claim it while it's still unclaimed, so two orders can't take the same card.
@@ -150,4 +177,10 @@ export async function assignStockCard(db: SupabaseClient, orderId: number, rawCa
   const { error: linkError } = await db.from("card_orders").update({ card_id: cardId }).eq("id", order.id);
   if (linkError) throw new Error(`Card ${cardId} is active but not linked to the order: ${linkError.message}`);
   return { cardId, slug: profile.slug, alreadyExisted: false };
+}
+
+/** Give a paying customer their profile straight away, so they can set up their page before the card arrives. */
+export async function ensureProfileForOrder(db: SupabaseClient, order: CardOrder) {
+  if (!order.user_id) return null;
+  return findOrCreateProfile(db, order.user_id, order);
 }
