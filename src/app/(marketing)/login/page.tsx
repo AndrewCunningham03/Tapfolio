@@ -11,10 +11,10 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
     <div className={`${styles.wrap} ${styles.narrow} ${styles.legal}`}>
       <p className={styles.eyebrow}>Your card</p>
       <h1>Sign in</h1>
-      <p>Enter the email you ordered your card with and we&apos;ll send you a link to sign in. No password needed.</p>
+      <p>Sign in with Google, or enter the email you ordered your card with and we&apos;ll send you a link. No password needed.</p>
       <Suspense>
         {searchParams.then((p) => (
-          <LoginForm next={safeNext(p.next)} linkError={p.error === "link"} />
+          <LoginForm next={safeNext(p.next)} linkError={p.error === "link"} googleError={p.error === "google"} />
         ))}
       </Suspense>
     </div>
