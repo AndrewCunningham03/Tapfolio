@@ -16,17 +16,15 @@ export const GOOGLE_CLIENT_ID = "96400455356-62o39snk1n9h5j201cevpevddb3cmsof.ap
 
 export type Currency = "GBP" | "EUR";
 
-// One product: a monthly subscription that includes the card and keeps the
-// profile live. The card itself is free, so `card` (the upfront price) is 0.
-// Delivery is paid once, with the first month: `delivery` is the home market
-// (UK in sterling, Ireland in euro) and `worldDelivery` is anywhere else.
-// Cards go by Royal Mail: Tracked 48 in the UK, International Standard abroad.
-// `goldCard` is the upfront price of gold and rose gold in the hidden card
-// designer. EUR prices are rounded equivalents.
+// One product, sold in the UK (sterling) and Ireland (euro): `start` is the first
+// payment, which covers the card, its delivery and the first month; after that
+// it is `monthly`. `card` is only the upfront price used by the hidden card
+// designer, whose gold and rose gold finishes cost `goldCard`.
+// Cards go by Royal Mail. EUR prices are rounded equivalents.
 // Consumer prices must include VAT once registered.
 export const PRICES = {
-  GBP: { card: 0, goldCard: 35, monthly: 10, delivery: 3.5, worldDelivery: 6 },
-  EUR: { card: 0, goldCard: 39, monthly: 12, delivery: 6, worldDelivery: 7 },
+  GBP: { card: 0, goldCard: 35, start: 30, monthly: 6.99 },
+  EUR: { card: 0, goldCard: 39, start: 36, monthly: 8.99 },
 } as const satisfies Record<Currency, Record<string, number>>;
 
 export type PriceKey = keyof (typeof PRICES)["GBP"];

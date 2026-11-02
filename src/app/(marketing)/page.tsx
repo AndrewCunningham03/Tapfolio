@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { CONTACT_EMAIL, formatPrice, GRACE_DAYS, PRICES } from "@/lib/site";
+import { CONTACT_EMAIL, GRACE_DAYS } from "@/lib/site";
 import { CardShowcase } from "./card-showcase";
 import { CurrencySwitch, Price } from "./currency";
-import { OrderForm } from "./order-form";
 import styles from "./marketing.module.css";
 
 const TRADES = [
@@ -25,8 +24,9 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "What does it cost?",
     a: (
       <>
-        <Price of="monthly" /> a month, and that includes your card. The only other cost is delivery, paid once with
-        your first month. No contract: cancel whenever you like, and your card simply stops showing your page.
+        <Price of="start" /> to start, which covers your card, its delivery and your first month. After that it&apos;s{" "}
+        <Price of="monthly" /> a month. No contract: cancel whenever you like, and your card simply stops showing your
+        page.
       </>
     ),
   },
@@ -56,7 +56,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Where do you deliver?",
-    a: `Anywhere. We post every card by Royal Mail: ${formatPrice(PRICES.GBP.delivery, "GBP")} across the UK (tracked), ${formatPrice(PRICES.EUR.delivery, "EUR")} to the Republic of Ireland, and ${formatPrice(PRICES.GBP.worldDelivery, "GBP")} or ${formatPrice(PRICES.EUR.worldDelivery, "EUR")} anywhere else, paid once with your first month. Outside the UK and EU, your country may charge import fees when it arrives.`,
+    a: "Across Northern Ireland, Great Britain and the Republic of Ireland. We post every card by Royal Mail, and delivery is included in your first payment.",
   },
   {
     q: "Can I get cards for my whole team?",
@@ -79,8 +79,8 @@ export default function HomePage() {
               prices whenever you like. The card never needs reprinting.
             </p>
             <div className={styles.ctaRow}>
-              <Link className={styles.btn} href="#order">
-                Order your card · <Price of="monthly" />/month
+              <Link className={styles.btn} href="/start">
+                Order your card · <Price of="start" /> to start
               </Link>
               <Link className={`${styles.btn} ${styles.ghost}`} href="#how">
                 See how it works
@@ -88,9 +88,9 @@ export default function HomePage() {
             </div>
             <p className={styles.priceNote}>
               <strong>
-                <Price of="monthly" /> a month
+                <Price of="start" /> to start
               </strong>
-              , card included. Just <Price of="delivery" /> delivery, then cancel any time.
+              , with the card, delivery and first month included. Then <Price of="monthly" /> a month, cancel any time.
             </p>
           </div>
           <CardShowcase />
@@ -101,7 +101,7 @@ export default function HomePage() {
             <li>Tap or scan, no app</li>
             <li>Works on iPhone and Android</li>
             <li>Take payments</li>
-            <li>Posted worldwide</li>
+            <li>UK and Ireland</li>
           </ul>
         </div>
       </section>
@@ -189,7 +189,7 @@ export default function HomePage() {
         <div className={styles.wrap}>
           <p className={styles.eyebrow}>Who it&apos;s for</p>
           <h2>Made for people who are out on the job.</h2>
-          <p className={styles.sub}>Built in Northern Ireland for small businesses across the UK, Ireland and beyond.</p>
+          <p className={styles.sub}>Built in Northern Ireland for small businesses across the UK and Ireland.</p>
           <ul className={styles.trades}>
             {TRADES.map((t) => (
               <li key={t}>{t}</li>
@@ -206,18 +206,20 @@ export default function HomePage() {
           <div className={styles.priceCard}>
             <div className={styles.priceMain}>
               <div className={styles.priceBig}>
-                <Price of="monthly" />
+                <Price of="start" />
               </div>
-              <p className={styles.priceThen}>a month, card included</p>
-              <p className={styles.priceSmall}>
-                Plus <Price of="delivery" /> delivery with your first month. No contract, cancel any time.
+              <p className={styles.priceThen}>
+                to start, then <Price of="monthly" /> a month
               </p>
-              <Link className={styles.btn} href="#order">
+              <p className={styles.priceSmall}>
+                Your card, delivery and first month are included. No contract, cancel any time.
+              </p>
+              <Link className={styles.btn} href="/start">
                 Order your card
               </Link>
             </div>
             <ul className={styles.includes}>
-              <li>Your Tapfolio card with a tap-to-share chip, at no extra cost</li>
+              <li>Your Tapfolio card with a tap-to-share chip, posted to you</li>
               <li>Your own QR code on the back, for phones that can&apos;t tap</li>
               <li>Your own profile page with Save contact, in your colours</li>
               <li>Your logo, cover photo, and a gallery of photos and videos</li>
@@ -256,14 +258,18 @@ export default function HomePage() {
             <p className={styles.eyebrow}>Order</p>
             <h2>Get your card.</h2>
             <p className={styles.sub}>
-              Tell us where to send it. We&apos;ll email you a link to start your subscription, set up your profile, and
-              post your card.
+              Sign in with Google, tell us where to send it, and pay. Then set up your profile while your card is on its
+              way.
             </p>
+            <div className={styles.ctaRow}>
+              <Link className={styles.btn} href="/start">
+                Order your card · <Price of="start" /> to start
+              </Link>
+            </div>
             <p className={styles.contactLine}>
               Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
           </div>
-          <OrderForm />
         </div>
       </section>
     </>

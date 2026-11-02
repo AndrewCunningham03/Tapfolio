@@ -1,0 +1,93 @@
+import type Stripe from "stripe";
+import { PRICES, type Currency } from "@/lib/site";
+import { getStripe } from "@/lib/stripe";
+import { getAdminClient } from "@/lib/supabase/admin";
+
+// Stripe calls this when someone pays, a payment fails, or a subscription changes.
+// The signature check is what proves the call really came from Stripe.
+export async function POST(req: Request) {
+  const stripe = getStripe();
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const db = getAdminClient();
+  if (!stripe || !secret || !db) return new Response("Not configured", { status: 500 });
+
+  const signature = req.headers.get("stripe-signature");
+  if (!signature) return new Response("Missing signature", { status: 400 });
+
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(await req.text(), signature, secret);
+  } catch {
+    return new Response("Bad signature", { status: 400 });
+  }
+
+  try {
+    if (event.type === "checkout.session.completed") {
+      await recordOrder(stripe, db, event.data.object);
+    } else if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
+      await recordSubscription(db, event.data.object);
+    }
+  } catch (e) {
+    // A non-2xx answer makes Stripe retry later.
+    console.error("stripe webhook failed", event.type, e instanceof Error ? e.message : e);
+    return new Response("Failed", { status: 500 });
+  }
+  return new Response("ok");
+}
+
+type Db = NonNullable<ReturnType<typeof getAdminClient>>;
+
+async function recordSubscription(db: Db, sub: Stripe.Subscription) {
+  const userId = sub.metadata.user_id;
+  if (!userId) return;
+  // Newer Stripe versions keep the billing period on the subscription's items.
+  const periodEnd = sub.items.data[0]?.current_period_end;
+  const { error } = await db.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer.id,
+      stripe_subscription_id: sub.id,
+      status: sub.status,
+      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    },
+    { onConflict: "user_id" },
+  );
+  if (error) throw new Error(error.message);
+}
+
+async function recordOrder(stripe: Stripe, db: Db, session: Stripe.Checkout.Session) {
+  if (session.mode !== "subscription" || session.payment_status === "unpaid") return;
+  const userId = session.metadata?.user_id;
+  const country = session.metadata?.country;
+  if (!userId || !country) return;
+  const currency: Currency = session.metadata?.currency === "EUR" ? "EUR" : "GBP";
+
+  const details = session.customer_details;
+  const shipping = session as unknown as {
+    collected_information?: { shipping_details?: unknown };
+    shipping_details?: unknown;
+  };
+  const { error } = await db.from("card_orders").upsert(
+    {
+      status: "paid",
+      user_id: userId,
+      stripe_session_id: session.id,
+      stripe_customer_id: typeof session.customer === "string" ? session.customer : null,
+      name: details?.name || details?.email || "Customer",
+      email: details?.email ?? session.customer_email ?? "",
+      phone: details?.phone ?? null,
+      country,
+      quantity: "1",
+      currency,
+      card_price: PRICES[currency].start,
+      monthly_price: PRICES[currency].monthly,
+      shipping_address: shipping.collected_information?.shipping_details ?? shipping.shipping_details ?? null,
+    },
+    { onConflict: "stripe_session_id", ignoreDuplicates: true },
+  );
+  if (error) throw new Error(error.message);
+
+  if (typeof session.subscription === "string") {
+    await recordSubscription(db, await stripe.subscriptions.retrieve(session.subscription));
+  }
+}

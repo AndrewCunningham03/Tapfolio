@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Manrope } from "next/font/google";
-import { CurrencyProvider, Price } from "./currency";
+import { CONTACT_EMAIL } from "@/lib/site";
+import { CurrencyProvider } from "./currency";
 import { Wordmark } from "./wordmark";
 import styles from "./marketing.module.css";
 
@@ -22,8 +23,8 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
               <Link href="/#pricing">Pricing</Link>
               <Link href="/#faq">FAQ</Link>
               <Link href="/login">Sign in</Link>
-              <Link className={`${styles.btn} ${styles.btnSmall}`} href="/#order">
-                Order · <Price of="monthly" />/month
+              <Link className={`${styles.btn} ${styles.btnSmall}`} href="/start">
+                Get your card
               </Link>
             </nav>
           </div>
@@ -37,7 +38,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
               <Wordmark />
             </Link>
             <nav aria-label="Footer">
-              <Link href="/#order">Contact</Link>
+              <a href={`mailto:${CONTACT_EMAIL}`}>Contact</a>
               <Link href="/privacy">Privacy</Link>
             </nav>
             <span>© Tapfolio · Northern Ireland</span>
