@@ -3,7 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { IMAGE_MAX_SIDE, IMAGE_TYPES, MAX_PHOTOS, MAX_VIDEO_BYTES, MAX_VIDEOS, VIDEO_TYPES, type UploadKind } from "@/lib/media-limits";
+import {
+  IMAGE_MAX_SIDE,
+  IMAGE_TYPES,
+  MAX_PHOTOS,
+  MAX_VIDEO_BYTES,
+  MAX_VIDEOS,
+  VIDEO_TYPES,
+  type UploadKind,
+} from "@/lib/media-limits";
 import { THEME_PRESETS, themeVars, type PresetId, type ThemeChoice } from "@/lib/themes";
 import { deleteMedia, finishUpload, removeImage, requestUpload, saveTheme } from "./media-actions";
 import styles from "../marketing.module.css";
@@ -49,7 +57,11 @@ export function PageDesigner(props: {
   const [busy, setBusy] = useState<string | null>(null);
   const [, startRefresh] = useTransition();
   const storage = useMemo(
-    () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!).storage.from(BUCKET),
+    () =>
+      createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      ).storage.from(BUCKET),
     [],
   );
 
@@ -66,7 +78,8 @@ export function PageDesigner(props: {
     let width: number | undefined;
     let height: number | undefined;
     if (kind !== "video") {
-      if (!IMAGE_TYPES.includes(file.type) && !file.type.startsWith("image/")) throw new Error("Please choose a photo (JPG, PNG or WebP).");
+      if (!IMAGE_TYPES.includes(file.type) && !file.type.startsWith("image/"))
+        throw new Error("Please choose a photo (JPG, PNG or WebP).");
       ({ blob: body, width, height } = await shrinkImage(file, IMAGE_MAX_SIDE[kind]));
       type = "image/jpeg";
     } else {
@@ -88,7 +101,13 @@ export function PageDesigner(props: {
     setBusy(kind);
     try {
       for (const file of Array.from(files)) await upload(kind, file);
-      done(kind === "avatar" ? "Profile photo updated." : kind === "cover" ? "Cover photo updated." : "Added to your gallery.");
+      done(
+        kind === "avatar"
+          ? "Profile photo updated."
+          : kind === "cover"
+            ? "Cover photo updated."
+            : "Added to your gallery.",
+      );
     } catch (err) {
       setStatus({ ok: false, message: err instanceof Error ? err.message : "Upload failed." });
       startRefresh(() => router.refresh());
@@ -101,8 +120,14 @@ export function PageDesigner(props: {
   async function run(label: string, fn: () => Promise<{ ok: boolean; message?: string }>, success: string) {
     setStatus(null);
     setBusy(label);
-    const result = await fn();
-    setBusy(null);
+    let result: { ok: boolean; message?: string };
+    try {
+      result = await fn();
+    } catch {
+      result = { ok: false, message: "Something went wrong. Please try again." };
+    } finally {
+      setBusy(null);
+    }
     if (result.ok) done(success);
     else setStatus({ ok: false, message: result.message ?? "Something went wrong." });
   }
@@ -119,15 +144,33 @@ export function PageDesigner(props: {
               const p = THEME_PRESETS[id];
               return (
                 <label key={id} className={styles.swatch} data-checked={theme.preset === id}>
-                  <input type="radio" name="theme" checked={theme.preset === id} onChange={() => setTheme({ preset: id })} />
-                  <span className={styles.swatchChip} style={{ background: `linear-gradient(135deg, ${p.bg} 0 50%, ${p.accent} 50%)` }} />
+                  <input
+                    type="radio"
+                    name="theme"
+                    checked={theme.preset === id}
+                    onChange={() => setTheme({ preset: id })}
+                  />
+                  <span
+                    className={styles.swatchChip}
+                    style={{ background: `linear-gradient(135deg, ${p.bg} 0 50%, ${p.accent} 50%)` }}
+                  />
                   <span className={styles.swatchLabel}>{p.label}</span>
                 </label>
               );
             })}
             <label className={styles.swatch} data-checked={theme.preset === "custom"}>
-              <input type="radio" name="theme" checked={theme.preset === "custom"} onChange={() => setTheme({ preset: "custom", background: theme.background ?? "#ffffff", accent: theme.accent })} />
-              <span className={styles.swatchChip} style={{ background: "conic-gradient(#f43f5e, #f59e0b, #22c55e, #3b82f6, #a855f7, #f43f5e)" }} />
+              <input
+                type="radio"
+                name="theme"
+                checked={theme.preset === "custom"}
+                onChange={() =>
+                  setTheme({ preset: "custom", background: theme.background ?? "#ffffff", accent: theme.accent })
+                }
+              />
+              <span
+                className={styles.swatchChip}
+                style={{ background: "conic-gradient(#f43f5e, #f59e0b, #22c55e, #3b82f6, #a855f7, #f43f5e)" }}
+              />
               <span className={styles.swatchLabel}>Custom</span>
             </label>
           </div>
@@ -146,7 +189,11 @@ export function PageDesigner(props: {
           {theme.preset === "custom" && (
             <label>
               Background
-              <input type="color" value={theme.background ?? "#ffffff"} onChange={(e) => setTheme({ ...theme, background: e.target.value })} />
+              <input
+                type="color"
+                value={theme.background ?? "#ffffff"}
+                onChange={(e) => setTheme({ ...theme, background: e.target.value })}
+              />
             </label>
           )}
           <label>
@@ -158,11 +205,20 @@ export function PageDesigner(props: {
             />
           </label>
           {theme.accent && (
-            <button type="button" className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`} onClick={() => setTheme({ ...theme, accent: undefined })}>
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`}
+              onClick={() => setTheme({ ...theme, accent: undefined })}
+            >
               Reset button colour
             </button>
           )}
-          <button type="button" className={styles.btn} disabled={busy !== null} onClick={() => run("theme", () => saveTheme(theme), "Colours saved. Your card shows them now.")}>
+          <button
+            type="button"
+            className={styles.btn}
+            disabled={busy !== null}
+            onClick={() => run("theme", () => saveTheme(theme), "Colours saved. Your card shows them now.")}
+          >
             {busy === "theme" ? "Saving…" : "Save colours"}
           </button>
         </div>
@@ -179,10 +235,20 @@ export function PageDesigner(props: {
             </div>
             <label className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`}>
               {busy === "avatar" ? "Uploading…" : props.photoUrl ? "Change photo or logo" : "Add photo or logo"}
-              <input type="file" accept="image/*" hidden disabled={busy !== null} onChange={(e) => onFiles("avatar", e.target.files, e.target)} />
+              <input
+                type="file"
+                accept="image/*"
+                className={styles.fileInput}
+                disabled={busy !== null}
+                onChange={(e) => onFiles("avatar", e.target.files, e.target)}
+              />
             </label>
             {props.photoUrl && (
-              <button type="button" className={styles.linkButton} onClick={() => run("avatar-remove", () => removeImage("avatar"), "Profile photo removed.")}>
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={() => run("avatar-remove", () => removeImage("avatar"), "Profile photo removed.")}
+              >
                 Remove
               </button>
             )}
@@ -194,10 +260,20 @@ export function PageDesigner(props: {
             </div>
             <label className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`}>
               {busy === "cover" ? "Uploading…" : props.coverUrl ? "Change cover photo" : "Add cover photo"}
-              <input type="file" accept="image/*" hidden disabled={busy !== null} onChange={(e) => onFiles("cover", e.target.files, e.target)} />
+              <input
+                type="file"
+                accept="image/*"
+                className={styles.fileInput}
+                disabled={busy !== null}
+                onChange={(e) => onFiles("cover", e.target.files, e.target)}
+              />
             </label>
             {props.coverUrl && (
-              <button type="button" className={styles.linkButton} onClick={() => run("cover-remove", () => removeImage("cover"), "Cover photo removed.")}>
+              <button
+                type="button"
+                className={styles.linkButton}
+                onClick={() => run("cover-remove", () => removeImage("cover"), "Cover photo removed.")}
+              >
                 Remove
               </button>
             )}
@@ -208,17 +284,30 @@ export function PageDesigner(props: {
       <fieldset>
         <legend>Photos and videos</legend>
         <p className={styles.fieldHint}>
-          Show off your work: up to {MAX_PHOTOS} photos ({photos} used) and {MAX_VIDEOS} videos of up to 50 MB each ({videos} used).
-          MP4 videos play on every phone.
+          Show off your work: up to {MAX_PHOTOS} photos ({photos} used) and {MAX_VIDEOS} videos of up to 50 MB each (
+          {videos} used). MP4 videos play on every phone.
         </p>
         <div className={styles.ctaRow} style={{ marginTop: 12 }}>
           <label className={`${styles.btn} ${styles.btnSmall}`} aria-disabled={photos >= MAX_PHOTOS || busy !== null}>
             {busy === "photo" ? "Uploading…" : "Add photos"}
-            <input type="file" accept="image/*" multiple hidden disabled={photos >= MAX_PHOTOS || busy !== null} onChange={(e) => onFiles("photo", e.target.files, e.target)} />
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className={styles.fileInput}
+              disabled={photos >= MAX_PHOTOS || busy !== null}
+              onChange={(e) => onFiles("photo", e.target.files, e.target)}
+            />
           </label>
           <label className={`${styles.btn} ${styles.btnSmall}`} aria-disabled={videos >= MAX_VIDEOS || busy !== null}>
             {busy === "video" ? "Uploading video…" : "Add a video"}
-            <input type="file" accept="video/mp4,video/webm,video/quicktime" hidden disabled={videos >= MAX_VIDEOS || busy !== null} onChange={(e) => onFiles("video", e.target.files, e.target)} />
+            <input
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              className={styles.fileInput}
+              disabled={videos >= MAX_VIDEOS || busy !== null}
+              onChange={(e) => onFiles("video", e.target.files, e.target)}
+            />
           </label>
         </div>
         {props.media.length > 0 && (
@@ -231,7 +320,12 @@ export function PageDesigner(props: {
                   // eslint-disable-next-line @next/next/no-img-element -- user upload
                   <img src={m.url} alt="" loading="lazy" />
                 )}
-                <button type="button" aria-label={`Delete this ${m.kind}`} disabled={busy !== null} onClick={() => run(`del-${m.id}`, () => deleteMedia(m.id), "Deleted.")}>
+                <button
+                  type="button"
+                  aria-label={`Delete this ${m.kind}`}
+                  disabled={busy !== null}
+                  onClick={() => run(`del-${m.id}`, () => deleteMedia(m.id), "Deleted.")}
+                >
                   ×
                 </button>
               </div>
@@ -241,7 +335,10 @@ export function PageDesigner(props: {
       </fieldset>
 
       {status && (
-        <p className={`${styles.notice} ${status.ok ? styles.thanks : styles.formError}`} role={status.ok ? "status" : "alert"}>
+        <p
+          className={`${styles.notice} ${status.ok ? styles.thanks : styles.formError}`}
+          role={status.ok ? "status" : "alert"}
+        >
           {status.message}
         </p>
       )}

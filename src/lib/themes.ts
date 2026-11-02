@@ -40,7 +40,7 @@ function mix(a: string, b: string, amount: number): string {
 /** Clean whatever was stored or submitted into a valid choice. */
 export function normaliseTheme(raw: unknown): ThemeChoice {
   const t = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
-  const preset = typeof t.preset === "string" && (t.preset in THEME_PRESETS || t.preset === "custom") ? (t.preset as ThemeChoice["preset"]) : "classic";
+  const preset = typeof t.preset === "string" && (Object.hasOwn(THEME_PRESETS, t.preset) || t.preset === "custom") ? (t.preset as ThemeChoice["preset"]) : "classic";
   const choice: ThemeChoice = { preset };
   if (isHex(t.accent)) choice.accent = t.accent.toLowerCase();
   if (preset === "custom") choice.background = isHex(t.background) ? t.background.toLowerCase() : "#ffffff";

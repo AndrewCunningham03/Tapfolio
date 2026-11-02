@@ -17,11 +17,15 @@ async function adminDb() {
 
 export async function setOrderStatus(orderId: number, status: OrderStatus): Promise<AdminResult> {
   if (!ORDER_STATUSES.includes(status)) return { ok: false, message: "Unknown status." };
-  const db = await adminDb();
-  const { error } = await db.from("card_orders").update({ status }).eq("id", orderId);
-  if (error) return { ok: false, message: error.message };
-  refresh();
-  return { ok: true, message: "Status updated." };
+  try {
+    const db = await adminDb();
+    const { error } = await db.from("card_orders").update({ status }).eq("id", orderId);
+    if (error) return { ok: false, message: error.message };
+    refresh();
+    return { ok: true, message: "Status updated." };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Something went wrong." };
+  }
 }
 
 export async function assignCard(orderId: number, cardId: string): Promise<AdminResult> {
@@ -51,10 +55,17 @@ export async function makeCardBatch(input: {
   }
   if (!metal && !plastic) return { ok: false, message: "Choose how many metal or plastic cards to make." };
 
-  const label = input.label.trim().slice(0, 80) || new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  const label =
+    input.label.trim().slice(0, 80) ||
+    new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   try {
     const db = await adminDb();
-    const batch = await createBatch(db, { metal, plastic, label, supplier: input.supplier.trim().slice(0, 80) || null });
+    const batch = await createBatch(db, {
+      metal,
+      plastic,
+      label,
+      supplier: input.supplier.trim().slice(0, 80) || null,
+    });
     refresh();
     return { ok: true, message: `Made ${batch.count} new card links in batch ${batch.id}.`, batchId: batch.id };
   } catch (err) {

@@ -17,8 +17,18 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/[slug]/vcard">) 
     headers: {
       // text/vcard makes iOS open the "Add to Contacts" sheet and Android open Contacts.
       "Content-Type": "text/vcard; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${vCardFilename(profile)}"`,
+      "Content-Disposition": contentDisposition(vCardFilename(profile)),
       "Cache-Control": "no-store",
     },
   });
+}
+
+/** Header values must be plain ASCII; names like "Łukasz" go in the UTF-8 filename* form. */
+function contentDisposition(filename: string): string {
+  const ascii =
+    filename
+      .normalize("NFKD")
+      .replace(/[^\x20-\x7e]/g, "")
+      .replace(/["\\]/g, "") || "contact.vcf";
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
 }

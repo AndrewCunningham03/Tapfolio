@@ -39,8 +39,16 @@ async function ownProfile() {
 
 const fail = (message: string) => ({ ok: false as const, message });
 
+/** Only files inside the customer's own folder may ever be deleted on their behalf. */
+const isOwnFile = (profileId: string, path: string | null): path is string =>
+  Boolean(path && path.startsWith(`${profileId}/`) && !path.includes(".."));
+
 /** Step 1: check the upload is allowed and hand the browser a one-time upload link. */
-export async function requestUpload(kind: UploadKind, contentType: string, size: number): Promise<Result<{ path: string; token: string }>> {
+export async function requestUpload(
+  kind: UploadKind,
+  contentType: string,
+  size: number,
+): Promise<Result<{ path: string; token: string }>> {
   const own = await ownProfile();
   if (!own) return fail("Please sign in again.");
   const { profile, db } = own;
@@ -54,7 +62,11 @@ export async function requestUpload(kind: UploadKind, contentType: string, size:
   }
 
   if (kind === "photo" || kind === "video") {
-    const { count } = await db.from("profile_media").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).eq("kind", kind);
+    const { count } = await db
+      .from("profile_media")
+      .select("id", { count: "exact", head: true })
+      .eq("profile_id", profile.id)
+      .eq("kind", kind);
     const max = kind === "photo" ? MAX_PHOTOS : MAX_VIDEOS;
     if ((count ?? 0) >= max) return fail(`You can have up to ${max} ${kind}s. Delete one to add another.`);
   }
@@ -81,11 +93,20 @@ export async function finishUpload(kind: UploadKind, path: string, width?: numbe
   if (kind === "avatar" || kind === "cover") {
     const column = kind === "avatar" ? "photo_path" : "cover_path";
     const old = kind === "avatar" ? profile.photo_path : profile.cover_path;
-    const { error } = await db.from("profiles").update({ [column]: path }).eq("id", profile.id);
+    const { error } = await db
+      .from("profiles")
+      .update({ [column]: path })
+      .eq("id", profile.id);
     if (error) return fail("We couldn't save that image.");
-    if (old) await db.storage.from(MEDIA_BUCKET).remove([old]);
+    if (isOwnFile(profile.id, old)) await db.storage.from(MEDIA_BUCKET).remove([old]);
   } else {
-    const { data: last } = await db.from("profile_media").select("position").eq("profile_id", profile.id).order("position", { ascending: false }).limit(1).maybeSingle();
+    const { data: last } = await db
+      .from("profile_media")
+      .select("position")
+      .eq("profile_id", profile.id)
+      .order("position", { ascending: false })
+      .limit(1)
+      .maybeSingle();
     const { error } = await db.from("profile_media").insert({
       profile_id: profile.id,
       kind,
@@ -107,7 +128,12 @@ export async function deleteMedia(id: number): Promise<Result> {
   const own = await ownProfile();
   if (!own) return fail("Please sign in again.");
   const { profile, db } = own;
-  const { data: item } = await db.from("profile_media").select("id, path").eq("id", id).eq("profile_id", profile.id).maybeSingle();
+  const { data: item } = await db
+    .from("profile_media")
+    .select("id, path")
+    .eq("id", id)
+    .eq("profile_id", profile.id)
+    .maybeSingle();
   if (!item) return fail("That item wasn't found.");
   await db.from("profile_media").delete().eq("id", item.id);
   await db.storage.from(MEDIA_BUCKET).remove([item.path]);
@@ -120,8 +146,11 @@ export async function removeImage(kind: "avatar" | "cover"): Promise<Result> {
   if (!own) return fail("Please sign in again.");
   const { profile, db } = own;
   const old = kind === "avatar" ? profile.photo_path : profile.cover_path;
-  await db.from("profiles").update({ [kind === "avatar" ? "photo_path" : "cover_path"]: null }).eq("id", profile.id);
-  if (old) await db.storage.from(MEDIA_BUCKET).remove([old]);
+  await db
+    .from("profiles")
+    .update({ [kind === "avatar" ? "photo_path" : "cover_path"]: null })
+    .eq("id", profile.id);
+  if (isOwnFile(profile.id, old)) await db.storage.from(MEDIA_BUCKET).remove([old]);
   updateTag(profileTag(profile.slug));
   return { ok: true };
 }
@@ -132,7 +161,10 @@ export async function saveTheme(raw: unknown): Promise<Result> {
   const { data: profile } = await supabase.from("profiles").select("id, slug").limit(1).maybeSingle();
   if (!profile) return fail("We couldn't find your profile.");
   // Runs as the customer: row-level security and column grants apply.
-  const { error } = await supabase.from("profiles").update({ theme: normaliseTheme(raw) }).eq("id", profile.id);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ theme: normaliseTheme(raw) })
+    .eq("id", profile.id);
   if (error) return fail("We couldn't save your colours.");
   updateTag(profileTag(profile.slug));
   return { ok: true };
