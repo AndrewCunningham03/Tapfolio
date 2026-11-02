@@ -1,37 +1,27 @@
 -- Demo data for development. Mirrors the sample profile in src/lib/profiles.ts.
 
 insert into public.profiles
-  (slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials)
+  (slug, full_name, job_title, organisation, about, phone, email, country, theme)
 values (
-  'john-smith',
-  'John Smith',
-  'Owner, Gas Safe Engineer',
-  'Smith Plumbing & Heating',
-  'Boiler installs, servicing and emergency repairs across York and North Yorkshire. Gas Safe registered, fully insured.',
-  '07700 900123',
-  'john@smithplumbing.co.uk',
-  'https://smithplumbing.co.uk',
-  '12 High Street',
-  'York',
-  'YO1 7HU',
-  'United Kingdom',
-  '{"facebook": "https://www.facebook.com/", "instagram": "https://www.instagram.com/", "linkedin": "https://www.linkedin.com/", "whatsapp": "https://wa.me/447700900123"}'
+  'ash-and-oak-interiors',
+  'Conor Walsh',
+  'Bespoke Kitchens & Bedroom Units',
+  'Ash & Oak Interiors',
+  'Fitted kitchens, bedroom units, wardrobes and utility rooms. Kitchens, bedrooms and bespoke furniture, made to measure.',
+  '+353 1 234 5678',
+  'hello@example.com',
+  'Ireland',
+  '{"preset": "custom", "background": "#3a2b20", "accent": "#c9a77c"}'
 );
-
--- Demo "Pay me" details (fake: the IBAN is the standard documentation example).
-update public.profiles set
-  pay_links = '{"revolut": "https://revolut.me/johnsmith-demo", "card": "https://pay.sumup.com/b2c/QDEMO1234"}',
-  bank = '{"account_name": "J Smith Plumbing Ltd", "sort_code": "000000", "account_number": "12345678", "iban": "IE29AIBK93115212345678", "bic": "AIBKIE2D"}'
-where slug = 'john-smith';
 
 insert into public.batches (label, supplier, tier, quantity, notes)
 values ('Demo batch', 'none', 'standard', 2, 'Seed data for local testing');
 
--- An active card already linked to John Smith: /C/7KQ2XMP
+-- An active card already linked to Ash & Oak Interiors: /C/7KQ2XMP
 insert into public.cards (id, batch_id, tier, status, profile_id, claimed_at)
 select '7KQ2XMP', b.id, 'standard', 'active', p.id, now()
 from public.batches b, public.profiles p
-where b.label = 'Demo batch' and p.slug = 'john-smith';
+where b.label = 'Demo batch' and p.slug = 'ash-and-oak-interiors';
 
 -- An unclaimed card for testing activation: /C/4RD9WZT with claim code TEST-K3YS-2026.
 -- Codes are normalised (upper case, dashes removed) before hashing; see src/lib/ids.ts.

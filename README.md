@@ -10,11 +10,11 @@ Every card is encoded with a permanent random ID, never a name:
 HTTPS://TAPFOLIO.CO.UK/C/7KQ2XMP   (chip + printed QR)
         │
         ├─ unclaimed  → activation page (needs the one-time claim code from the insert)
-        ├─ active     → 302 redirect to the profile, e.g. /john-smith
+        ├─ active     → 302 redirect to the profile, e.g. /ash-and-oak-interiors
         └─ disabled   → "card deactivated" page
 ```
 
-The profile address (`/john-smith`) can change without breaking any card. Lost cards can be disabled and cards reassigned.
+The profile address (`/ash-and-oak-interiors`) can change without breaking any card. Lost cards can be disabled and cards reassigned.
 
 ## Stack
 
@@ -46,7 +46,7 @@ supabase link --project-ref <your-project-ref>
 supabase db push --include-seed
 ```
 
-Demo cards from the seed: `/C/7KQ2XMP` (active, John Smith) and `/C/4RD9WZT` (unclaimed, claim code `TEST-K3YS-2026`).
+Demo cards from the seed: `/C/7KQ2XMP` (active, Ash & Oak Interiors) and `/C/4RD9WZT` (unclaimed, claim code `TEST-K3YS-2026`).
 
 ## Project layout
 

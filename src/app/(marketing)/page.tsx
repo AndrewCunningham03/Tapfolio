@@ -111,7 +111,7 @@ export default function HomePage() {
           <div>
             <div className={styles.phone}>
               <div className={styles.screen}>
-                <iframe src="/john-smith" title="A live example Tapfolio profile" loading="lazy" />
+                <iframe src="/ash-and-oak-interiors" title="A live example Tapfolio profile" loading="lazy" />
               </div>
             </div>
             <p className={styles.phoneCaption}>A real profile. Scroll it.</p>
@@ -162,7 +162,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className={styles.payPanel} aria-hidden="true">
-            <h3>Pay Smith Plumbing &amp; Heating</h3>
+            <h3>Pay Ash &amp; Oak Interiors</h3>
             <div className={styles.payMethods}>
               <span>Revolut</span>
               <span>PayPal</span>
