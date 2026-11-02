@@ -20,29 +20,21 @@ export function LoginForm({
   if (state.status === "sent") {
     return (
       <div className={`${styles.notice} ${styles.thanks}`} role="status">
-        <strong>Check your email.</strong> If {state.email} has a Tapfolio card,
-        we&apos;ve sent a sign-in link to it. Open it on this device. It works
-        once and expires in 10 minutes.
+        <strong>Check your email.</strong> If {state.email} has a Tapfolio card, we&apos;ve sent a sign-in link to it.
+        Open it on this device. It works once and expires in 10 minutes.
         <br />
-        Nothing after a couple of minutes? Check your spam folder, and make sure
-        this is the email address you ordered your card with.
+        Nothing after a couple of minutes? Check your spam folder, and make sure this is the email address you ordered
+        your card with.
       </div>
     );
   }
 
   return (
     <>
-      <form
-        className={`${styles.form} ${styles.loginForm}`}
-        action={signInWithGoogle}
-      >
+      <form className={`${styles.form} ${styles.loginForm}`} action={signInWithGoogle}>
         {googleError && (
-          <p
-            className={`${styles.notice} ${styles.formError} ${styles.full}`}
-            role="alert"
-          >
-            We couldn&apos;t sign you in with Google. Please try again, or use
-            your email below.
+          <p className={`${styles.notice} ${styles.formError} ${styles.full}`} role="alert">
+            We couldn&apos;t sign you in with Google. Please try again, or use your email below.
           </p>
         )}
         <input type="hidden" name="next" value={next} />
@@ -55,12 +47,8 @@ export function LoginForm({
       <p className={styles.formNote}>Or get a sign-in link by email:</p>
       <form className={`${styles.form} ${styles.loginForm}`} action={action}>
         {linkError && (
-          <p
-            className={`${styles.notice} ${styles.formError} ${styles.full}`}
-            role="alert"
-          >
-            That sign-in link has expired or was already used. Ask for a new one
-            below.
+          <p className={`${styles.notice} ${styles.formError} ${styles.full}`} role="alert">
+            That sign-in link has expired or was already used. Ask for a new one below.
           </p>
         )}
         <input type="hidden" name="next" value={next} />
@@ -81,10 +69,7 @@ export function LoginForm({
           </button>
         </div>
         {state.status === "error" && (
-          <p
-            className={`${styles.notice} ${styles.formError} ${styles.full}`}
-            role="alert"
-          >
+          <p className={`${styles.notice} ${styles.formError} ${styles.full}`} role="alert">
             {state.message}
           </p>
         )}
