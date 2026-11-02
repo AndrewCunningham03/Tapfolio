@@ -11,6 +11,9 @@ export const CONTACT_EMAIL = "admin@tapfolio.co.uk";
  */
 export const CARD_URL_BASE = "HTTPS://TAPFOLIO.CO.UK/C/";
 
+/** Public ID of the Google sign-in client (not a secret; the secret lives in Supabase). */
+export const GOOGLE_CLIENT_ID = "96400455356-62o39snk1n9h5j201cevpevddb3cmsof.apps.googleusercontent.com";
+
 export type Currency = "GBP" | "EUR";
 
 // One product: a monthly subscription that includes the card and keeps the

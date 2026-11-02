@@ -1,24 +1,21 @@
 "use server";
 
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { safeNext } from "@/lib/auth";
 import { getServerClient } from "@/lib/supabase/server";
 
-/** Sign in (or sign up) with a Google account. Google sends the visitor back to /auth/callback. */
-export async function signInWithGoogle(form: FormData) {
-  const next = safeNext(form.get("next"));
-  const h = await headers();
-  const origin = h.get("origin") ?? `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
+export type GoogleResult = { ok: true; next: string } | { ok: false };
 
+/**
+ * Finish a Google sign-in (or sign-up). The browser gets a signed ID token from
+ * Google's own pop-up and hands it over with the nonce it made; Supabase checks
+ * both and starts the session.
+ */
+export async function signInWithGoogleToken(token: string, nonce: string, rawNext: string): Promise<GoogleResult> {
   const supabase = await getServerClient();
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
-  });
-  if (error || !data.url) {
-    console.error("google sign-in failed", error?.message);
-    redirect(`/login?error=google&next=${encodeURIComponent(next)}`);
+  const { error } = await supabase.auth.signInWithIdToken({ provider: "google", token, nonce });
+  if (error) {
+    console.error("google sign-in failed", error.message);
+    return { ok: false };
   }
-  redirect(data.url);
+  return { ok: true, next: safeNext(rawNext) };
 }
