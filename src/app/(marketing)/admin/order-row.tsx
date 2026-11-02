@@ -132,7 +132,7 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
           </div>
           <div>
             <dt>Ordered</dt>
-            <dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</dd>
+            <dd>{new Date(order.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/London" })}</dd>
           </div>
           {order.message && (
             <div className={styles.orderMessage}>

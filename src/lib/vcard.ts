@@ -17,6 +17,11 @@ function esc(value: string): string {
     .replace(/[,;]/g, (c) => `\\${c}`);
 }
 
+// URI values are not text values: keep them as written, minus any line breaks.
+function uri(value: string): string {
+  return value.replace(/[\r\n]/g, "");
+}
+
 // Fold lines longer than 75 octets (RFC 6350 §3.2), without splitting a UTF-8 character.
 function fold(line: string): string {
   const out: string[] = [];
@@ -54,7 +59,7 @@ export function buildVCard(p: Profile, profileUrl: string): string {
   if (p.jobTitle) lines.push(`TITLE:${esc(p.jobTitle)}`);
   if (p.phone) lines.push(`TEL;TYPE=CELL,VOICE:${esc(p.phone)}`);
   if (p.email) lines.push(`EMAIL;TYPE=INTERNET,WORK:${esc(p.email)}`);
-  if (p.website) lines.push(`URL;TYPE=WORK:${esc(p.website)}`);
+  if (p.website) lines.push(`URL;TYPE=WORK:${uri(p.website)}`);
   if (p.street || p.city || p.postcode) {
     const adr = ["", "", p.street ?? "", p.city ?? "", "", p.postcode ?? "", p.country ?? ""].map(esc).join(";");
     lines.push(`ADR;TYPE=WORK:${adr}`);
@@ -64,10 +69,10 @@ export function buildVCard(p: Profile, profileUrl: string): string {
   let item = 1;
   for (const [network, url] of Object.entries(p.socials) as [SocialNetwork, string][]) {
     if (!url) continue;
-    lines.push(`item${item}.URL:${esc(url)}`, `item${item}.X-ABLabel:${SOCIAL_LABELS[network]}`);
+    lines.push(`item${item}.URL:${uri(url)}`, `item${item}.X-ABLabel:${SOCIAL_LABELS[network]}`);
     item++;
   }
-  lines.push(`item${item}.URL:${esc(profileUrl)}`, `item${item}.X-ABLabel:Tapfolio profile`);
+  lines.push(`item${item}.URL:${uri(profileUrl)}`, `item${item}.X-ABLabel:Tapfolio profile`);
 
   if (p.about) lines.push(`NOTE:${esc(p.about)}`);
   lines.push("END:VCARD");
