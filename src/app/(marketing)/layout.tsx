@@ -40,6 +40,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
             <nav aria-label="Footer">
               <a href={`mailto:${CONTACT_EMAIL}`}>Contact</a>
               <Link href="/privacy">Privacy</Link>
+              <Link href="/terms">Terms</Link>
             </nav>
             <span>© Tapfolio · Northern Ireland</span>
           </div>
