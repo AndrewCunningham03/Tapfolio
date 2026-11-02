@@ -1,8 +1,8 @@
 // Business details shown across the marketing site.
 export const SITE_NAME = "Tapfolio";
 
-// TODO: replace with a mailbox you own once the domain is registered
-export const CONTACT_EMAIL = "hello@tapfolio.co.uk";
+// Forwarded to the owner's inbox by Cloudflare Email Routing.
+export const CONTACT_EMAIL = "admin@tapfolio.co.uk";
 
 /**
  * What every card's chip and QR code open. Always the live domain, whatever
