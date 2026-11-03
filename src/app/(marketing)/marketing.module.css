@@ -519,3 +519,4 @@ label:has(> .fileInput:focus-visible) { outline: 2px solid currentColor; outline
   .btnLg { padding: 14px 24px; }
   .priceNote { margin-top: 16px; font-size: 0.9rem; }
 }
+.waitingOrder { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; padding: 14px 18px; border: 1px solid var(--line); border-radius: 16px; }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { FINISHES, LAYOUTS, type CardDesign } from "@/lib/card-design";
+import { addressLines } from "@/lib/address";
 import type { CardOrder, OrderStatus } from "@/lib/orders";
 import { CARD_URL_BASE, formatPrice } from "@/lib/site";
 import { CardBack, CardFront } from "../design/card-preview";
@@ -275,20 +276,4 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
       )}
     </article>
   );
-}
-
-/** The posting address from Stripe, one line each; older orders only have a region. */
-function addressLines(order: CardOrder): string[] {
-  const a = order.shipping_address?.address;
-  if (!a) return [order.country];
-  const lines = [
-    order.shipping_address?.name,
-    a.line1,
-    a.line2,
-    a.city,
-    a.state,
-    a.postal_code,
-    a.country === "IE" ? "Ireland" : a.country === "GB" ? `United Kingdom (${order.country})` : a.country,
-  ];
-  return lines.filter((l): l is string => Boolean(l && l.trim()));
 }
