@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
 import { PRICES, type Currency } from "@/lib/site";
 import { getStripe } from "@/lib/stripe";
+import { alertNewOrder } from "@/lib/alerts";
 import { ensureProfileForOrder, type CardOrder } from "@/lib/orders";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -69,25 +70,30 @@ async function recordOrder(stripe: Stripe, db: Db, session: Stripe.Checkout.Sess
     collected_information?: { shipping_details?: unknown };
     shipping_details?: unknown;
   };
-  const { error } = await db.from("card_orders").upsert(
-    {
-      status: "paid",
-      user_id: userId,
-      stripe_session_id: session.id,
-      stripe_customer_id: typeof session.customer === "string" ? session.customer : null,
-      name: details?.name || details?.email || "Customer",
-      email: details?.email ?? session.customer_email ?? "",
-      phone: details?.phone ?? null,
-      country,
-      quantity: "1",
-      currency,
-      card_price: PRICES[currency].start,
-      monthly_price: PRICES[currency].monthly,
-      shipping_address: shipping.collected_information?.shipping_details ?? shipping.shipping_details ?? null,
-    },
-    { onConflict: "stripe_session_id", ignoreDuplicates: true },
-  );
+  const { data: inserted, error } = await db
+    .from("card_orders")
+    .upsert(
+      {
+        status: "paid",
+        user_id: userId,
+        stripe_session_id: session.id,
+        stripe_customer_id: typeof session.customer === "string" ? session.customer : null,
+        name: details?.name || details?.email || "Customer",
+        email: details?.email ?? session.customer_email ?? "",
+        phone: details?.phone ?? null,
+        country,
+        quantity: "1",
+        currency,
+        card_price: PRICES[currency].start,
+        monthly_price: PRICES[currency].monthly,
+        shipping_address: shipping.collected_information?.shipping_details ?? shipping.shipping_details ?? null,
+      },
+      { onConflict: "stripe_session_id", ignoreDuplicates: true },
+    )
+    .select("id");
   if (error) throw new Error(error.message);
+  // Nothing inserted means Stripe sent this event before: no second alert.
+  const isNew = (inserted?.length ?? 0) > 0;
 
   // Their page exists from the moment they pay; the card is linked to it when posted.
   const { data: order } = await db
@@ -96,6 +102,7 @@ async function recordOrder(stripe: Stripe, db: Db, session: Stripe.Checkout.Sess
     .eq("stripe_session_id", session.id)
     .single<CardOrder>();
   if (order) await ensureProfileForOrder(db, order);
+  if (order && isNew) await alertNewOrder(order);
 
   if (typeof session.subscription === "string") {
     await recordSubscription(db, await stripe.subscriptions.retrieve(session.subscription));
