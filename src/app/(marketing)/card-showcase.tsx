@@ -4,7 +4,7 @@ import { useRef } from "react";
 import styles from "./marketing.module.css";
 
 /**
- * The metal card, front and back, rendered from the real print artwork.
+ * The Tapfolio card, front and back, rendered from the real print artwork.
  * Tilts gently towards the pointer; static for touch and reduced motion.
  */
 export function CardShowcase() {
@@ -35,13 +35,13 @@ export function CardShowcase() {
           className={`${styles.card} ${styles.cardBack}`}
           style={{ backgroundImage: "url(/cards/metal-back.png)" }}
           role="img"
-          aria-label="Back of the Tapfolio metal card, with a QR code and tap instructions"
+          aria-label="Back of the Tapfolio card, with a QR code and tap instructions"
         />
         <div
           className={`${styles.card} ${styles.cardFront}`}
           style={{ backgroundImage: "url(/cards/metal-front.png)" }}
           role="img"
-          aria-label="Front of the Tapfolio metal card in black steel with an engraved logo"
+          aria-label="Front of the black Tapfolio card with the logo and a tap symbol"
         />
       </div>
     </div>

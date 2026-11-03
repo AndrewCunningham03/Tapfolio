@@ -10,11 +10,17 @@ export const metadata: Metadata = { title: "Get your card", robots: { index: fal
 export default function StartPage() {
   return (
     <div className={`${styles.wrap} ${styles.narrow} ${styles.legal}`}>
-      <p className={styles.eyebrow}>Order</p>
-      <h1>Get your card</h1>
-      <Suspense>
-        <Form />
-      </Suspense>
+      <div className={styles.panel}>
+        <p className={styles.eyebrow}>Order</p>
+        <h1>Get your card</h1>
+        <p className={styles.sub}>
+          Choose where we should post it, then pay securely with Stripe. You can set up your page while your card is on
+          its way.
+        </p>
+        <Suspense>
+          <Form />
+        </Suspense>
+      </div>
     </div>
   );
 }
