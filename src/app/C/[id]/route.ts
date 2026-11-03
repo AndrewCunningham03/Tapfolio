@@ -1,5 +1,6 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { lookupCard } from "@/lib/cards";
+import { isProfilePaused } from "@/lib/paused";
 import { recordTap } from "@/lib/taps";
 
 // Every card's chip and QR code open https://<domain>/C/<ID>. This sends the
@@ -16,6 +17,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/C/[id]">) {
 
   switch (card.status) {
     case "active": {
+      if (await isProfilePaused({ profileId: card.profileId })) return to("/card/paused");
       const userAgent = req.headers.get("user-agent");
       after(() => recordTap({ userAgent, source: "card", cardId: card.id, profileId: card.profileId }));
       return to(`/${card.slug}`);

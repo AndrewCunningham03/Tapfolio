@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     return [
       // The card designer is switched off for now (every card is the standard
       // Tapfolio design). Remove this to bring it back; the code is in app/(marketing)/design.
-      { source: "/design", destination: "/#order", permanent: false },
+      { source: "/design", destination: "/start", permanent: false },
     ];
   },
   async rewrites() {

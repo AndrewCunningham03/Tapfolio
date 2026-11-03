@@ -33,7 +33,13 @@ export function PaySection({ profile }: { profile: Profile }) {
       {links.length > 0 && (
         <div className={styles.payLinks}>
           {links.map(([method, url]) => (
-            <a key={method} href={url} target="_blank" rel="noopener" className={method === "card" ? styles.payPrimary : undefined}>
+            <a
+              key={method}
+              href={url}
+              target="_blank"
+              rel="noopener"
+              className={method === "card" ? styles.payPrimary : undefined}
+            >
               {PAY_LABELS[method]}
             </a>
           ))}
@@ -56,7 +62,9 @@ export function PaySection({ profile }: { profile: Profile }) {
         </dl>
       )}
 
-      <p className={styles.payNote}>Payments go directly to {payee}. Check the details with them if you&apos;re unsure.</p>
+      <p className={styles.payNote}>
+        Payments go directly to {payee}. Check the details with them if you&apos;re unsure.
+      </p>
     </section>
   );
 }

@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Tapfolio · The metal business card customers can tap and pay",
+    default: "Tapfolio · A business card that opens your own page",
     template: "%s · Tapfolio",
   },
   description:
-    "A solid metal NFC business card. Tap it on any phone to share your details, save your number and take payment. Update it any time without reprinting.",
+    "An NFC and QR business card for the UK and Ireland. Customers tap or scan it to save your contact, call you or pay you. Update your page any time without reprinting.",
   openGraph: { siteName: "Tapfolio", type: "website" },
   twitter: { card: "summary" },
 };

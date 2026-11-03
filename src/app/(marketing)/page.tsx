@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { CONTACT_EMAIL, formatPrice, GRACE_DAYS, PRICES } from "@/lib/site";
+import { CONTACT_EMAIL, GRACE_DAYS } from "@/lib/site";
 import { CardShowcase } from "./card-showcase";
 import { CurrencySwitch, Price } from "./currency";
-import { OrderForm } from "./order-form";
 import styles from "./marketing.module.css";
 
 const TRADES = [
@@ -12,6 +11,7 @@ const TRADES = [
   "Barbers",
   "Salons",
   "Mechanics",
+  "Kitchen fitters",
   "Estate agents",
   "Personal trainers",
   "Dog groomers",
@@ -20,35 +20,81 @@ const TRADES = [
   "Photographers",
 ];
 
+const STEPS = [
+  {
+    title: "Hand over your card",
+    text: "Give it to a customer or keep it in your wallet. The chip and QR code inside hold a permanent link to your page.",
+  },
+  {
+    title: "They tap or scan",
+    text: "They hold it to the top of their phone, or scan the QR code on the back with the camera. Your page opens. No app needed.",
+  },
+  {
+    title: "They save you or pay you",
+    text: "One button adds you to their contacts. Others call, text, email, find you on the map, or pay you.",
+  },
+];
+
+const FEATURES = [
+  {
+    title: "A Tapfolio card",
+    text: "A metal Tapfolio card with a tap chip built in and a QR code on the back. Posted by Royal Mail.",
+  },
+  {
+    title: "Your own page",
+    text: "Your name, photo or logo, cover photo, about text, social links and a gallery of photos and videos. Six colour themes, or pick your own colour.",
+  },
+  {
+    title: "Edit it from your phone",
+    text: "Change your number, prices or photos whenever you like. The page updates straight away and the card never needs reprinting.",
+  },
+  {
+    title: "See who taps",
+    text: "Your dashboard shows taps in the last 30 days, taps in total, and how many people saved your contact.",
+  },
+  {
+    title: "Get paid, 0% commission",
+    text: "Add Revolut, PayPal, Monzo, a card payment link and your bank details, with copy buttons. Customers pay you directly. We never touch the money.",
+  },
+];
+
+const ORDER_STEPS = [
+  { title: "Sign in with Google", text: "No password to set up." },
+  { title: "Choose where it's going", text: "Northern Ireland, Great Britain or the Republic of Ireland." },
+  { title: "Pay securely", text: "Checkout is handled by Stripe. Your card is posted by Royal Mail." },
+  { title: "Set up your page", text: "Add your details and photos while your card is on its way." },
+];
+
 const FAQ: { q: string; a: React.ReactNode }[] = [
   {
     q: "What does it cost?",
     a: (
       <>
-        <Price of="monthly" /> a month, and that includes your card. The only other cost is delivery, paid once with
-        your first month. No contract: cancel whenever you like, and your card simply stops showing your page.
+        <Price of="start" /> to start, which covers your card, its delivery and your first month. After that it&apos;s{" "}
+        <Price of="monthly" /> a month. No contract: cancel whenever you like, and your card simply stops showing your
+        page.
       </>
     ),
   },
   {
-    q: "Can I make the page my own?",
-    a: "Yes. Choose your colours, add your logo, a cover photo, and photos and videos of your work from your dashboard. Change them whenever you like.",
-  },
-  {
-    q: "What happens if I stop paying?",
-    a: `We'll remind you before anything changes. If a payment fails, your card keeps working for ${GRACE_DAYS} days. After that it pauses until you restart, and your details are kept, so it comes back exactly as it was.`,
-  },
-  {
-    q: "Do you take a cut when customers pay me?",
-    a: "No. The payment buttons take your customer straight to your own Revolut, PayPal, Monzo or card payment page, or show your bank details. The money goes directly to you. We never touch it.",
+    q: "Is it really a metal card?",
+    a: "Yes. It is a metal Tapfolio card with a tap chip built in and a QR code on the back. The chip reads straight through the metal. Hold the card near the top of the phone.",
   },
   {
     q: "Do people need an app to use it?",
     a: "No. Most iPhones and Android phones read the card with a tap. Phones that can't scan the QR code on the back with their camera instead.",
   },
   {
-    q: "Does a metal card really work with phones?",
-    a: "Yes. The chip is built into the card so it can be read through the metal. Hold it near the top of the phone.",
+    q: "Can I make the page my own?",
+    a: "Yes. Choose a colour theme or your own colour, add your logo, a cover photo, and photos and videos of your work from your dashboard. Change them whenever you like.",
+  },
+  {
+    q: "Do you take a cut when customers pay me?",
+    a: "No. The payment buttons take your customer straight to your own Revolut, PayPal, Monzo or card payment page, or show your bank details. The money goes directly to you. We never touch it.",
+  },
+  {
+    q: "What happens if I stop paying?",
+    a: `We'll remind you before anything changes. If a payment fails, your card keeps working for ${GRACE_DAYS} days. After that it pauses until you restart, and your details are kept, so it comes back exactly as it was.`,
   },
   {
     q: "What if my number or prices change?",
@@ -56,11 +102,11 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Where do you deliver?",
-    a: `Anywhere. We post every card by Royal Mail: ${formatPrice(PRICES.GBP.delivery, "GBP")} across the UK (tracked), ${formatPrice(PRICES.EUR.delivery, "EUR")} to the Republic of Ireland, and ${formatPrice(PRICES.GBP.worldDelivery, "GBP")} or ${formatPrice(PRICES.EUR.worldDelivery, "EUR")} anywhere else, paid once with your first month. Outside the UK and EU, your country may charge import fees when it arrives.`,
+    a: "Northern Ireland, Great Britain and the Republic of Ireland. We post every card by Royal Mail, and delivery is included in your first payment.",
   },
   {
     q: "Can I get cards for my whole team?",
-    a: "Yes. Each person gets their own card and profile. Tell us how many you need in the order form and we'll set them all up.",
+    a: "Yes. Each person gets their own card and profile. Email us with how many you need and we'll set them all up.",
   },
 ];
 
@@ -69,127 +115,99 @@ export default function HomePage() {
     <>
       <section className={styles.hero}>
         <div className={`${styles.wrap} ${styles.heroGrid}`}>
-          <div>
-            <span className={styles.kicker}>Solid metal NFC business card</span>
+          <div className={styles.heroCopy}>
+            <span className={styles.kicker}>NFC and QR business cards for the UK and Ireland</span>
             <h1>
-              The last business card <span className={styles.metalText}>you&apos;ll ever buy.</span>
+              A business card that opens <span className={styles.accentText}>your own page.</span>
             </h1>
             <p className={styles.lede}>
-              Tap it on any phone and your details come up, ready to save, call, or pay you. Change your number or
-              prices whenever you like. The card never needs reprinting.
+              Tap the card on a phone, or scan its QR code, and your page opens. Customers can save your contact, call
+              you, or pay you. They don&apos;t need an app.
             </p>
             <div className={styles.ctaRow}>
-              <Link className={styles.btn} href="#order">
-                Order your card · <Price of="monthly" />/month
+              <Link className={`${styles.btn} ${styles.btnLg}`} href="/start">
+                Get your card
               </Link>
-              <Link className={`${styles.btn} ${styles.ghost}`} href="#how">
+              <Link className={`${styles.btn} ${styles.btnLg} ${styles.ghost}`} href="#how">
                 See how it works
               </Link>
             </div>
             <p className={styles.priceNote}>
               <strong>
-                <Price of="monthly" /> a month
-              </strong>
-              , card included. Just <Price of="delivery" /> delivery, then cancel any time.
+                <Price of="start" /> to start
+              </strong>{" "}
+              for the card, delivery and first month. Then <Price of="monthly" /> a month. Cancel any time.
             </p>
           </div>
-          <CardShowcase />
+          <div className={styles.heroDemo}>
+            <div className={styles.phone}>
+              <div className={styles.screen}>
+                <iframe src="/ash-and-oak-interiors" title="An example Tapfolio profile page" loading="eager" />
+              </div>
+            </div>
+            <p className={styles.phoneCaption}>An example page. Scroll it and try the buttons.</p>
+          </div>
         </div>
         <div className={`${styles.wrap} ${styles.facts}`}>
           <ul>
-            <li>Your page, your colours</li>
             <li>Tap or scan, no app</li>
-            <li>Works on iPhone and Android</li>
-            <li>Take payments</li>
-            <li>Posted worldwide</li>
+            <li>iPhone and Android</li>
+            <li>Save contact, call, pay</li>
+            <li>0% commission on payments</li>
+            <li>No contract</li>
           </ul>
         </div>
       </section>
 
       <section id="how" className={styles.section}>
-        <div className={`${styles.wrap} ${styles.how}`}>
-          <div>
-            <div className={styles.phone}>
-              <div className={styles.screen}>
-                <iframe src="/ash-and-oak-interiors" title="A live example Tapfolio profile" loading="lazy" />
-              </div>
-            </div>
-            <p className={styles.phoneCaption}>A real profile. Scroll it.</p>
-          </div>
-          <div>
+        <div className={styles.wrap}>
+          <div className={styles.head}>
             <p className={styles.eyebrow}>How it works</p>
             <h2>Hand it over. They tap. You&apos;re in their phone.</h2>
-            <p className={styles.sub}>No fumbling for a pen, no card that ends up in a drawer.</p>
-            <ol className={styles.steps}>
-              <li>
-                <span className={styles.stepNum}>01</span>
-                <div>
-                  <h3>Tap</h3>
-                  <p>They hold your card to their phone, or scan the code on the back. Your page opens instantly.</p>
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>02</span>
-                <div>
-                  <h3>Save</h3>
-                  <p>One button puts your name, number, email and address straight into their contacts.</p>
-                </div>
-              </li>
-              <li>
-                <span className={styles.stepNum}>03</span>
-                <div>
-                  <h3>Get paid</h3>
-                  <p>Finished the job? They can pay you there and then, by Revolut, PayPal, card or bank transfer.</p>
-                </div>
-              </li>
-            </ol>
+            <p className={styles.sub}>Three steps, and none of them needs your customer to install anything.</p>
           </div>
+          <ol className={styles.stepGrid}>
+            {STEPS.map((step, i) => (
+              <li key={step.title}>
+                <span className={styles.stepNum} aria-hidden="true">
+                  {i + 1}
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section id="paid" className={`${styles.section} ${styles.paid}`}>
-        <div className={`${styles.wrap} ${styles.paidGrid}`}>
-          <div>
-            <p className={styles.eyebrow}>Get paid</p>
-            <h2>Your card is now how customers pay you.</h2>
-            <p className={styles.sub}>
-              Add your Revolut, PayPal or Monzo link, a card payment link from SumUp or Stripe, and your bank details.
-              Customers pay you in a couple of taps, with nothing to type out or get wrong.
-            </p>
-            <div className={styles.zero}>
-              <strong>0%</strong>
-              <span>commission. The money goes straight to you.</span>
-            </div>
+      <section id="features" className={`${styles.section} ${styles.band}`}>
+        <div className={`${styles.wrap} ${styles.featureGrid}`}>
+          <div className={styles.featureVisual}>
+            <p className={styles.eyebrow}>What you get</p>
+            <h2>One card. One page. Always up to date.</h2>
+            <CardShowcase />
           </div>
-          <div className={styles.payPanel} aria-hidden="true">
-            <h3>Pay Ash &amp; Oak Interiors</h3>
-            <div className={styles.payMethods}>
-              <span>Revolut</span>
-              <span>PayPal</span>
-              <span>Monzo</span>
-              <span>Pay by card</span>
-              <span>Bank transfer</span>
-            </div>
-            <div className={styles.payBank}>
-              <div>
-                Sort code <b>00-00-00</b>
-              </div>
-              <div>
-                Account <b>12345678</b>
-              </div>
-              <div>
-                IBAN <b>IE29 AIBK 9311 …</b>
-              </div>
-            </div>
-          </div>
+          <ul className={styles.featureList}>
+            {FEATURES.map((f) => (
+              <li key={f.title}>
+                <h3>{f.title}</h3>
+                <p>{f.text}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       <section className={styles.section}>
         <div className={styles.wrap}>
-          <p className={styles.eyebrow}>Who it&apos;s for</p>
-          <h2>Made for people who are out on the job.</h2>
-          <p className={styles.sub}>Built in Northern Ireland for small businesses across the UK, Ireland and beyond.</p>
+          <div className={styles.head}>
+            <p className={styles.eyebrow}>Who it&apos;s for</p>
+            <h2>Made for people who are out on the job.</h2>
+            <p className={styles.sub}>
+              If customers find you by word of mouth, on site or at the counter, a Tapfolio card saves them hunting for
+              your number. Built in Northern Ireland for small businesses across the UK and Ireland.
+            </p>
+          </div>
           <ul className={styles.trades}>
             {TRADES.map((t) => (
               <li key={t}>{t}</li>
@@ -198,46 +216,87 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="pricing" className={styles.section}>
+      <section id="pricing" className={`${styles.section} ${styles.band}`}>
         <div className={styles.wrap}>
-          <p className={styles.eyebrow}>Pricing</p>
-          <h2>One card. One simple price.</h2>
+          <div className={styles.head}>
+            <p className={styles.eyebrow}>Pricing</p>
+            <h2>One card. One simple price.</h2>
+            <p className={styles.sub}>
+              Pay once to get started, then a small monthly fee to keep your page live. Available in the UK and Ireland.
+            </p>
+          </div>
           <CurrencySwitch />
           <div className={styles.priceCard}>
             <div className={styles.priceMain}>
+              <p className={styles.priceLabel}>To start</p>
               <div className={styles.priceBig}>
-                <Price of="monthly" />
+                <Price of="start" />
               </div>
-              <p className={styles.priceThen}>a month, card included</p>
-              <p className={styles.priceSmall}>
-                Plus <Price of="delivery" /> delivery with your first month. No contract, cancel any time.
+              <p className={styles.priceThen}>
+                Then <Price of="monthly" /> a month
               </p>
-              <Link className={styles.btn} href="#order">
-                Order your card
+              <p className={styles.priceSmall}>No contract. Cancel any time.</p>
+              <Link className={`${styles.btn} ${styles.btnLg}`} href="/start">
+                Get your card
               </Link>
             </div>
-            <ul className={styles.includes}>
-              <li>Your Tapfolio card with a tap-to-share chip, at no extra cost</li>
-              <li>Your own QR code on the back, for phones that can&apos;t tap</li>
-              <li>Your own profile page with Save contact, in your colours</li>
-              <li>Your logo, cover photo, and a gallery of photos and videos</li>
-              <li>Pay buttons: Revolut, PayPal, Monzo, card and bank transfer</li>
-              <li>Change your details any time, live instantly</li>
-              <li>See how often your card is tapped</li>
-            </ul>
+            <div className={styles.priceDetail}>
+              <div>
+                <h3>Your first payment covers</h3>
+                <ul className={styles.includes}>
+                  <li>Your metal Tapfolio card</li>
+                  <li>Delivery by Royal Mail</li>
+                  <li>Your first month of Tapfolio</li>
+                </ul>
+              </div>
+              <div>
+                <h3>After that, every month</h3>
+                <ul className={styles.includes}>
+                  <li>
+                    <Price of="monthly" /> keeps your page and card live
+                  </li>
+                  <li>Edit your page as often as you like</li>
+                  <li>Tap stats and pay buttons included</li>
+                  <li>0% commission. Payments go straight to you</li>
+                </ul>
+              </div>
+              <p className={styles.terms}>
+                If a payment fails we&apos;ll remind you, and your card keeps working for {GRACE_DAYS} days. After that
+                it pauses, and your details are kept. Prices are in pounds for the UK and euro for Ireland.
+              </p>
+            </div>
           </div>
-          <p className={styles.terms}>
-            Prices include everything above. If a payment fails we&apos;ll remind you, and your card keeps working for{" "}
-            {GRACE_DAYS} days.
-          </p>
         </div>
       </section>
 
-      <section id="faq" className={`${styles.section} ${styles.paid}`}>
+      <section id="order" className={styles.section}>
+        <div className={styles.wrap}>
+          <div className={styles.head}>
+            <p className={styles.eyebrow}>Ordering</p>
+            <h2>From order to first tap in four steps.</h2>
+          </div>
+          <ol className={`${styles.stepGrid} ${styles.stepGrid4}`}>
+            {ORDER_STEPS.map((step, i) => (
+              <li key={step.title}>
+                <span className={styles.stepNum} aria-hidden="true">
+                  {i + 1}
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section id="faq" className={`${styles.section} ${styles.band}`}>
         <div className={`${styles.wrap} ${styles.faqGrid}`}>
           <div>
             <p className={styles.eyebrow}>Questions</p>
             <h2>Good to know.</h2>
+            <p className={styles.sub}>
+              Something else? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+            </p>
           </div>
           <div className={styles.faq}>
             {FAQ.map(({ q, a }) => (
@@ -250,20 +309,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="order" className={styles.section}>
-        <div className={`${styles.wrap} ${styles.orderGrid}`}>
-          <div>
-            <p className={styles.eyebrow}>Order</p>
+      <section className={styles.section}>
+        <div className={styles.wrap}>
+          <div className={styles.finalCta}>
             <h2>Get your card.</h2>
             <p className={styles.sub}>
-              Tell us where to send it. We&apos;ll email you a link to start your subscription, set up your profile, and
-              post your card.
+              <Price of="start" /> to start, then <Price of="monthly" /> a month. Set up your page while your card is on
+              its way.
             </p>
-            <p className={styles.contactLine}>
-              Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-            </p>
+            <div className={styles.ctaRow}>
+              <Link className={`${styles.btn} ${styles.btnLg}`} href="/start">
+                Get your card
+              </Link>
+            </div>
           </div>
-          <OrderForm />
         </div>
       </section>
     </>
