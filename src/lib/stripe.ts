@@ -16,14 +16,12 @@ const SHIP_TO: Record<string, Stripe.Checkout.SessionCreateParams.ShippingAddres
   "England, Scotland or Wales": ["GB"],
 };
 
-/** Days of the first month, which the first payment already covers. */
-const FIRST_MONTH_DAYS = 30;
-
 const pence = (amount: number) => Math.round(amount * 100);
 
 /**
- * One checkout: the first payment (card, delivery and first month) is taken now, the
- * subscription then waits out that first month and bills the monthly price from then on.
+ * One checkout. Today the customer pays the first month plus a one-off charge for the card and
+ * its delivery, which add up to the "start" price; after that the subscription bills the monthly
+ * price on the same date each month.
  */
 export async function createCheckout(opts: {
   userId: string;
@@ -50,22 +48,24 @@ export async function createCheckout(opts: {
           currency: code,
           unit_amount: pence(PRICES[currency].monthly),
           recurring: { interval: "month" },
-          product_data: { name: "Tapfolio monthly: your profile, kept live" },
+          product_data: { name: "Tapfolio monthly" },
         },
       },
       {
         quantity: 1,
         price_data: {
           currency: code,
-          unit_amount: pence(PRICES[currency].start),
-          product_data: { name: "Your Tapfolio card, delivery and first month" },
+          unit_amount: pence(PRICES[currency].start) - pence(PRICES[currency].monthly),
+          product_data: { name: "Your Tapfolio card and delivery (one-off)" },
         },
       },
     ],
     shipping_address_collection: { allowed_countries: shipTo },
     phone_number_collection: { enabled: true },
     metadata,
-    subscription_data: { metadata, trial_period_days: FIRST_MONTH_DAYS },
+    subscription_data: { metadata },
+    // Charge in the currency we priced in (pounds in the UK, euro in Ireland), never a converted one.
+    adaptive_pricing: { enabled: false },
     success_url: `${opts.origin}/dashboard?ordered=1`,
     cancel_url: `${opts.origin}/start`,
   });
