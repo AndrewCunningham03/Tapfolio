@@ -84,7 +84,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
             </div>
             <div className={styles.footerBase}>
               <span>© Tapfolio · Northern Ireland</span>
-              <span>Cards posted by Royal Mail to the UK and Ireland.</span>
+              <span>Cards posted to the UK and Ireland.</span>
             </div>
           </div>
         </footer>

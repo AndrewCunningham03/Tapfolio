@@ -38,7 +38,7 @@ const STEPS = [
 const FEATURES = [
   {
     title: "A Tapfolio card",
-    text: "A metal Tapfolio card with a tap chip built in and a QR code on the back. Posted by Royal Mail.",
+    text: "A metal Tapfolio card with a tap chip built in and a QR code on the back. Posted to you.",
   },
   {
     title: "Your own page",
@@ -61,7 +61,7 @@ const FEATURES = [
 const ORDER_STEPS = [
   { title: "Sign in with Google", text: "No password to set up." },
   { title: "Choose where it's going", text: "Northern Ireland, Great Britain or the Republic of Ireland." },
-  { title: "Pay securely", text: "Checkout is handled by Stripe. Your card is posted by Royal Mail." },
+  { title: "Pay securely", text: "Checkout is handled by Stripe. Your card is posted to you." },
   { title: "Set up your page", text: "Add your details and photos while your card is on its way." },
 ];
 
@@ -102,7 +102,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Where do you deliver?",
-    a: "Northern Ireland, Great Britain and the Republic of Ireland. We post every card by Royal Mail, and delivery is included in your first payment.",
+    a: "Northern Ireland, Great Britain and the Republic of Ireland. Delivery is included in your first payment.",
   },
   {
     q: "Can I get cards for my whole team?",
@@ -245,7 +245,7 @@ export default function HomePage() {
                 <h3>Your first payment covers</h3>
                 <ul className={styles.includes}>
                   <li>Your metal Tapfolio card</li>
-                  <li>Delivery by Royal Mail</li>
+                  <li>Delivery to your door</li>
                   <li>Your first month of Tapfolio</li>
                 </ul>
               </div>

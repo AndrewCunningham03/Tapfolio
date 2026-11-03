@@ -43,7 +43,7 @@ export default function TermsPage() {
       <ul>
         <li>
           <strong>First payment:</strong> {gbp("start")} in the UK, or {eur("start")} in Ireland. It covers your card,
-          its delivery by Royal Mail and your first month.
+          its delivery and your first month.
         </li>
         <li>
           <strong>After that:</strong> {gbp("monthly")} a month in the UK, or {eur("monthly")} in Ireland, taken
@@ -61,9 +61,9 @@ export default function TermsPage() {
 
       <h2>Delivery</h2>
       <p>
-        We post cards by Royal Mail to addresses in the United Kingdom and the Republic of Ireland, usually within [X]
-        working days of your order. Delivery times are estimates. If your card has not arrived after [X] working days,
-        email us and we will look into it.
+        We post cards to addresses in the United Kingdom and the Republic of Ireland, usually within [X] working days of
+        your order. Delivery times are estimates. If your card has not arrived after [X] working days, email us and we
+        will look into it.
       </p>
 
       <h2>Cancelling</h2>
