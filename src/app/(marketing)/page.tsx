@@ -38,7 +38,7 @@ const STEPS = [
 const FEATURES = [
   {
     title: "A Tapfolio card",
-    text: "A standard Tapfolio-branded card with a tap chip and a QR code, in metal or plastic. Posted by Royal Mail.",
+    text: "A metal Tapfolio card with a tap chip built in and a QR code on the back. Posted by Royal Mail.",
   },
   {
     title: "Your own page",
@@ -77,8 +77,8 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     ),
   },
   {
-    q: "Is the card metal or plastic?",
-    a: "You get a standard Tapfolio card, in metal or plastic. Both have the same tap chip and QR code, and both work the same way. The chip is built in, so it reads through metal too. Hold the card near the top of the phone.",
+    q: "Is it really a metal card?",
+    a: "Yes. It is a metal Tapfolio card with a tap chip built in and a QR code on the back. The chip reads straight through the metal. Hold the card near the top of the phone.",
   },
   {
     q: "Do people need an app to use it?",
@@ -244,7 +244,7 @@ export default function HomePage() {
               <div>
                 <h3>Your first payment covers</h3>
                 <ul className={styles.includes}>
-                  <li>Your Tapfolio card, in metal or plastic</li>
+                  <li>Your metal Tapfolio card</li>
                   <li>Delivery by Royal Mail</li>
                   <li>Your first month of Tapfolio</li>
                 </ul>
