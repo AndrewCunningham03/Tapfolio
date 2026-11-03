@@ -45,6 +45,18 @@ async function recordSubscription(db: Db, sub: Stripe.Subscription) {
   if (!userId) return;
   // Newer Stripe versions keep the billing period on the subscription's items.
   const periodEnd = sub.items.data[0]?.current_period_end;
+  // The grace period runs from the first failure: keep the earlier date if a payment keeps failing.
+  const { data: existing } = await db
+    .from("subscriptions")
+    .select("past_due_since")
+    .eq("user_id", userId)
+    .maybeSingle<{ past_due_since: string | null }>();
+  const pastDueSince =
+    sub.status === "past_due"
+      ? (existing?.past_due_since ?? new Date().toISOString())
+      : sub.status === "active" || sub.status === "trialing"
+        ? null
+        : (existing?.past_due_since ?? null);
   const { error } = await db.from("subscriptions").upsert(
     {
       user_id: userId,
@@ -52,6 +64,7 @@ async function recordSubscription(db: Db, sub: Stripe.Subscription) {
       stripe_subscription_id: sub.id,
       status: sub.status,
       current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      past_due_since: pastDueSince,
     },
     { onConflict: "user_id" },
   );

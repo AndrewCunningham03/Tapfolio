@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { isAdmin, requireUser } from "@/lib/auth";
 import { mediaUrl, PROFILE_COLUMNS, type ProfileRow } from "@/lib/profiles";
+import { graceEndsAt, isLive, type SubscriptionState } from "@/lib/billing-state";
 import { normaliseTheme } from "@/lib/themes";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { getServerClient } from "@/lib/supabase/server";
@@ -122,13 +123,21 @@ async function Dashboard() {
       .returns<{ id: string; status: string }[]>(),
     tapCounts(profile.id),
     galleryFor(profile.id),
-    supabase.from("subscriptions").select("status").maybeSingle<{ status: string }>(),
+    supabase
+      .from("subscriptions")
+      .select("status, current_period_end, past_due_since")
+      .maybeSingle<SubscriptionState>(),
   ]);
 
   return (
     <>
       <Head title={`Hi ${profile.full_name.split(/\s+/)[0]}`} admin={admin} />
       <DashboardNotices />
+      {sub && billingWarning(sub) && (
+        <p className={`${styles.notice} ${styles.formError}`} role="alert">
+          {billingWarning(sub)}
+        </p>
+      )}
       {sub && (
         <form action={openBilling} className={styles.billingRow}>
           <span>
@@ -194,4 +203,25 @@ async function Dashboard() {
       />
     </>
   );
+}
+
+const dateOf = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "Europe/London" });
+
+/** What the customer needs to know about their subscription right now, or null if all is well. */
+function billingWarning(sub: SubscriptionState): string | null {
+  const live = isLive(sub);
+  if (sub.status === "past_due") {
+    const end = graceEndsAt(sub);
+    return live
+      ? `Your last payment didn't go through. Your card keeps working until ${end ? dateOf(end) : "your payment is fixed"}. Press Manage billing to update your payment details.`
+      : "Your card is paused because a payment didn't go through. Press Manage billing to update your payment details and it will come straight back.";
+  }
+  if (sub.status === "canceled") {
+    const end = sub.current_period_end ? dateOf(new Date(sub.current_period_end)) : null;
+    return live
+      ? `Your subscription is cancelled. Your card keeps working until ${end}.`
+      : "Your subscription has ended, so your card is paused. Your details are kept: start a new subscription to bring it back.";
+  }
+  if (!live) return "Your card is paused because your subscription isn't active. Press Manage billing to put it right.";
+  return null;
 }

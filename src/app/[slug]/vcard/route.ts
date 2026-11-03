@@ -1,4 +1,5 @@
 import { after, type NextRequest } from "next/server";
+import { isProfilePaused } from "@/lib/paused";
 import { getProfileBySlug } from "@/lib/profiles";
 import { recordTap } from "@/lib/taps";
 import { buildVCard, vCardFilename } from "@/lib/vcard";
@@ -8,6 +9,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/[slug]/vcard">) 
   const { slug } = await ctx.params;
   const profile = await getProfileBySlug(slug);
   if (!profile) return new Response("Not found", { status: 404 });
+  if (await isProfilePaused({ slug: profile.slug })) return new Response("This page is paused.", { status: 404 });
 
   const userAgent = req.headers.get("user-agent");
   after(() => recordTap({ userAgent, source: "vcard", profileId: profile.id }));

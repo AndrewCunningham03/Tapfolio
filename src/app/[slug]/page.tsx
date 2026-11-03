@@ -2,18 +2,18 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatAddress, getProfileBySlug, initials, mapsUrl, telHref, type MediaItem, type SocialNetwork } from "@/lib/profiles";
-import { themeVars } from "@/lib/themes";
 import {
-  AddContactIcon,
-  GlobeIcon,
-  MailIcon,
-  MobileIcon,
-  PhoneIcon,
-  PinIcon,
-  SOCIAL_ICONS,
-  TextIcon,
-} from "./icons";
+  formatAddress,
+  getProfileBySlug,
+  initials,
+  mapsUrl,
+  telHref,
+  type MediaItem,
+  type SocialNetwork,
+} from "@/lib/profiles";
+import { isProfilePaused } from "@/lib/paused";
+import { themeVars } from "@/lib/themes";
+import { AddContactIcon, GlobeIcon, MailIcon, MobileIcon, PhoneIcon, PinIcon, SOCIAL_ICONS, TextIcon } from "./icons";
 import { OwnerBar } from "./owner-bar";
 import { PaySection } from "./pay";
 import styles from "./profile.module.css";
@@ -46,6 +46,25 @@ export default function ProfilePage({ params }: PageProps<"/[slug]">) {
 async function ProfileContent({ slug }: { slug: string }) {
   const profile = await getProfileBySlug(slug);
   if (!profile) notFound();
+
+  // Checked on every view (never cached): the answer changes when a payment fails or is fixed.
+  if (await isProfilePaused({ slug: profile.slug })) {
+    return (
+      <div className={styles.shell}>
+        <div className={styles.page}>
+          <div className={styles.intro}>
+            <h1>This page is paused</h1>
+            <p className={styles.role}>
+              The owner needs to update their payment details. If this is your page, sign in to put it right.
+            </p>
+            <p>
+              <Link href="/login?next=/dashboard">Sign in</Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const address = formatAddress(profile);
   const maps = mapsUrl(profile);
@@ -160,7 +179,13 @@ function Gallery({ media, owner }: { media: MediaItem[]; owner: string }) {
           ) : (
             <a key={m.id} href={m.url} target="_blank" rel="noopener">
               {/* eslint-disable-next-line @next/next/no-img-element -- user uploads from Supabase Storage */}
-              <img src={m.url} alt={`${owner}, photo ${i + 1}`} loading="lazy" width={m.width ?? undefined} height={m.height ?? undefined} />
+              <img
+                src={m.url}
+                alt={`${owner}, photo ${i + 1}`}
+                loading="lazy"
+                width={m.width ?? undefined}
+                height={m.height ?? undefined}
+              />
             </a>
           ),
         )}
