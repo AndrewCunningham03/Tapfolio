@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Card batches: supplier spreadsheets (made by npm run batch)
 /batches/
+
+# Local copy of the card templates for the owner
+Card templates/
