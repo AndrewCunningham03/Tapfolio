@@ -78,6 +78,56 @@ export const PinIcon = () => (
   />
 );
 
+export const CardIcon = () => (
+  <Icon
+    d={
+      <>
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M2 10h20M6 15h4" />
+      </>
+    }
+  />
+);
+/** "Opens somewhere else": an arrow out of the corner. */
+export const ExternalIcon = () => <Icon d={<path d="M7 17 17 7M8 7h9v9" />} />;
+export const ChevronIcon = () => <Icon d={<path d="m9 6 6 6-6 6" />} />;
+export const CopyIcon = () => (
+  <Icon
+    d={
+      <>
+        <rect x="9" y="9" width="12" height="12" rx="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </>
+    }
+  />
+);
+export const CheckIcon = () => <Icon d={<path d="M20 6 9 17l-5-5" />} />;
+export const ShieldIcon = () => (
+  <Icon
+    d={
+      <>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    }
+  />
+);
+export const BankIcon = () => <Icon d={<path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18M12 3l9 5H3z" />} />;
+export const PauseIcon = () => (
+  <Icon
+    d={
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M10 15V9M14 15V9" />
+      </>
+    }
+  />
+);
+/** Contactless waves, for the Tapfolio footer. */
+export const TapIcon = () => (
+  <Icon d={<path d="M8.5 8.5a5 5 0 0 1 0 7M12 5a10 10 0 0 1 0 14M15.5 2a15 15 0 0 1 0 20M5 11.5a1 1 0 0 1 0 1" />} />
+);
+
 export const SOCIAL_ICONS: Record<SocialNetwork, { label: string; icon: React.ReactNode }> = {
   facebook: {
     label: "Facebook",
