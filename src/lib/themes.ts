@@ -11,7 +11,30 @@ export const THEME_PRESETS = {
 } as const;
 
 export type PresetId = keyof typeof THEME_PRESETS;
-export type ThemeChoice = { preset: PresetId | "custom"; accent?: string; background?: string };
+
+/** Typefaces a customer can pick for their public page. `stack` is the CSS font-family. */
+export const FONT_OPTIONS = {
+  clean: { label: "Clean", stack: "inherit" },
+  classic: { label: "Classic", stack: "Georgia, \"Times New Roman\", serif" },
+  bold: { label: "Bold", stack: "\"Arial Black\", \"Helvetica Neue\", Arial, sans-serif" },
+} as const;
+export type FontId = keyof typeof FONT_OPTIONS;
+
+/** Shapes for the page's buttons. `outline` also changes the fill (see the data-buttons attribute). */
+export const BUTTON_STYLES = {
+  rounded: { label: "Rounded", radius: "14px" },
+  square: { label: "Square", radius: "4px" },
+  outline: { label: "Outline", radius: "14px" },
+} as const;
+export type ButtonStyleId = keyof typeof BUTTON_STYLES;
+
+export type ThemeChoice = {
+  preset: PresetId | "custom";
+  accent?: string;
+  background?: string;
+  font?: FontId;
+  buttons?: ButtonStyleId;
+};
 
 const HEX = /^#[0-9a-f]{6}$/i;
 export const isHex = (v: unknown): v is string => typeof v === "string" && HEX.test(v);
@@ -53,6 +76,8 @@ export function normaliseTheme(raw: unknown): ThemeChoice {
   const choice: ThemeChoice = { preset };
   if (isHex(t.accent)) choice.accent = t.accent.toLowerCase();
   if (preset === "custom") choice.background = isHex(t.background) ? t.background.toLowerCase() : "#ffffff";
+  if (typeof t.font === "string" && Object.hasOwn(FONT_OPTIONS, t.font)) choice.font = t.font as FontId;
+  if (typeof t.buttons === "string" && Object.hasOwn(BUTTON_STYLES, t.buttons)) choice.buttons = t.buttons as ButtonStyleId;
   return choice;
 }
 
@@ -91,6 +116,13 @@ export function themeVars(choice: ThemeChoice): Record<string, string> {
     "--accent-text": contrast(onAccent, accent) >= 4.5 ? onAccent : readableOn(accent, "#ffffff", "#000000"),
     "--accent-soft": mix(accent, card, 0.85),
     "--banner-to": mix(accent, "#000000", 0.35),
+    "--tf-font": FONT_OPTIONS[choice.font ?? "clean"].stack,
+    "--btn-radius": BUTTON_STYLES[choice.buttons ?? "rounded"].radius,
     colorScheme: dark ? "dark" : "light",
   };
+}
+
+/** Attributes for the page's outermost element, so CSS can switch on font and button style. */
+export function themeAttrs(choice: ThemeChoice): { "data-font": FontId; "data-buttons": ButtonStyleId } {
+  return { "data-font": choice.font ?? "clean", "data-buttons": choice.buttons ?? "rounded" };
 }
