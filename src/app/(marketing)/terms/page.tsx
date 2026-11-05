@@ -18,7 +18,7 @@ export default function TermsPage() {
   return (
     <div className={`${styles.wrap} ${styles.narrow} ${styles.legal}`}>
       <h1>Terms of service</h1>
-      <p>Last updated: [DATE]</p>
+      <p>Last updated: 5 November 2026</p>
 
       <p className={styles.draft}>
         <strong>Draft.</strong> This is a starting template, not legal advice. Fill in the bracketed details and have it
@@ -52,7 +52,6 @@ export default function TermsPage() {
         <li>
           <strong>Payments</strong> are handled by Stripe. We never see or store your full card number.
         </li>
-        <li>[Prices include VAT, or: we are not VAT registered. Choose one before launch.]</li>
         <li>
           We will tell you in writing at least 30 days before any change to the monthly price, and you can cancel before
           it takes effect.
@@ -61,8 +60,8 @@ export default function TermsPage() {
 
       <h2>Delivery</h2>
       <p>
-        We post cards to addresses in the United Kingdom and the Republic of Ireland, usually within [X] working days of
-        your order. Delivery times are estimates. If your card has not arrived after [X] working days, email us and we
+        We post cards to addresses in the United Kingdom and the Republic of Ireland, usually within 1 working day of
+        your order. Delivery times are estimates. If your card has not arrived after 7 working days, email us and we
         will look into it.
       </p>
 
@@ -76,11 +75,10 @@ export default function TermsPage() {
         <li>
           <strong>Your 14-day right to cancel:</strong> if you order online you can cancel within 14 days of receiving
           your card and ask for a refund of what you paid. To do this, email us. Please return the card to us within 14
-          days of telling us you are cancelling. [Have this wording checked: it depends on whether the card counts as
-          personalised.]
+          days of telling us you are cancelling.
         </li>
         <li>
-          <strong>Your details:</strong> after you cancel we keep your profile for [90] days in case you come back, then
+          <strong>Your details:</strong> after you cancel we keep your profile for 90 days in case you come back, then
           delete it.
         </li>
       </ul>
@@ -108,7 +106,7 @@ export default function TermsPage() {
         We take reasonable care to keep the service running, but we cannot promise it will never be interrupted, and
         phones differ in how they read cards. Nothing in these terms limits your legal rights as a consumer, or our
         liability for anything the law does not allow us to limit. Otherwise our total liability to you is limited to
-        what you have paid us in the 12 months before the problem. [Have this clause checked.]
+        what you have paid us in the 12 months before the problem.
       </p>
 
       <h2>Your data</h2>
@@ -120,7 +118,7 @@ export default function TermsPage() {
       <p>
         We may update these terms and will tell you about important changes. These terms are governed by the law of
         Northern Ireland, and for consumers in the Republic of Ireland that does not remove the protections of Irish
-        consumer law. [Have this clause checked.]
+        consumer law.
       </p>
     </div>
   );
