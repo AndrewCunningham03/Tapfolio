@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { createClient } from "@supabase/supabase-js";
 import {
   IMAGE_MAX_SIDE,
@@ -12,10 +12,23 @@ import {
   VIDEO_TYPES,
   type UploadKind,
 } from "@/lib/media-limits";
-import { THEME_PRESETS, themeVars, type PresetId, type ThemeChoice } from "@/lib/themes";
+import {
+  BUTTON_STYLES,
+  FONT_OPTIONS,
+  THEME_PRESETS,
+  normaliseTheme,
+  themeVars,
+  type ButtonStyleId,
+  type FontId,
+  type PresetId,
+  type ThemeChoice,
+} from "@/lib/themes";
+import { colourFromLogoUrl } from "./logo-colours";
 import { deleteMedia, finishUpload, removeImage, requestUpload, saveTheme } from "./media-actions";
+import { PagePreview, type PreviewLink } from "./preview";
 import { SECTIONS } from "./sections";
 import ds from "./dashboard.module.css";
+import x from "./design-extras.module.css";
 import styles from "../marketing.module.css";
 
 export type DesignerMedia = { id: number; kind: "photo" | "video"; url: string };
@@ -247,106 +260,296 @@ export function PhotoSection(props: { photoUrl?: string; coverUrl?: string }) {
   );
 }
 
-/** Colour theme, with a live preview. Saved with its own button. */
-export function ColoursSection(props: { theme: ThemeChoice; name: string }) {
+/** Colours, font and button shape, with a live preview. Nothing is saved until "Save look" is pressed. */
+const themeKey = (t: ThemeChoice) => JSON.stringify(normaliseTheme(t));
+
+type LogoNote = { ok: true; accent: string; background: string } | { ok: false; message: string } | null;
+
+export function ColoursSection(props: {
+  theme: ThemeChoice;
+  name: string;
+  jobTitle?: string | null;
+  organisation?: string | null;
+  /** The saved profile photo or logo: shown in the preview, and read for "Pick colours from my logo". */
+  photoUrl?: string;
+  coverUrl?: string;
+  /** The customer's own link buttons, drawn in the preview when there are any. */
+  customLinks?: PreviewLink[];
+}) {
   const { status, busy, run } = useMediaTools();
+  const uid = useId();
   const [theme, setTheme] = useState<ThemeChoice>(props.theme);
-  const preview = themeVars(theme) as React.CSSProperties;
+  const [savedKey, setSavedKey] = useState(() => themeKey(props.theme));
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [logoNote, setLogoNote] = useState<LogoNote>(null);
+  const [logoUndo, setLogoUndo] = useState<ThemeChoice | null>(null);
   const id = SECTIONS.colours.id;
+
+  const vars = themeVars(theme);
+  const unsaved = themeKey(theme) !== savedKey;
+  const font = theme.font ?? "clean";
+  const buttons = theme.buttons ?? "rounded";
+
+  /** A change made by hand: the logo suggestion no longer applies. */
+  const edit = (next: ThemeChoice) => {
+    setTheme(next);
+    setLogoNote(null);
+    setLogoUndo(null);
+  };
+
+  async function matchLogo() {
+    if (!props.photoUrl) return;
+    setLogoBusy(true);
+    setLogoNote(null);
+    const result = await colourFromLogoUrl(props.photoUrl);
+    setLogoBusy(false);
+    if (!result.ok) {
+      setLogoNote({
+        ok: false,
+        message:
+          result.reason === "no-colour"
+            ? "We couldn't find a clear colour in your picture. It may be black and white. Choose your colours yourself, above."
+            : "We couldn't read your picture just now. You can still choose your colours yourself, above.",
+      });
+      return;
+    }
+    const { accent, background } = result.colours;
+    setLogoUndo(theme);
+    setTheme((t) => ({ ...t, preset: "custom", accent, background }));
+    setLogoNote({ ok: true, accent, background });
+  }
+
+  const save = () =>
+    run(
+      "theme",
+      async () => {
+        const saving = themeKey(theme);
+        const result = await saveTheme(theme);
+        if (result.ok) setSavedKey(saving);
+        return result;
+      },
+      "Look saved. Your page shows it now.",
+    );
 
   return (
     <fieldset className={ds.section} id={id}>
       <SectionHead
-        title="Colours"
-        intro="Pick a look for your page. Text colours adjust automatically so it's always easy to read."
+        title="Colours and style"
+        intro="Pick a look for your page and watch the preview change. Nothing goes on your page until you press Save look. Text colours adjust automatically so it's always easy to read."
       />
-      <div className={styles.themeGrid}>
-        <div className={styles.swatches} role="radiogroup" aria-label="Colour theme">
-          {(Object.keys(THEME_PRESETS) as PresetId[]).map((preset) => {
-            const p = THEME_PRESETS[preset];
-            return (
-              <label key={preset} className={styles.swatch} data-checked={theme.preset === preset}>
+      <div className={x.designLayout}>
+        <PagePreview
+          theme={theme}
+          name={props.name}
+          jobTitle={props.jobTitle}
+          organisation={props.organisation}
+          photoUrl={props.photoUrl}
+          coverUrl={props.coverUrl}
+          customLinks={props.customLinks}
+          unsaved={unsaved}
+        />
+
+        <div className={x.controls}>
+          <div className={x.group}>
+            <h3 className={x.groupTitle} id={`${uid}-colours`}>
+              Colours
+            </h3>
+            <div className={x.presetGrid} role="radiogroup" aria-labelledby={`${uid}-colours`}>
+              {(Object.keys(THEME_PRESETS) as PresetId[]).map((preset) => {
+                const p = THEME_PRESETS[preset];
+                return (
+                  <label
+                    key={preset}
+                    className={`${x.option} ${x.presetOption}`}
+                    data-checked={theme.preset === preset}
+                  >
+                    <input
+                      type="radio"
+                      name="theme"
+                      checked={theme.preset === preset}
+                      onChange={() => edit({ preset, font: theme.font, buttons: theme.buttons })}
+                    />
+                    <span
+                      className={x.chip}
+                      style={{ background: `linear-gradient(135deg, ${p.bg} 0 50%, ${p.accent} 50%)` }}
+                    />
+                    <span>{p.label}</span>
+                  </label>
+                );
+              })}
+              <label className={`${x.option} ${x.presetOption}`} data-checked={theme.preset === "custom"}>
                 <input
                   type="radio"
                   name="theme"
-                  checked={theme.preset === preset}
-                  onChange={() => setTheme({ preset })}
+                  checked={theme.preset === "custom"}
+                  onChange={() => edit({ ...theme, preset: "custom", background: theme.background ?? "#ffffff" })}
                 />
                 <span
-                  className={styles.swatchChip}
-                  style={{ background: `linear-gradient(135deg, ${p.bg} 0 50%, ${p.accent} 50%)` }}
+                  className={x.chip}
+                  style={{ background: "conic-gradient(#f43f5e, #f59e0b, #22c55e, #3b82f6, #a855f7, #f43f5e)" }}
                 />
-                <span className={styles.swatchLabel}>{p.label}</span>
+                <span>Custom</span>
               </label>
-            );
-          })}
-          <label className={styles.swatch} data-checked={theme.preset === "custom"}>
-            <input
-              type="radio"
-              name="theme"
-              checked={theme.preset === "custom"}
-              onChange={() =>
-                setTheme({ preset: "custom", background: theme.background ?? "#ffffff", accent: theme.accent })
-              }
-            />
-            <span
-              className={styles.swatchChip}
-              style={{ background: "conic-gradient(#f43f5e, #f59e0b, #22c55e, #3b82f6, #a855f7, #f43f5e)" }}
-            />
-            <span className={styles.swatchLabel}>Custom</span>
-          </label>
-        </div>
+            </div>
 
-        <div className={styles.miniPreview} style={preview} role="img" aria-label="Preview of your colours">
-          <div className={styles.miniBanner} />
-          <div className={styles.miniAvatar} />
-          <strong>{props.name}</strong>
-          <span>Save contact</span>
-          <i />
-          <i />
+            <div className={x.pickRow}>
+              {theme.preset === "custom" && (
+                <label>
+                  Background
+                  <input
+                    type="color"
+                    className={ds.colourPick}
+                    value={theme.background ?? "#ffffff"}
+                    onChange={(e) => edit({ ...theme, background: e.target.value })}
+                  />
+                </label>
+              )}
+              <label>
+                Buttons and highlights
+                <input
+                  type="color"
+                  className={ds.colourPick}
+                  value={theme.accent ?? vars["--accent"]}
+                  onChange={(e) => edit({ ...theme, accent: e.target.value })}
+                />
+              </label>
+              {theme.accent && (
+                <button
+                  type="button"
+                  className={`${styles.btn} ${styles.ghost} ${styles.btnSmall} ${ds.tap}`}
+                  onClick={() => edit({ ...theme, accent: undefined })}
+                >
+                  Reset button colour
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className={x.group}>
+            <h3 className={x.groupTitle} id={`${uid}-logo`}>
+              Match your logo
+            </h3>
+            <p className={x.groupHint} id={`${uid}-logo-hint`}>
+              {props.photoUrl
+                ? "Takes the main colour from your photo or logo and tries it on your page. You can change it afterwards."
+                : "Add a photo or logo at the top of this page first, then this can pick its colours."}
+            </p>
+            <div className={x.logoActions}>
+              <button
+                type="button"
+                className={`${styles.btn} ${styles.ghost} ${ds.tap}`}
+                disabled={!props.photoUrl || logoBusy}
+                aria-describedby={`${uid}-logo-hint`}
+                onClick={matchLogo}
+              >
+                {logoBusy ? "Looking at your logo…" : "Pick colours from my logo"}
+              </button>
+              {logoUndo && (
+                <button
+                  type="button"
+                  className={`${styles.linkButton} ${ds.textButton}`}
+                  onClick={() => {
+                    setTheme(logoUndo);
+                    setLogoUndo(null);
+                    setLogoNote(null);
+                  }}
+                >
+                  Undo logo colours
+                </button>
+              )}
+            </div>
+            <div role="status">
+              {logoNote && (
+                <p className={x.note}>
+                  {logoNote.ok ? (
+                    <>
+                      <span className={x.noteChips} aria-hidden="true">
+                        <i style={{ background: logoNote.background }} />
+                        <i style={{ background: logoNote.accent }} />
+                      </span>
+                      Colours picked from your logo. Check the preview, then press Save look.
+                    </>
+                  ) : (
+                    logoNote.message
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className={x.group}>
+            <h3 className={x.groupTitle} id={`${uid}-font`}>
+              Font
+            </h3>
+            <div className={x.choiceGrid} role="radiogroup" aria-labelledby={`${uid}-font`}>
+              {(Object.keys(FONT_OPTIONS) as FontId[]).map((f) => (
+                <label key={f} className={`${x.option} ${x.fontOption}`} data-checked={font === f}>
+                  <input
+                    type="radio"
+                    name="look-font"
+                    checked={font === f}
+                    onChange={() => edit({ ...theme, font: f })}
+                  />
+                  <span className={x.fontAa} style={{ fontFamily: FONT_OPTIONS[f].stack }} aria-hidden="true">
+                    Aa
+                  </span>
+                  <span style={{ fontFamily: FONT_OPTIONS[f].stack }}>{FONT_OPTIONS[f].label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className={x.group}>
+            <h3 className={x.groupTitle} id={`${uid}-buttons`}>
+              Button style
+            </h3>
+            <p className={x.groupHint}>The shape of Save contact and the other buttons on your page.</p>
+            <div className={x.choiceGrid} role="radiogroup" aria-labelledby={`${uid}-buttons`}>
+              {(Object.keys(BUTTON_STYLES) as ButtonStyleId[]).map((b) => (
+                <label key={b} className={`${x.option} ${x.buttonOption}`} data-checked={buttons === b}>
+                  <input
+                    type="radio"
+                    name="look-buttons"
+                    checked={buttons === b}
+                    onChange={() => edit({ ...theme, buttons: b })}
+                  />
+                  {/* A sample button in the page's own colours, so the choice is easy to compare. */}
+                  <span
+                    className={x.sampleCard}
+                    aria-hidden="true"
+                    style={
+                      {
+                        background: vars["--card"],
+                        "--btn-radius": BUTTON_STYLES[b].radius,
+                        "--sample-accent": vars["--accent"],
+                        "--sample-on-accent": vars["--accent-text"],
+                        "--sample-text": vars["--text"],
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span className={x.sampleBtn} data-style={b}>
+                      Save contact
+                    </span>
+                  </span>
+                  <span className={x.optionLabel}>{BUTTON_STYLES[b].label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className={x.group}>
+            <div className={x.saveRow}>
+              <button type="button" className={`${styles.btn} ${ds.tap}`} disabled={busy !== null} onClick={save}>
+                {busy === "theme" ? "Saving…" : "Save look"}
+              </button>
+              <p className={x.saveHint} data-unsaved={unsaved ? "true" : "false"}>
+                {unsaved ? "You have changes that aren't saved yet." : "Your page already shows this look."}
+              </p>
+            </div>
+            <StatusLine status={status} />
+          </div>
         </div>
       </div>
-
-      <div className={styles.colourRow}>
-        {theme.preset === "custom" && (
-          <label>
-            Background
-            <input
-              type="color"
-              className={ds.colourPick}
-              value={theme.background ?? "#ffffff"}
-              onChange={(e) => setTheme({ ...theme, background: e.target.value })}
-            />
-          </label>
-        )}
-        <label>
-          Buttons and highlights
-          <input
-            type="color"
-            className={ds.colourPick}
-            value={theme.accent ?? (theme.preset === "custom" ? "#178046" : THEME_PRESETS[theme.preset].accent)}
-            onChange={(e) => setTheme({ ...theme, accent: e.target.value })}
-          />
-        </label>
-        {theme.accent && (
-          <button
-            type="button"
-            className={`${styles.btn} ${styles.ghost} ${styles.btnSmall} ${ds.tap}`}
-            onClick={() => setTheme({ ...theme, accent: undefined })}
-          >
-            Reset button colour
-          </button>
-        )}
-        <button
-          type="button"
-          className={`${styles.btn} ${ds.tap}`}
-          disabled={busy !== null}
-          onClick={() => run("theme", () => saveTheme(theme), "Colours saved. Your page shows them now.")}
-        >
-          {busy === "theme" ? "Saving…" : "Save colours"}
-        </button>
-      </div>
-      <StatusLine status={status} />
     </fieldset>
   );
 }

@@ -252,7 +252,15 @@ async function Dashboard() {
             hidden_fields: profile.hidden_fields,
           }}
         />
-        <ColoursSection theme={normaliseTheme(profile.theme)} name={profile.full_name} />
+        <ColoursSection
+          theme={normaliseTheme(profile.theme)}
+          name={profile.full_name}
+          jobTitle={profile.job_title}
+          organisation={profile.organisation}
+          photoUrl={mediaUrl(profile.photo_path)}
+          coverUrl={mediaUrl(profile.cover_path)}
+          customLinks={cleanCustomLinks(profile.custom_links)}
+        />
         <GallerySection media={media} />
       </div>
     </>
