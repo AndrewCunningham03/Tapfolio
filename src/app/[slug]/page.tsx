@@ -13,7 +13,7 @@ import {
   type SocialNetwork,
 } from "@/lib/profiles";
 import { isProfilePaused } from "@/lib/paused";
-import { themeVars } from "@/lib/themes";
+import { themeAttrs, themeVars } from "@/lib/themes";
 import {
   AddContactIcon,
   ChevronIcon,
@@ -69,7 +69,11 @@ async function ProfileShell({ slug }: { slug: string }) {
   const profile = await getProfileBySlug(slug);
   if (!profile) notFound();
   return (
-    <div className={styles.shell} style={themeVars(profile.theme) as React.CSSProperties}>
+    <div
+      className={styles.shell}
+      style={themeVars(profile.theme) as React.CSSProperties}
+      {...themeAttrs(profile.theme)}
+    >
       <Suspense
         fallback={
           <ProfileSkeleton
