@@ -1,8 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { CONTACT_EMAIL, GRACE_DAYS } from "@/lib/site";
+import { CONTACT_EMAIL, formatPrice, GRACE_DAYS, PRICES, SITE_NAME } from "@/lib/site";
 import { CardShowcase } from "./card-showcase";
 import { CurrencySwitch, Price } from "./currency";
 import styles from "./marketing.module.css";
+
+// What Facebook, WhatsApp and X show when the homepage is shared. The image is opengraph-image.tsx.
+const SHARE_TITLE = "Tapfolio · A business card that opens your own page";
+const SHARE_DESCRIPTION = `A metal NFC and QR business card. Customers tap or scan it to save your contact, call you or pay you, with no app. ${formatPrice(PRICES.GBP.start, "GBP")} to start, then ${formatPrice(PRICES.GBP.monthly, "GBP")} a month. UK and Ireland.`;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_GB",
+    url: "/",
+    title: SHARE_TITLE,
+    description: SHARE_DESCRIPTION,
+  },
+};
 
 const TRADES = [
   "Window cleaners",
@@ -59,10 +76,10 @@ const FEATURES = [
 ];
 
 const ORDER_STEPS = [
-  { title: "Sign in with Google", text: "No password to set up." },
+  { title: "Sign in with Google", text: "No password to set up. Don't use Google? Email us and we'll sort it." },
   { title: "Choose where it's going", text: "Northern Ireland, Great Britain or the Republic of Ireland." },
-  { title: "Pay securely", text: "Checkout is handled by Stripe. Your card is posted to you." },
-  { title: "Set up your page", text: "Add your details and photos while your card is on its way." },
+  { title: "Pay securely", text: "Checkout is handled by Stripe. Add your delivery address there." },
+  { title: "Set up your page", text: "Add your details and photos straight away, while your card is posted to you." },
 ];
 
 const FAQ: { q: string; a: React.ReactNode }[] = [
@@ -142,7 +159,8 @@ export default function HomePage() {
           <div className={styles.heroDemo}>
             <div className={styles.phone}>
               <div className={styles.screen}>
-                <iframe src="/ash-and-oak-interiors" title="An example Tapfolio profile page" loading="eager" />
+                {/* Lazy: on phones the demo sits below the hero copy, so it loads as the visitor scrolls. */}
+                <iframe src="/ash-and-oak-interiors" title="An example Tapfolio profile page" loading="lazy" />
               </div>
             </div>
             <p className={styles.phoneCaption}>An example page. Scroll it and try the buttons.</p>
@@ -286,6 +304,11 @@ export default function HomePage() {
               </li>
             ))}
           </ol>
+          <div className={styles.ctaRow}>
+            <Link className={`${styles.btn} ${styles.btnLg}`} href="/start">
+              Get your card
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -322,6 +345,7 @@ export default function HomePage() {
                 Get your card
               </Link>
             </div>
+            <p className={styles.ctaNext}>Next: sign in with Google, choose where to post it, then pay with Stripe.</p>
           </div>
         </div>
       </section>
