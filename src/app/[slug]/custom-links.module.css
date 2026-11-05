@@ -1,0 +1,69 @@
+/* The owner's own buttons ("Book a quote"). Colours and shape come from the theme
+   variables on the page shell (src/lib/themes.ts): a solid accent fill by default,
+   or no fill with an accent border and label when the page uses outline buttons. */
+.links {
+  list-style: none;
+  margin: 12px var(--gutter) 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 12px 20px;
+  border: 2px solid var(--accent);
+  border-radius: var(--btn-radius, 14px);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-family: var(--tf-head, inherit);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Outline: no fill, an accent border and an accent label. The page's other buttons
+   (profile.module.css) keep --ink and --ink-edge, the accent nudged so it stays
+   readable on the card; they're used here when they exist. */
+[data-buttons="outline"] .links a {
+  background: transparent;
+  border-color: var(--ink-edge, var(--accent));
+  color: var(--ink, var(--accent));
+  box-shadow: none;
+}
+
+/* Feedback. */
+@media (hover: hover) {
+  .links a:hover {
+    filter: brightness(1.05);
+  }
+  [data-buttons="outline"] .links a:hover {
+    background: var(--accent-soft);
+    filter: none;
+  }
+}
+.links a:active {
+  filter: brightness(0.94);
+}
+[data-buttons="outline"] .links a:active {
+  background: color-mix(in srgb, var(--accent-soft), var(--ink, var(--accent)) 14%);
+  filter: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .links a {
+    transition:
+      transform 0.15s ease,
+      background-color 0.15s ease,
+      filter 0.15s ease;
+  }
+  .links a:active {
+    transform: scale(0.98);
+  }
+}

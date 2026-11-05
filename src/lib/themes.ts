@@ -8,15 +8,32 @@ export const THEME_PRESETS = {
   sand: { label: "Sand", bg: "#f3ece1", card: "#fffaf2", accent: "#a85a1c" },
   ocean: { label: "Ocean", bg: "#0b1726", card: "#112238", accent: "#38bdf8" },
   blush: { label: "Blush", bg: "#fbf0f2", card: "#ffffff", accent: "#be3a64" },
+  // Added for trades and small businesses. Every one passes the readable-text rules in themeVars
+  // (text 7:1, secondary text 4.6:1, text on the accent 4.5:1) and its accent reads at 4.5:1 on its card.
+  workwear: { label: "Workwear", bg: "#17181a", card: "#232528", accent: "#ffc61a" },
+  barbershop: { label: "Barbershop", bg: "#0b0b0b", card: "#171615", accent: "#d4a847" },
+  salon: { label: "Salon", bg: "#e8eee6", card: "#fcfdfb", accent: "#4f7358" },
+  slate: { label: "Slate", bg: "#e3e8ee", card: "#ffffff", accent: "#3f5a7a" },
+  terracotta: { label: "Terracotta", bg: "#1d110d", card: "#2a1812", accent: "#e9855a" },
+  navy: { label: "Navy", bg: "#0f2342", card: "#ffffff", accent: "#1e4f8f" },
+  graphite: { label: "Graphite", bg: "#121212", card: "#1e1e20", accent: "#ff7a2f" },
+  lavender: { label: "Lavender", bg: "#ece7f5", card: "#ffffff", accent: "#6b4fa3" },
 } as const;
 
 export type PresetId = keyof typeof THEME_PRESETS;
 
 /** Typefaces a customer can pick for their public page. `stack` is the CSS font-family. */
 export const FONT_OPTIONS = {
-  clean: { label: "Clean", stack: "inherit" },
-  classic: { label: "Classic", stack: "Georgia, \"Times New Roman\", serif" },
-  bold: { label: "Bold", stack: "\"Arial Black\", \"Helvetica Neue\", Arial, sans-serif" },
+  // The phone's own interface font (SF on iPhone, Roboto on Android, Segoe UI on Windows).
+  clean: { label: "Clean", stack: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' },
+  // Georgia on iPhone, Mac and Windows; Android has no Georgia, so it gets Noto Serif.
+  classic: { label: "Classic", stack: 'Georgia, "Noto Serif", "Times New Roman", serif' },
+  // A heavy face for headings: Arial Black (Windows, Mac), Avenir Next Heavy (iPhone), Roboto Black (Android).
+  // The page sets headings in it at weight 900 and keeps reading text in the clean sans-serif.
+  bold: {
+    label: "Bold",
+    stack: '"Arial Black", "Avenir Next", Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+  },
 } as const;
 export type FontId = keyof typeof FONT_OPTIONS;
 

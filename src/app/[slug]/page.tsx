@@ -27,6 +27,7 @@ import {
   TapIcon,
   TextIcon,
 } from "./icons";
+import { CustomLinks } from "./custom-links";
 import { OwnerBar } from "./owner-bar";
 import { PaySection } from "./pay";
 import { ProfileSkeleton } from "./skeleton";
@@ -154,6 +155,8 @@ async function ProfileContent({ profile }: { profile: Profile }) {
             ))}
           </div>
         )}
+
+        <CustomLinks links={profile.customLinks} owner={firstName} />
 
         <PaySection profile={profile} />
 
