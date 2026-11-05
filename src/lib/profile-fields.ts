@@ -23,6 +23,12 @@ export const PAY_LABELS: Record<PayMethod, { label: string; example: string }> =
   card: { label: "Card payment link", example: "https://pay.sumup.com/… or a Stripe link" },
 };
 
+/** A custom button on the public page ("Book a quote"), as stored in profiles.custom_links. */
+export type CustomLink = { label: string; url: string };
+export const MAX_CUSTOM_LINKS = 6; // also the check on profiles.custom_links
+export const CUSTOM_LINK_LABEL_MAX = 40;
+export const CUSTOM_LINK_URL_MAX = 2000; // long booking and calendar links exist; this just stops absurd ones
+
 /** Fields an owner can keep on file but hide from their public page. Values match profiles.hidden_fields. */
 export const HIDEABLE_FIELDS = {
   phone: "Phone",

@@ -5,6 +5,7 @@ export const SECTIONS = {
   photo: { id: "photo", label: "Photo" },
   details: { id: "details", label: "About you" },
   contact: { id: "contact", label: "Contact" },
+  buttons: { id: "buttons", label: "Buttons" },
   pay: { id: "get-paid", label: "Get paid" },
   socials: { id: "socials", label: "Socials" },
   privacy: { id: "hide-details", label: "Hide details" },
