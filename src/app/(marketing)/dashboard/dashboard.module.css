@@ -595,3 +595,13 @@
   color: var(--muted, #9a9fa8);
   font-size: 0.9rem;
 }
+
+/* The extra "Buttons" chip makes the menu about 930px wide, so between 900px and 980px of screen it scrolls
+   again: bring back the fade on the right that hints at that (wider than this, it all fits). */
+@media (min-width: 900px) and (max-width: 979px) {
+  .jumpList {
+    padding-right: 24px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+}
