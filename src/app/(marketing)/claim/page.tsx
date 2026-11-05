@@ -7,7 +7,7 @@ import { isCardId, normalise } from "@/lib/ids";
 import type { ShippingDetails } from "@/lib/orders";
 import { CONTACT_EMAIL } from "@/lib/site";
 import { getAdminClient } from "@/lib/supabase/admin";
-import { CardNotice } from "../card/notice";
+import { CardNotice, NoticeAside } from "../card/notice";
 import { AssignPanel, type WaitingOrder } from "./assign-panel";
 
 export const metadata: Metadata = { title: "Card not set up yet", robots: { index: false } };
@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Card not set up yet", robots: { inde
 // owner scans a card with their phone, they get the paid orders waiting for one, with an Assign button.
 export default function ClaimPage({ searchParams }: PageProps<"/claim">) {
   return (
-    <CardNotice title="This card isn't set up yet">
+    <CardNotice title="This card isn't set up yet" tone="setup">
       <Suspense fallback={<Visitor />}>
         {searchParams.then((p) => (
           <Scanned card={String(p.card ?? "")} />
@@ -28,10 +28,18 @@ export default function ClaimPage({ searchParams }: PageProps<"/claim">) {
 
 function Visitor() {
   return (
-    <p>
-      This Tapfolio card hasn&apos;t been linked to a profile yet. If it&apos;s yours, we&apos;ll have it ready for you
-      shortly. Any questions, email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-    </p>
+    <>
+      <p>
+        This Tapfolio card is new and hasn&apos;t been linked to anyone&apos;s page yet. If someone has just given it to
+        you, ask them for their details for now.
+      </p>
+      <NoticeAside>
+        <p>
+          We&apos;re getting it ready, and it will open your page as soon as it&apos;s linked. Any questions, email{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+        </p>
+      </NoticeAside>
+    </>
   );
 }
 

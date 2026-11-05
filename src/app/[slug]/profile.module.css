@@ -1,41 +1,111 @@
 /* Public profile page. Every colour comes from the owner's chosen theme
    (src/lib/themes.ts), set as custom properties on .shell; these defaults are
-   the Classic theme, used while the page loads. */
+   the Classic theme. */
 .shell {
   --bg: #f4f7f5;
   --card: #ffffff;
   --text: #121614;
-  --muted: #5f6662;
-  --line: #e3e6e4;
-  --soft: #eef1ef;
+  --muted: #717372;
+  --line: #dedede;
+  --soft: #eeefef;
   --accent: #178046;
   --accent-text: #ffffff;
-  --accent-soft: #dcefe4;
+  --accent-soft: #dcece3;
   --banner-to: #0f532e;
+  /* Outline for secondary buttons: clearer than --line, softer than text. */
+  --edge: color-mix(in srgb, var(--text) 22%, var(--card));
+  --gutter: 24px;
 
   min-height: 100vh;
+  min-height: 100svh;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
 }
+@media (max-width: 359px) {
+  .shell {
+    --gutter: 16px;
+  }
+}
+
+/* Before the profile (and so its colours) is known: plain greys that follow the phone's light or dark mode. */
+.neutral {
+  --bg: #f2f3f5;
+  --card: #ffffff;
+  --text: #121614;
+  --soft: #eeeff1;
+  --line: #e4e5e7;
+  --accent: #dcdfe3;
+  --accent-soft: #eceef0;
+  --banner-to: #c3c7cd;
+}
+@media (prefers-color-scheme: dark) {
+  .neutral {
+    --bg: #09090a;
+    --card: #141416;
+    --text: #f4f5f7;
+    --soft: #222326;
+    --line: #2a2b2e;
+    --accent: #2c2e32;
+    --accent-soft: #222326;
+    --banner-to: #1a1b1e;
+  }
+}
+
 .shell a:focus-visible,
-.shell button:focus-visible {
-  outline: 2px solid var(--accent);
+.shell button:focus-visible,
+.shell video:focus-visible {
+  outline: 2px solid var(--text);
   outline-offset: 3px;
 }
 
 .page {
+  display: flex;
+  flex-direction: column;
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100svh;
   background: var(--card);
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
 }
+.main {
+  flex: 1 0 auto;
+}
+/* Wider screens: the page floats as a card. */
+@media (min-width: 560px) {
+  .shell {
+    padding: 32px 0;
+  }
+  .page {
+    min-height: calc(100svh - 64px);
+    border-radius: 28px;
+    overflow: clip;
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 40px 80px -40px rgba(0, 0, 0, 0.45);
+  }
+}
 
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Header: cover, photo, name ---------------------------------------------- */
 .banner {
-  height: 132px;
-  background: linear-gradient(135deg, var(--accent), var(--banner-to));
-  position: relative;
+  height: 136px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, 0.16), transparent 55%),
+    linear-gradient(135deg, var(--accent), var(--banner-to));
   overflow: hidden;
 }
 .banner img {
@@ -45,18 +115,19 @@
   display: block;
 }
 .avatar {
-  width: 112px;
-  height: 112px;
+  width: 116px;
+  height: 116px;
   border-radius: 50%;
-  margin: -56px auto 0;
+  margin: -58px auto 0;
   position: relative;
-  z-index: 1;
   background: var(--accent-soft);
   border: 4px solid var(--card);
+  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.55);
   display: grid;
   place-items: center;
-  font-size: 2.4rem;
+  font-size: 2.5rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text);
   overflow: hidden;
 }
@@ -68,166 +139,322 @@
 
 .intro {
   text-align: center;
-  padding: 14px 24px 8px;
+  padding: 14px var(--gutter) 0;
 }
-.intro h1 {
+.name {
   margin: 0;
-  font-size: 1.6rem;
-  letter-spacing: -0.02em;
-}
-.role {
-  color: var(--muted);
-  margin: 2px 0 0;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
 }
 .org {
+  margin: 6px 0 0;
+  font-size: 1.05rem;
   font-weight: 700;
+  line-height: 1.35;
+}
+.role {
   margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
+/* Save contact and the quick actions -------------------------------------- */
+/* 1.2rem bold counts as large text, so it stays readable on any accent. */
 .save {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin: 20px 24px 8px;
-  padding: 16px;
-  border-radius: 14px;
+  margin: 20px var(--gutter) 0;
+  min-height: 58px;
+  padding: 12px 20px;
+  border-radius: 16px;
   background: var(--accent);
   color: var(--accent-text);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   text-decoration: none;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-}
-.save:active {
-  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 12px 28px -14px rgba(0, 0, 0, 0.6);
 }
 .save svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+  flex: none;
 }
 
 .quick {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 8px;
-  padding: 12px 24px 4px;
+  margin: 10px var(--gutter) 0;
 }
-.quick a {
+.quick > * {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 12px 4px;
-  border-radius: 12px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 10px 2px;
+  border-radius: 14px;
   background: var(--soft);
   color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 650;
+  line-height: 1.2;
   text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
+  white-space: nowrap;
 }
 .quick svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+/* One or two actions: wide buttons with the icon beside the label. */
+.quickFew > * {
+  flex-direction: row;
+  gap: 10px;
+  min-height: 58px;
+  font-size: 1rem;
+}
+@media (max-width: 359px) {
+  .quick {
+    gap: 6px;
+  }
+  .quick:not(.quickFew) > * {
+    font-size: 0.75rem;
+  }
 }
 
-.about {
-  margin: 8px 24px 0;
+/* Sections ---------------------------------------------------------------- */
+.section {
+  margin: 28px var(--gutter) 0;
+}
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--muted);
-  font-size: 0.95rem;
+}
+.about {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: break-word;
 }
 
-/* Pay me */
+/* Pay --------------------------------------------------------------------- */
 .pay {
-  margin: 20px 24px 4px;
+  margin: 24px var(--gutter) 0;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 20px;
 }
-.pay h2,
-.gallery h2 {
+@media (max-width: 359px) {
+  .pay {
+    padding: 14px;
+  }
+}
+.payTitle {
   margin: 0 0 12px;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
 }
 .payLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
 }
 .payLinks a {
-  display: block;
-  text-align: center;
-  padding: 12px 10px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 700;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 9px 14px 9px 10px;
+  border-radius: 14px;
+  border: 1.5px solid var(--edge);
   color: var(--text);
+  text-decoration: none;
+}
+.payIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
   background: var(--soft);
-  border: 1px solid var(--line);
+}
+.payIcon svg {
+  width: 20px;
+  height: 20px;
+}
+.payText {
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+}
+.payText strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.payText small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.payGo {
+  display: grid;
+  color: var(--muted);
+}
+.payGo svg {
+  width: 18px;
+  height: 18px;
 }
 .payLinks a.payPrimary {
   background: var(--accent);
-  color: var(--accent-text);
   border-color: var(--accent);
+  color: var(--accent-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+.payPrimary .payIcon {
+  background: color-mix(in srgb, var(--accent-text) 14%, transparent);
+}
+.payPrimary small,
+.payPrimary .payGo {
+  color: inherit;
+}
+
+.bankTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.payTitle + .bankTitle {
+  margin-top: 4px;
+}
+.bankTitle svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
 }
 .bank {
-  margin: 14px 0 0;
-  padding: 0;
+  margin: 0;
 }
-.bank div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 4px 12px;
-  padding: 9px 0;
-  border-top: 1px solid var(--line);
+.bank > div {
+  padding: 10px 0 12px;
+  border-bottom: 1px solid var(--line);
 }
-.bank div:first-child {
-  border-top: 0;
+.bank > div:last-child {
+  border-bottom: 0;
 }
 .bank dt {
   color: var(--muted);
-  font-size: 0.82rem;
-  flex: none;
+  font-size: 0.8rem;
 }
-/* Long values (an IBAN) drop onto their own line instead of breaking mid-group. */
 .bank dd {
-  margin: 0 0 0 auto;
+  margin: 2px 0 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* One tap selects the whole value, for copying by hand if the Copy button is blocked. */
+.bankValue {
+  min-width: 0;
+  font-size: 1.12rem;
+  font-weight: 650;
+  line-height: 1.35;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  white-space: nowrap;
+  letter-spacing: 0.02em;
+  overflow-wrap: break-word;
+  -webkit-user-select: all;
+  user-select: all;
 }
 .copy {
+  position: relative;
   flex: none;
-  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 6.25rem;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--edge);
   background: var(--card);
   color: var(--text);
   font: inherit;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 4px 9px;
-  border-radius: 999px;
   cursor: pointer;
 }
+/* A 48px-tall touch target around the 40px pill. */
+.copy::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.copy svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.copied {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
 .payNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   margin: 12px 0 0;
-  font-size: 0.75rem;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 0.8rem;
+  line-height: 1.45;
   color: var(--muted);
 }
-
-/* Photos and videos */
-.gallery {
-  margin: 20px 24px 4px;
+.payNote svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
 }
+
+/* Photos and videos ------------------------------------------------------- */
 .galleryGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 .galleryGrid > * {
   border-radius: 12px;
@@ -235,31 +462,38 @@
   background: var(--soft);
   aspect-ratio: 1;
 }
-.galleryGrid a,
+.galleryGrid a {
+  display: block;
+}
 .galleryGrid img {
   display: block;
   width: 100%;
   height: 100%;
-}
-.galleryGrid img {
   object-fit: cover;
 }
-.galleryGrid video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  background: #000;
-}
-/* Videos play best full width. */
 .galleryGrid .wide {
   grid-column: 1 / -1;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 3 / 2;
+}
+/* Videos keep their own shape (letterboxed, never cropped) at full width. */
+.galleryGrid .video {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+  max-height: 70svh;
+  background: #000;
+}
+.video video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
 }
 
+/* Contact details --------------------------------------------------------- */
 .details {
   list-style: none;
-  margin: 16px 24px;
+  margin: 0;
   padding: 0;
   border-top: 1px solid var(--line);
 }
@@ -270,46 +504,68 @@
   display: flex;
   gap: 14px;
   align-items: center;
-  padding: 14px 4px;
+  min-height: 64px;
+  padding: 10px 2px;
   color: var(--text);
   text-decoration: none;
 }
 .ico {
   flex: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: var(--accent-soft);
   color: var(--text);
   display: grid;
   place-items: center;
 }
 .ico svg {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
 }
-.details small {
+.detailText {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.detailText small {
   display: block;
+  margin-bottom: 2px;
   color: var(--muted);
   font-size: 0.78rem;
 }
-.details span {
-  word-break: break-word;
+.detailGo {
+  flex: none;
+  display: grid;
+  color: var(--muted);
+}
+.detailGo svg {
+  width: 18px;
+  height: 18px;
 }
 
 .socials {
+  list-style: none;
+  margin: 24px var(--gutter) 0;
+  padding: 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 8px;
+}
+@media (max-width: 359px) {
+  .socials {
+    gap: 4px;
+  }
 }
 .socials a {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--edge);
   color: var(--text);
 }
 .socials svg {
@@ -317,35 +573,194 @@
   height: 20px;
 }
 
+/* Footer ------------------------------------------------------------------ */
 .footer {
-  text-align: center;
-  padding: 16px 24px 28px;
-  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 36px;
+  padding: 0 var(--gutter) calc(16px + env(safe-area-inset-bottom));
+  font-size: 0.82rem;
   color: var(--muted);
+  text-align: center;
 }
-.footer a {
-  color: var(--text);
-  font-weight: 700;
+.footerCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
   text-decoration: none;
 }
+.footerCta strong {
+  color: var(--text);
+}
+.footerCta svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--text);
+}
+.footerLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--muted);
+  text-underline-offset: 3px;
+}
 
-.skeleton {
-  min-height: 100vh;
-  background: var(--bg);
+/* Paused page ------------------------------------------------------------- */
+.paused {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px var(--gutter) 0;
+}
+.pausedIcon {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--text);
+}
+.pausedIcon svg {
+  width: 32px;
+  height: 32px;
+}
+.pausedLead {
+  margin: 10px 0 0;
+  max-width: 22em;
+  color: var(--muted);
+}
+.pausedHelp {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin-top: 28px;
+  text-align: left;
+}
+.pausedHelp p {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--soft);
+  font-size: 0.92rem;
+}
+.paused .save {
+  align-self: stretch;
+  margin: 16px 0 0;
+}
+
+/* Loading placeholder ----------------------------------------------------- */
+.bone {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  height: 0.8em;
+  border-radius: 6px;
+  background: var(--soft);
+}
+.boneBox,
+.quick > .boneBox {
+  background: var(--soft);
+  box-shadow: none;
+}
+.boneTall {
+  height: 220px;
+  border-radius: 20px;
 }
 
 /* Only the signed-in owner sees this. */
 .ownerBar {
   position: fixed;
   left: 50%;
-  bottom: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   z-index: 10;
-  padding: 12px 22px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 24px;
   border-radius: 999px;
   background: var(--text);
   color: var(--card);
   font-weight: 700;
+  white-space: nowrap;
   text-decoration: none;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+/* Room to scroll the footer out from under it. */
+.page:has(.ownerBar) .footer {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+/* Feedback ---------------------------------------------------------------- */
+.save:active,
+.payLinks a.payPrimary:active {
+  filter: brightness(0.94);
+}
+.quick > a:active,
+.payLinks a:active,
+.copy:active,
+.socials a:active,
+.details a:active .ico {
+  background: color-mix(in srgb, var(--soft), var(--text) 10%);
+}
+@media (hover: hover) {
+  .quick > a:hover,
+  .payLinks a:not(.payPrimary):hover,
+  .copy:not(.copied):hover,
+  .socials a:hover,
+  .footerCta:hover {
+    background: var(--soft);
+  }
+  .quick > a:hover {
+    background: color-mix(in srgb, var(--soft), var(--text) 6%);
+  }
+  .save:hover,
+  .payLinks a.payPrimary:hover {
+    filter: brightness(1.05);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .save,
+  .quick > a,
+  .payLinks a,
+  .copy,
+  .socials a,
+  .galleryGrid img {
+    transition:
+      transform 0.15s ease,
+      background-color 0.15s ease,
+      filter 0.15s ease;
+  }
+  .save:active,
+  .quick > a:active,
+  .payLinks a:active {
+    transform: scale(0.98);
+  }
+  @media (hover: hover) {
+    .galleryGrid a:hover img {
+      transform: scale(1.04);
+    }
+  }
+  .loading .bone,
+  .loading .boneBox,
+  .loading .avatar {
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
 }

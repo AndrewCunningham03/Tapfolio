@@ -1,0 +1,141 @@
+/* Card notice pages: where a card link lands when it can't open a profile
+   (not set up yet, paused, deactivated, unknown). Uses the marketing site's
+   colours (custom properties set on .site). */
+.notice {
+  --tone: var(--steel);
+  padding-top: 56px;
+  padding-bottom: 96px;
+}
+.setup {
+  --tone: var(--green-text);
+}
+.paused {
+  --tone: var(--yellow);
+}
+.off {
+  --tone: var(--muted);
+}
+
+.panel {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(80% 60% at 0% 0%, color-mix(in srgb, var(--tone) 12%, transparent), transparent 70%), var(--raised);
+}
+@media (max-width: 560px) {
+  .notice {
+    padding-top: 24px;
+    padding-bottom: 56px;
+  }
+  .panel {
+    padding: 28px 20px;
+    border-radius: var(--radius);
+  }
+}
+
+/* The little metal card with a status badge. */
+.glyph {
+  position: relative;
+  width: 92px;
+  margin-bottom: 24px;
+}
+.glyph svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.55));
+}
+.badge {
+  position: absolute;
+  right: -12px;
+  bottom: -10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  border: 2px solid var(--tone);
+  color: var(--tone);
+}
+.badge svg {
+  width: 18px;
+  height: 18px;
+  filter: none;
+}
+
+.notice .panel h1 {
+  margin: 0 0 12px;
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+.body {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+.body p {
+  margin: 0 0 12px;
+}
+.body p:last-child {
+  margin-bottom: 0;
+}
+.body strong {
+  color: var(--text);
+}
+.body a:not([class]) {
+  color: var(--steel);
+  font-weight: 700;
+}
+
+/* "Is this your card?" */
+.aside {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.025);
+}
+.notice .aside h2 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.aside p {
+  margin: 0;
+  font-size: 0.98rem;
+}
+.aside .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 28px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+@media (max-width: 560px) {
+  .more .actionsBtn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  .aside .actions > * {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

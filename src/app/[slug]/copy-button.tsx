@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CheckIcon, CopyIcon } from "./icons";
 import styles from "./profile.module.css";
 
 /** Copies a value (e.g. an account number) and confirms briefly. */
@@ -18,8 +19,20 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
   }
 
   return (
-    <button type="button" className={styles.copy} onClick={copy} aria-label={`Copy ${label}`}>
-      {copied ? "Copied" : "Copy"}
-    </button>
+    <>
+      <button
+        type="button"
+        className={copied ? `${styles.copy} ${styles.copied}` : styles.copy}
+        onClick={copy}
+        aria-label={`Copy ${label}`}
+      >
+        {copied ? <CheckIcon /> : <CopyIcon />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+      {/* Screen readers hear the confirmation; the button's own name stays "Copy …". */}
+      <span className={styles.srOnly} role="status">
+        {copied ? `${label} copied` : ""}
+      </span>
+    </>
   );
 }
