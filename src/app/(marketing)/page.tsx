@@ -223,7 +223,7 @@ export default function HomePage() {
             <h2>Made for people who are out on the job.</h2>
             <p className={styles.sub}>
               If customers find you by word of mouth, on site or at the counter, a Tapfolio card saves them hunting for
-              your number. Built in Northern Ireland for small businesses across the UK and Ireland.
+              your number. Made for small businesses across the UK and Ireland.
             </p>
           </div>
           <ul className={styles.trades}>

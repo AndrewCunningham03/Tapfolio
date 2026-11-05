@@ -47,7 +47,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               <Link className={styles.logo} href="/" aria-label="Tapfolio home">
                 <Wordmark />
               </Link>
-              <p>A metal business card you tap or scan that opens your own page. Made in Northern Ireland.</p>
+              <p>A metal business card you tap or scan that opens your own page.</p>
             </div>
             <nav aria-label="Footer: product">
               <h2>Tapfolio</h2>
@@ -90,7 +90,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </nav>
           </div>
           <div className={styles.footerBase}>
-            <span>© Tapfolio · Northern Ireland</span>
+            <span>© Tapfolio</span>
             <span>Cards posted to the UK and Ireland.</span>
           </div>
         </div>
