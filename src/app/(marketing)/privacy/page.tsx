@@ -8,25 +8,17 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// DRAFT TEMPLATE: fill in every [bracketed] item and have it checked before
-// launch, then remove the draft notice.
 export default function PrivacyPage() {
   return (
     <div className={`${styles.wrap} ${styles.narrow} ${styles.legal}`}>
       <h1>Privacy policy</h1>
       <p>Last updated: 5 November 2026</p>
 
-      <p className={styles.draft}>
-        <strong>Draft.</strong> This is a starting template, not legal advice. Fill in the bracketed details and have it
-        reviewed before the site goes live.
-      </p>
-
       <h2>Who we are</h2>
       <p>
-        Tapfolio is run by [YOUR NAME / COMPANY NAME, company number if any], [ADDRESS], Northern Ireland. We are the
-        controller of the personal data described here. We are based in the United Kingdom and also serve customers in
-        Ireland and elsewhere, so we follow the UK GDPR and, for customers in the EU, the EU GDPR. Contact us about
-        privacy at {CONTACT_EMAIL}.
+        Tapfolio is based at Merchants Quay, Newry, Northern Ireland. We are the controller of the personal data
+        described here. We are based in the United Kingdom and also serve customers in Ireland and elsewhere, so we
+        follow the UK GDPR and, for customers in the EU, the EU GDPR. Contact us about privacy at {CONTACT_EMAIL}.
       </p>
 
       <h2>What we collect</h2>
