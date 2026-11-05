@@ -1,0 +1,550 @@
+/* Customer dashboard. Builds on the marketing site's colours (the --vars set on
+   .site in marketing.module.css), with fallbacks so it still reads if those move.
+   Some rules repeat a class (.x.x) to win over the older shared dashboard styles
+   without editing that file. */
+
+.dash {
+  --dash-header: var(--header-h, 68px); /* height of the site's sticky header */
+  --dash-jump: 64px; /* height of the sticky section menu */
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Anything tappable is at least 44px tall. */
+.tap {
+  min-height: 44px;
+  justify-content: center;
+}
+.textButton.textButton {
+  min-height: 44px;
+  padding: 0 6px;
+  margin-left: -6px;
+  color: var(--steel, #c9ced6);
+}
+
+/* Header row: wraps on small phones instead of squashing the buttons. */
+.head.head {
+  flex-wrap: wrap;
+  align-items: center;
+}
+.headActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Messages, billing and the "your page" panel at the top. */
+.top {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0 0;
+}
+.top > p {
+  margin: 0;
+}
+
+.billing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 14px 14px 14px 18px;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.16));
+  border-radius: 16px;
+}
+.billing p {
+  margin: 0;
+}
+.billingStatus {
+  color: var(--muted, #9a9fa8);
+}
+.billingStatus strong {
+  color: var(--text, #f2f3f5);
+}
+.billingWarn {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.55);
+}
+.billingWarn h2.billingTitle {
+  font-size: 1.15rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.billingWarn p {
+  margin: 0;
+}
+.billingActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+.billingActions a {
+  color: var(--text, #f2f3f5);
+  font-weight: 700;
+}
+
+/* Your page: link, share buttons and the set-up checklist. */
+.yourPage {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 20px;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.16));
+  background: var(--raised, #111113);
+  scroll-margin-top: calc(var(--dash-header) + 16px);
+}
+.yourPage h2.panelTitle {
+  font-size: 1.35rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.yourPage p {
+  margin: 0;
+}
+.yourPage .pageUrl {
+  margin: 6px 0 0;
+  font-size: 1.05rem;
+  color: var(--steel, #c9ced6);
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
+.pageUrl strong {
+  color: var(--text, #f2f3f5);
+}
+.shareRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.shareNote {
+  flex-basis: 100%;
+  color: var(--muted, #9a9fa8);
+  font-size: 0.9rem;
+}
+.setupIntro {
+  color: var(--muted, #9a9fa8);
+}
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.progress {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--raised-2, #17181b);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green, #1f9d55);
+}
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.steps a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 8px 16px 8px 12px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  background: var(--bg, #09090a);
+  text-decoration: none;
+  font-weight: 700;
+}
+.steps a:hover {
+  border-color: var(--line-strong, rgba(255, 255, 255, 0.16));
+}
+.steps a::after {
+  content: "";
+  flex: none;
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--muted, #9a9fa8);
+  border-right: 2px solid var(--muted, #9a9fa8);
+  transform: rotate(45deg);
+}
+.stepMark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong, rgba(255, 255, 255, 0.16));
+}
+.stepDone a {
+  color: var(--muted, #9a9fa8);
+  font-weight: 600;
+}
+.stepDone .stepMark {
+  border-color: var(--green, #1f9d55);
+  background: var(--green, #1f9d55);
+}
+.stepDone .stepMark::after {
+  content: "";
+  width: 10px;
+  height: 6px;
+  margin-top: -3px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+.stepHint {
+  display: block;
+  color: var(--muted, #9a9fa8);
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Sticky section menu. */
+.jump {
+  position: sticky;
+  top: var(--dash-header);
+  z-index: 15;
+  margin: 28px -24px 16px;
+  padding: 10px 24px;
+  background: rgba(9, 9, 10, 0.94);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+}
+.jumpList {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0 24px 0 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Fades out on the right, a hint that the menu scrolls sideways. */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.jumpList::-webkit-scrollbar {
+  display: none;
+}
+.jumpList li {
+  flex: none;
+}
+.jumpList a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.16));
+  color: var(--muted, #9a9fa8);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.jumpList a:hover {
+  color: var(--text, #f2f3f5);
+}
+.jumpList a[aria-current] {
+  background: var(--text, #f2f3f5);
+  border-color: var(--text, #f2f3f5);
+  color: #0a0a0b;
+}
+@media (min-width: 900px) {
+  /* Wide screens: tighter chips so every section fits on one line, with no fade. */
+  .jumpList {
+    padding-right: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .jumpList a {
+    padding: 0 12px;
+    font-size: 0.88rem;
+  }
+}
+@media (max-height: 560px) {
+  /* Short screens (a phone on its side): don't pin the menu, keep room for the form. */
+  .jump {
+    position: static;
+  }
+}
+
+/* Sections. */
+.sections {
+  display: grid;
+  gap: 16px;
+}
+.section {
+  scroll-margin-top: calc(var(--dash-header) + var(--dash-jump) + 12px);
+}
+.dash h2.sectionTitle {
+  font-size: 1.2rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+.sectionIntro {
+  color: var(--muted, #9a9fa8);
+  font-size: 0.95rem;
+  margin: 4px 0 18px;
+  max-width: 40em;
+}
+.sectionIntro a {
+  color: var(--text, #f2f3f5);
+}
+.dash h3.subTitle {
+  font-size: 1rem;
+  letter-spacing: 0;
+  margin: 26px 0 4px;
+}
+.subIntro {
+  color: var(--muted, #9a9fa8);
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+}
+
+/* Form fields. */
+.editor input,
+.editor textarea {
+  /* Keep a focused field clear of the sticky header, menu and save bar. */
+  scroll-margin-top: calc(var(--dash-header) + var(--dash-jump) + 48px);
+  scroll-margin-bottom: 120px;
+}
+.hint {
+  color: var(--muted, #9a9fa8);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: -2px 0 10px;
+}
+.fieldError {
+  color: #fecaca;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: -2px 0 10px;
+  padding-left: 10px;
+  border-left: 3px solid #f87171;
+}
+.editor input[aria-invalid="true"],
+.editor textarea[aria-invalid="true"] {
+  border-color: #f87171;
+  box-shadow: 0 0 0 1px #f87171;
+}
+.counter {
+  color: var(--muted, #9a9fa8);
+  font-size: 0.8rem;
+  text-align: right;
+  margin: 6px 0 0;
+}
+
+/* tapfolio.co.uk/[ your-name ] */
+.prefixField {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.16));
+  border-radius: 14px;
+  background: var(--raised, #111113);
+  overflow: hidden;
+}
+.prefixField:focus-within {
+  outline: 2px solid var(--steel, #c9ced6);
+  outline-offset: 1px;
+}
+.prefixField:has(input[aria-invalid="true"]) {
+  border-color: #f87171;
+  box-shadow: 0 0 0 1px #f87171;
+}
+.prefixField span {
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  color: var(--muted, #9a9fa8);
+  white-space: nowrap;
+}
+.prefixField span,
+.prefixField .prefixInput.prefixInput {
+  font: inherit;
+  font-size: 1rem;
+}
+.prefixField .prefixInput.prefixInput {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 14px 16px 14px 1px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text, #f2f3f5);
+  box-shadow: none;
+  outline: none;
+}
+
+/* Hide-details tick boxes: big enough to hit with a thumb. */
+.checkRow.checkRow {
+  min-height: 44px;
+}
+.checkRow.checkRow input {
+  width: 22px !important;
+  height: 22px;
+  flex: none;
+}
+
+/* Save bar: sticks to the bottom of the screen while the details form is in view. */
+.saveBar {
+  position: sticky;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 10px 10px 10px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.16));
+  background: rgba(17, 17, 19, 0.97);
+  box-shadow: 0 -10px 40px -16px rgba(0, 0, 0, 0.9);
+}
+.saveBar[data-tone="ok"] {
+  border-color: rgba(31, 157, 85, 0.75);
+}
+.saveBar[data-tone="dirty"] {
+  border-color: rgba(250, 204, 21, 0.55);
+}
+.saveBar[data-tone="error"] {
+  border-color: rgba(239, 68, 68, 0.8);
+}
+.saveText {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.saveText p {
+  margin: 0;
+}
+.saveText a {
+  color: var(--text, #f2f3f5);
+  font-weight: 700;
+}
+.saveOk {
+  color: #86efac;
+  font-weight: 700;
+}
+.saveError {
+  color: #fecaca;
+}
+.saveError strong {
+  color: #fff;
+}
+.saveDirty {
+  color: var(--yellow, #facc15);
+  font-weight: 700;
+}
+.saveIdle {
+  color: var(--muted, #9a9fa8);
+}
+.saveButton.saveButton {
+  flex: none;
+  min-height: 48px;
+  padding-inline: 26px;
+  justify-content: center;
+}
+@media (max-width: 560px) {
+  .saveBar {
+    padding-left: 14px;
+    gap: 10px;
+  }
+  .saveText {
+    font-size: 0.85rem;
+  }
+  .saveButton.saveButton {
+    padding-inline: 20px;
+  }
+}
+
+/* Photo, colours and gallery sections. */
+.sectionStatus.sectionStatus {
+  margin: 16px 0 0;
+}
+.slotTitle {
+  font-weight: 700;
+  margin: 0;
+}
+.slotHint {
+  color: var(--muted, #9a9fa8);
+  font-size: 0.86rem;
+  margin: -4px 0 0;
+}
+.slotActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+}
+.colourPick.colourPick[type="color"] {
+  width: 56px;
+  height: 44px;
+}
+.deleteMedia.deleteMedia {
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.deleteMedia.deleteMedia:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+.uploadRow {
+  margin-top: 14px !important;
+}
+.mediaList {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.hintAfter.hintAfter {
+  margin: 10px 0 0;
+}
+.wait p {
+  margin: 0;
+}
+.wait p + p {
+  margin-top: 12px;
+}
