@@ -12,24 +12,17 @@ export const metadata: Metadata = {
 const gbp = (key: "start" | "monthly") => formatPrice(PRICES.GBP[key], "GBP");
 const eur = (key: "start" | "monthly") => formatPrice(PRICES.EUR[key], "EUR");
 
-// DRAFT TEMPLATE: fill in every [bracketed] item and have it checked before
-// launch, then remove the draft notice.
 export default function TermsPage() {
   return (
     <div className={`${styles.wrap} ${styles.narrow} ${styles.legal}`}>
       <h1>Terms of service</h1>
       <p>Last updated: 5 November 2026</p>
 
-      <p className={styles.draft}>
-        <strong>Draft.</strong> This is a starting template, not legal advice. Fill in the bracketed details and have it
-        reviewed before the site goes live.
-      </p>
-
       <h2>Who we are</h2>
       <p>
-        Tapfolio is run by [YOUR NAME / COMPANY NAME, company number if any], [ADDRESS], Northern Ireland
-        (&quot;we&quot;, &quot;us&quot;). You can reach us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-        These terms apply when you order a Tapfolio card or use your Tapfolio profile page (&quot;the service&quot;).
+        Tapfolio is based at Merchants Quay, Newry, Northern Ireland (&quot;we&quot;, &quot;us&quot;). You can reach us
+        at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. These terms apply when you order a Tapfolio card or
+        use your Tapfolio profile page (&quot;the service&quot;).
       </p>
 
       <h2>What you get</h2>
