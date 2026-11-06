@@ -326,7 +326,7 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
 
       <fieldset className={ds.section} id={SECTIONS.buttons.id}>
         <SectionHead
-          title="Your buttons"
+          title="Your link buttons"
           intro="Big buttons on your page, just under Call, Text and Email, for the things customers ask for most. For example: Book a quote, See our prices or Leave a Google review. Each one has the words on it and a link. You can have up to 6."
         />
         <LinkButtonsEditor
