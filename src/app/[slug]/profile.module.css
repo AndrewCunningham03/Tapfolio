@@ -16,10 +16,23 @@
   --edge: color-mix(in srgb, var(--text) 22%, var(--card));
   --gutter: 24px;
 
+  /* Typeface and button shape are the owner's choices (themeVars sets --tf-font and
+     --btn-radius, themeAttrs sets data-font and data-buttons); these are the defaults.
+     The other radii follow the button shape so a "square" page is square throughout. */
+  --tf-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --tf-font: var(--tf-sans);
+  --btn-radius: 14px;
+  --pill-radius: 999px;
+  --card-radius: 20px;
+  --tile-radius: 12px;
+  --chip-radius: 10px;
+  --social-radius: 50%;
+
   min-height: 100vh;
   min-height: 100svh;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--tf-font);
   line-height: 1.5;
   -webkit-tap-highlight-color: transparent;
 }
@@ -27,6 +40,29 @@
   .shell {
     --gutter: 16px;
   }
+}
+.shell[data-buttons="square"] {
+  --pill-radius: var(--btn-radius);
+  --card-radius: 6px;
+  --tile-radius: 3px;
+  --chip-radius: 2px;
+  --social-radius: var(--btn-radius);
+}
+
+/* Per-typeface tuning. "clean" is the default look and needs none. */
+/* Classic: Georgia has old-style (bouncing) numerals, so figures that must be read
+   exactly (bank details) switch back to the sans-serif. Tracking is looser than clean. */
+.shell[data-font="classic"] {
+  font-variant-numeric: lining-nums;
+}
+.shell[data-font="classic"] .bankValue {
+  font-family: var(--tf-sans);
+}
+/* Bold: the heavy face (Arial Black, Avenir Next Heavy, Roboto Black) is only for
+   headings and the main button; reading text stays in the plain sans-serif. */
+.shell[data-font="bold"] {
+  --tf-head: var(--tf-font);
+  font-family: var(--tf-sans);
 }
 
 /* Before the profile (and so its colours) is known: plain greys that follow the phone's light or dark mode. */
@@ -143,6 +179,7 @@
 }
 .name {
   margin: 0;
+  font-family: var(--tf-head, inherit);
   font-size: 1.7rem;
   line-height: 1.2;
   font-weight: 800;
@@ -155,6 +192,17 @@
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.35;
+}
+.shell[data-font="classic"] .name {
+  letter-spacing: -0.012em;
+}
+.shell[data-font="bold"] .name {
+  font-size: 1.55rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.shell[data-font="bold"] .org {
+  font-weight: 800;
 }
 .role {
   margin: 2px 0 0;
@@ -174,9 +222,10 @@
   margin: 20px var(--gutter) 0;
   min-height: 58px;
   padding: 12px 20px;
-  border-radius: 16px;
+  border-radius: var(--btn-radius);
   background: var(--accent);
   color: var(--accent-text);
+  font-family: var(--tf-head, inherit);
   font-weight: 700;
   font-size: 1.2rem;
   line-height: 1.2;
@@ -207,7 +256,7 @@
   min-width: 0;
   min-height: 76px;
   padding: 10px 2px;
-  border-radius: 14px;
+  border-radius: var(--btn-radius);
   background: var(--soft);
   color: var(--text);
   font-size: 0.85rem;
@@ -236,6 +285,19 @@
     font-size: 0.75rem;
   }
 }
+/* Georgia and Noto Serif run wider than the phone's sans-serif, so the labels under the
+   icons step down a little to stay inside their buttons. */
+@media (max-width: 399px) {
+  .shell[data-font="classic"] .quick:not(.quickFew) > * {
+    font-size: 0.76rem;
+    letter-spacing: -0.01em;
+  }
+}
+@media (max-width: 359px) {
+  .shell[data-font="classic"] .quick:not(.quickFew) > * {
+    font-size: 0.7rem;
+  }
+}
 
 /* Sections ---------------------------------------------------------------- */
 .section {
@@ -262,7 +324,7 @@
   margin: 24px var(--gutter) 0;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--card-radius);
 }
 @media (max-width: 359px) {
   .pay {
@@ -271,6 +333,7 @@
 }
 .payTitle {
   margin: 0 0 12px;
+  font-family: var(--tf-head, inherit);
   font-size: 1.15rem;
   font-weight: 800;
   line-height: 1.3;
@@ -290,7 +353,7 @@
   gap: 12px;
   min-height: 60px;
   padding: 9px 14px 9px 10px;
-  border-radius: 14px;
+  border-radius: var(--btn-radius);
   border: 1.5px solid var(--edge);
   color: var(--text);
   text-decoration: none;
@@ -298,7 +361,7 @@
 .payIcon {
   width: 38px;
   height: 38px;
-  border-radius: 10px;
+  border-radius: var(--chip-radius);
   display: grid;
   place-items: center;
   background: var(--soft);
@@ -407,7 +470,7 @@
   min-width: 6.25rem;
   min-height: 40px;
   padding: 0 14px;
-  border-radius: 999px;
+  border-radius: var(--pill-radius);
   border: 1.5px solid var(--edge);
   background: var(--card);
   color: var(--text);
@@ -457,7 +520,7 @@
   gap: 6px;
 }
 .galleryGrid > * {
-  border-radius: 12px;
+  border-radius: var(--tile-radius);
   overflow: hidden;
   background: var(--soft);
   aspect-ratio: 1;
@@ -513,7 +576,7 @@
   flex: none;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--tile-radius);
   background: var(--accent-soft);
   color: var(--text);
   display: grid;
@@ -562,7 +625,7 @@
 .socials a {
   width: 46px;
   height: 46px;
-  border-radius: 50%;
+  border-radius: var(--social-radius);
   display: grid;
   place-items: center;
   border: 1.5px solid var(--edge);
@@ -591,7 +654,7 @@
   min-height: 44px;
   padding: 6px 16px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--pill-radius);
   color: var(--muted);
   text-decoration: none;
 }
@@ -651,7 +714,7 @@
 .pausedHelp p {
   margin: 0;
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: var(--btn-radius);
   background: var(--soft);
   font-size: 0.92rem;
 }
@@ -676,7 +739,7 @@
 }
 .boneTall {
   height: 220px;
-  border-radius: 20px;
+  border-radius: var(--card-radius);
 }
 
 /* Only the signed-in owner sees this. */
@@ -690,7 +753,7 @@
   align-items: center;
   min-height: 48px;
   padding: 0 24px;
-  border-radius: 999px;
+  border-radius: var(--pill-radius);
   background: var(--text);
   color: var(--card);
   font-weight: 700;
@@ -701,6 +764,47 @@
 /* Room to scroll the footer out from under it. */
 .page:has(.ownerBar) .footer {
   padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+/* Outline buttons --------------------------------------------------------- */
+/* No fill, a 2px accent border and accent-coloured label. An accent a customer picks
+   can be too pale (or too dark) to read as text on their card, so where the browser can
+   do it (relative colours + light-dark()) the accent's lightness is clamped, keeping
+   its hue and strength: label >= 4.5:1 and border >= 3:1 on the card. Elsewhere the
+   label falls back to the page's text colour, which always passes. */
+.shell[data-buttons="outline"] {
+  --ink: var(--text);
+  --ink-edge: var(--accent);
+}
+@supports (color: oklch(from red l c h)) and (color: light-dark(red, blue)) {
+  .shell[data-buttons="outline"] {
+    --ink: light-dark(oklch(from var(--accent) min(l, 0.46) c h), oklch(from var(--accent) max(l, 0.78) c h));
+    --ink-edge: light-dark(oklch(from var(--accent) min(l, 0.58) c h), oklch(from var(--accent) max(l, 0.66) c h));
+  }
+}
+/* The loading placeholders (.boneBox) keep their solid grey. */
+.shell[data-buttons="outline"] :is(.save:not(.boneBox), .quick > a, .payLinks a.payPrimary) {
+  background: transparent;
+  border: 2px solid var(--ink-edge);
+  color: var(--ink);
+  box-shadow: none;
+}
+/* The 2px border takes 4px off each quick action's width; give it back from the padding. */
+.shell[data-buttons="outline"] .quick > a {
+  padding-inline: 0;
+}
+.shell[data-buttons="outline"] .payPrimary .payIcon {
+  background: var(--accent-soft);
+}
+.shell[data-buttons="outline"] :is(.save, .quick > a, .payLinks a.payPrimary):active {
+  background: var(--accent-soft);
+  filter: none;
+}
+@media (hover: hover) {
+  .shell[data-buttons="outline"] :is(.save, .quick > a, .payLinks a.payPrimary):hover {
+    background: var(--accent-soft);
+    filter: none;
+  }
 }
 
 /* Feedback ---------------------------------------------------------------- */

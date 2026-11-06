@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { isAdmin, requireUser } from "@/lib/auth";
-import { mediaUrl, PROFILE_COLUMNS, type ProfileRow } from "@/lib/profiles";
+import { cleanCustomLinks, mediaUrl, PROFILE_COLUMNS, type ProfileRow } from "@/lib/profiles";
 import { graceEndsAt, isLive, type SubscriptionState } from "@/lib/billing-state";
 import { CONTACT_EMAIL } from "@/lib/site";
 import { normaliseTheme } from "@/lib/themes";
@@ -248,10 +248,19 @@ async function Dashboard() {
             socials: (profile.socials ?? {}) as Record<string, string>,
             pay_links: (profile.pay_links ?? {}) as Record<string, string>,
             bank: (profile.bank ?? {}) as Record<string, string>,
+            custom_links: cleanCustomLinks(profile.custom_links),
             hidden_fields: profile.hidden_fields,
           }}
         />
-        <ColoursSection theme={normaliseTheme(profile.theme)} name={profile.full_name} />
+        <ColoursSection
+          theme={normaliseTheme(profile.theme)}
+          name={profile.full_name}
+          jobTitle={profile.job_title}
+          organisation={profile.organisation}
+          photoUrl={mediaUrl(profile.photo_path)}
+          coverUrl={mediaUrl(profile.cover_path)}
+          customLinks={cleanCustomLinks(profile.custom_links)}
+        />
         <GallerySection media={media} />
       </div>
     </>

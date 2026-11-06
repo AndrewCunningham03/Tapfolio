@@ -8,12 +8,15 @@ import {
   PROFILE_LIMITS,
   SOCIAL_LABELS,
   SOCIAL_NETWORKS,
+  type CustomLink,
   type HideableField,
   type PayMethod,
   type SocialNetwork,
 } from "@/lib/profile-fields";
 import { slugify } from "@/lib/slugs";
 import { saveProfile, type SaveState } from "./actions";
+import { describedBy, Field, tidyLink } from "./form-fields";
+import { LinkButtonsEditor } from "./link-buttons-editor";
 import { PUBLIC_HOST, SECTIONS } from "./sections";
 import ds from "./dashboard.module.css";
 import styles from "../marketing.module.css";
@@ -35,6 +38,7 @@ export type EditableProfile = {
   socials: Record<string, string>;
   pay_links: Record<string, string>;
   bank: Record<string, string>;
+  custom_links: CustomLink[];
   hidden_fields: string[];
 };
 
@@ -65,43 +69,6 @@ const SOCIAL_PLACEHOLDERS: Record<SocialNetwork, string> = {
   whatsapp: "07700 900123",
 };
 
-// Tidying what people type -------------------------------------------------------
-// Only fills in what the server would otherwise reject (it still checks everything).
-
-const HANDLE_LINKS: Partial<Record<SocialNetwork, (handle: string) => string>> = {
-  instagram: (h) => `https://instagram.com/${h}`,
-  tiktok: (h) => `https://tiktok.com/@${h}`,
-  x: (h) => `https://x.com/${h}`,
-};
-
-/** "07700 900123" (UK) or "087 123 4567" (Ireland) or "+44 7700 900123" → a wa.me link. */
-function whatsappLink(value: string): string | null {
-  if (!/^\+?[\d\s().-]{7,}$/.test(value)) return null;
-  let digits = value.replace(/\D/g, "");
-  if (value.startsWith("+")) digits = digits.replace(/^(44|353)0/, "$1");
-  else if (/^00\d+$/.test(digits)) digits = digits.slice(2).replace(/^(44|353)0/, "$1");
-  else if (/^07\d{9}$/.test(digits)) digits = `44${digits.slice(1)}`;
-  else if (/^08\d{8}$/.test(digits)) digits = `353${digits.slice(1)}`;
-  else return null;
-  return `https://wa.me/${digits}`;
-}
-
-/** "www.mybusiness.co.uk" → "https://www.mybusiness.co.uk", "@name" → the profile link, and so on. */
-function tidyLink(raw: string, opts: { network?: SocialNetwork; pay?: boolean } = {}): string {
-  const value = raw.trim();
-  if (!value) return value;
-  if (opts.network === "whatsapp") {
-    const wa = whatsappLink(value);
-    if (wa) return wa;
-  }
-  const toHandle = opts.network && HANDLE_LINKS[opts.network];
-  const handle = /^@([A-Za-z0-9._]{1,30})$/.exec(value);
-  if (toHandle && handle) return toHandle(handle[1]);
-  if (opts.pay && /^http:\/\//i.test(value)) return `https://${value.slice(7)}`;
-  if (!/^[a-z][a-z0-9+.-]*:/i.test(value) && /^[^\s@/]+\.[a-z]{2,}(\/\S*)?$/i.test(value)) return `https://${value}`;
-  return value;
-}
-
 const tidySlug = (raw: string) => slugify(raw) || raw.trim();
 
 // Matching errors to fields ------------------------------------------------------
@@ -109,6 +76,10 @@ const tidySlug = (raw: string) => slugify(raw) || raw.trim();
 /** Which fields a message from saveProfile (actions.ts) or the bank checks (lib/profiles.ts) is about. */
 function fieldsFor(message: string): string[] {
   const m = message.toLowerCase();
+  // "Button 2: the link must start with https://" is about row 2's link box; the other
+  // button messages don't say "link" and are about its words (readCustomLinks, actions.ts).
+  const button = /^button (\d+):/.exec(m);
+  if (button) return [`${/\blink\b/.test(m) ? "link_url" : "link_label"}_${Number(button[1]) - 1}`];
   if (m.includes("enter your name")) return ["full_name"];
   if (m.includes("profile address")) return ["slug"];
   if (m.includes("website")) return ["website"];
@@ -156,73 +127,6 @@ function focusField(names: string[]) {
     .map((n) => document.getElementById(n))
     .filter((el): el is HTMLInputElement => el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement);
   (els.find((el) => !el.value) ?? els[0])?.focus();
-}
-
-// Fields -------------------------------------------------------------------------
-
-type FieldProps = {
-  name: string;
-  label: string;
-  value: string | null | undefined;
-  /** undefined: fine. A message: shown under the label. "": marked as wrong, message shown elsewhere. */
-  error?: string;
-  type?: string;
-  placeholder?: string;
-  full?: boolean;
-  hint?: React.ReactNode;
-  autoComplete?: string;
-  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
-  required?: boolean;
-  maxLength?: number;
-  /** For links: tidy the value when the customer leaves the box. */
-  tidy?: (value: string) => string;
-};
-
-function describedBy(...ids: (string | false | undefined)[]) {
-  return ids.filter(Boolean).join(" ") || undefined;
-}
-
-function Field(props: FieldProps) {
-  const hintId = props.hint ? `${props.name}-hint` : undefined;
-  const errorId = props.error ? `${props.name}-error` : undefined;
-  const tidy = props.tidy;
-  return (
-    <div className={props.full ? styles.full : undefined}>
-      <label htmlFor={props.name}>{props.label}</label>
-      {props.hint && (
-        <p id={hintId} className={ds.hint}>
-          {props.hint}
-        </p>
-      )}
-      {props.error && (
-        <p id={errorId} className={ds.fieldError}>
-          {props.error}
-        </p>
-      )}
-      <input
-        id={props.name}
-        name={props.name}
-        type={props.type ?? "text"}
-        defaultValue={props.value ?? ""}
-        placeholder={props.placeholder}
-        autoComplete={props.autoComplete}
-        inputMode={props.inputMode}
-        required={props.required}
-        maxLength={props.maxLength}
-        aria-invalid={props.error !== undefined || undefined}
-        aria-describedby={describedBy(errorId, hintId)}
-        {...(tidy && {
-          autoCapitalize: "none",
-          autoCorrect: "off",
-          spellCheck: false,
-          onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
-            const tidied = tidy(e.currentTarget.value);
-            if (tidied !== e.currentTarget.value) e.currentTarget.value = tidied;
-          },
-        })}
-      />
-    </div>
-  );
 }
 
 function SectionHead({ title, intro }: { title: string; intro?: React.ReactNode }) {
@@ -418,6 +322,19 @@ export function ProfileEditor({ profile }: { profile: EditableProfile }) {
             <Field name="country" label="Country" value={profile.country} autoComplete="country-name" />
           </>,
         )}
+      </fieldset>
+
+      <fieldset className={ds.section} id={SECTIONS.buttons.id}>
+        <SectionHead
+          title="Your link buttons"
+          intro="Big buttons on your page, just under Call, Text and Email, for the things customers ask for most. For example: Book a quote, See our prices or Leave a Google review. Each one has the words on it and a link. You can have up to 6."
+        />
+        <LinkButtonsEditor
+          initial={profile.custom_links}
+          errors={errors}
+          attempt={attempt}
+          onEdit={() => setDirty(true)}
+        />
       </fieldset>
 
       <fieldset className={ds.section} id={SECTIONS.pay.id}>

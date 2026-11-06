@@ -5,11 +5,12 @@ export const SECTIONS = {
   photo: { id: "photo", label: "Photo" },
   details: { id: "details", label: "About you" },
   contact: { id: "contact", label: "Contact" },
+  buttons: { id: "buttons", label: "Link buttons" },
   pay: { id: "get-paid", label: "Get paid" },
   socials: { id: "socials", label: "Socials" },
   privacy: { id: "hide-details", label: "Hide details" },
   address: { id: "page-address", label: "Page address" },
-  colours: { id: "colours", label: "Colours" },
+  colours: { id: "colours", label: "Colours and style" },
   gallery: { id: "gallery", label: "Gallery" },
 } as const;
 

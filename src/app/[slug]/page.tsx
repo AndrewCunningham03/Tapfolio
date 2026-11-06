@@ -13,7 +13,7 @@ import {
   type SocialNetwork,
 } from "@/lib/profiles";
 import { isProfilePaused } from "@/lib/paused";
-import { themeVars } from "@/lib/themes";
+import { themeAttrs, themeVars } from "@/lib/themes";
 import {
   AddContactIcon,
   ChevronIcon,
@@ -27,6 +27,7 @@ import {
   TapIcon,
   TextIcon,
 } from "./icons";
+import { CustomLinks } from "./custom-links";
 import { OwnerBar } from "./owner-bar";
 import { PaySection } from "./pay";
 import { ProfileSkeleton } from "./skeleton";
@@ -68,7 +69,11 @@ async function ProfileShell({ slug }: { slug: string }) {
   const profile = await getProfileBySlug(slug);
   if (!profile) notFound();
   return (
-    <div className={styles.shell} style={themeVars(profile.theme) as React.CSSProperties}>
+    <div
+      className={styles.shell}
+      style={themeVars(profile.theme) as React.CSSProperties}
+      {...themeAttrs(profile.theme)}
+    >
       <Suspense
         fallback={
           <ProfileSkeleton
@@ -154,6 +159,8 @@ async function ProfileContent({ profile }: { profile: Profile }) {
             ))}
           </div>
         )}
+
+        <CustomLinks links={profile.customLinks} owner={firstName} />
 
         <PaySection profile={profile} />
 

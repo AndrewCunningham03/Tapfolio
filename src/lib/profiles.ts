@@ -1,10 +1,20 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import { PAY_METHODS, SOCIAL_NETWORKS, type HideableField, type PayMethod, type SocialNetwork } from "./profile-fields";
+import {
+  CUSTOM_LINK_LABEL_MAX,
+  CUSTOM_LINK_URL_MAX,
+  MAX_CUSTOM_LINKS,
+  PAY_METHODS,
+  SOCIAL_NETWORKS,
+  type CustomLink,
+  type HideableField,
+  type PayMethod,
+  type SocialNetwork,
+} from "./profile-fields";
 import { getAdminClient } from "./supabase/admin";
 import { normaliseTheme, type ThemeChoice } from "./themes";
 
-export type { PayMethod, SocialNetwork } from "./profile-fields";
+export type { CustomLink, PayMethod, SocialNetwork } from "./profile-fields";
 
 export type Socials = Partial<Record<SocialNetwork, string>>;
 export type PayLinks = Partial<Record<PayMethod, string>>;
@@ -36,6 +46,7 @@ export type Profile = {
   socials: Socials;
   payLinks: PayLinks;
   bank?: BankDetails;
+  customLinks: CustomLink[];
   photoUrl?: string;
   coverUrl?: string;
   theme: ThemeChoice;
@@ -63,6 +74,7 @@ export type ProfileRow = {
   socials: Record<string, unknown> | null;
   pay_links: Record<string, unknown> | null;
   bank: Record<string, unknown> | null;
+  custom_links: unknown; // a list of { label, url } when healthy; read it through cleanCustomLinks()
   photo_path: string | null;
   cover_path: string | null;
   theme: Record<string, unknown> | null;
@@ -71,7 +83,7 @@ export type ProfileRow = {
 };
 
 export const PROFILE_COLUMNS =
-  "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, pay_links, bank, photo_path, cover_path, theme, hidden_fields, plan";
+  "id, slug, full_name, job_title, organisation, about, phone, email, website, street, city, postcode, country, socials, pay_links, bank, custom_links, photo_path, cover_path, theme, hidden_fields, plan";
 
 /** Only allow http(s) links, so a profile can never carry a javascript: or data: URL. */
 export function safeUrl(value: unknown): string | undefined {
@@ -106,6 +118,45 @@ export function cleanPayLinks(raw: Record<string, unknown> | null): PayLinks {
 
 function text(value: unknown, max: number): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim().slice(0, max) : undefined;
+}
+
+// Custom buttons -------------------------------------------------------------------
+
+/** Letters in a button's label. Counts what people see (an emoji is one), not UTF-16 units. */
+export const labelLength = (label: string) => Array.from(label).length;
+
+/**
+ * A button's words, tidied: control and direction-override characters become
+ * spaces, runs of spaces collapse, the ends are trimmed. "" if nothing is left.
+ * Not capped: callers decide whether too long is an error or gets cut.
+ */
+export function tidyLinkLabel(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Keep the first CUSTOM_LINK_LABEL_MAX letters, never splitting an emoji in half. */
+const capLabel = (label: string) => Array.from(label).slice(0, CUSTOM_LINK_LABEL_MAX).join("").trim();
+
+/**
+ * Custom buttons that are safe to show: anything stored (null, not a list,
+ * half-filled items, a javascript: link) is dropped or tidied, never trusted.
+ * Used when a profile is read, so a bad value can't break or endanger the page.
+ */
+export function cleanCustomLinks(raw: unknown): CustomLink[] {
+  if (!Array.isArray(raw)) return [];
+  const links: CustomLink[] = [];
+  for (const item of raw) {
+    if (links.length >= MAX_CUSTOM_LINKS) break;
+    if (!item || typeof item !== "object") continue;
+    const label = capLabel(tidyLinkLabel((item as Record<string, unknown>).label));
+    const url = safeUrl((item as Record<string, unknown>).url);
+    if (label && url && url.length <= CUSTOM_LINK_URL_MAX) links.push({ label, url });
+  }
+  return links;
 }
 
 function bankDetails(raw: Record<string, unknown> | null): BankDetails | undefined {
@@ -188,6 +239,7 @@ function toProfile(row: ProfileRow, media: MediaRow[]): Profile {
     socials,
     payLinks: cleanPayLinks(row.pay_links),
     bank: bankDetails(row.bank),
+    customLinks: cleanCustomLinks(row.custom_links),
     photoUrl: mediaUrl(row.photo_path),
     coverUrl: mediaUrl(row.cover_path),
     theme: normaliseTheme(row.theme),

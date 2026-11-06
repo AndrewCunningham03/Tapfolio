@@ -2,8 +2,18 @@
 
 import { updateTag } from "next/cache";
 import { getUser } from "@/lib/auth";
-import { HIDEABLE_FIELDS, PAY_METHODS, PROFILE_LIMITS, SOCIAL_NETWORKS, type HideableField } from "@/lib/profile-fields";
-import { cleanBankForSave, cleanPayLinks, profileTag, safeUrl } from "@/lib/profiles";
+import {
+  CUSTOM_LINK_LABEL_MAX,
+  CUSTOM_LINK_URL_MAX,
+  HIDEABLE_FIELDS,
+  MAX_CUSTOM_LINKS,
+  PAY_METHODS,
+  PROFILE_LIMITS,
+  SOCIAL_NETWORKS,
+  type CustomLink,
+  type HideableField,
+} from "@/lib/profile-fields";
+import { cleanBankForSave, cleanPayLinks, labelLength, profileTag, safeUrl, tidyLinkLabel } from "@/lib/profiles";
 import { slugProblem } from "@/lib/slugs";
 import { getServerClient } from "@/lib/supabase/server";
 
@@ -11,6 +21,32 @@ export type SaveState = { status: "idle" | "ok" | "error"; message?: string; slu
 
 const text = (form: FormData, name: keyof typeof PROFILE_LIMITS) =>
   String(form.get(name) ?? "").trim().slice(0, PROFILE_LIMITS[name]) || null;
+
+/**
+ * The custom buttons from the form (link_label_0..5 with link_url_0..5), or what's wrong with one.
+ * Empty rows are skipped. The wording matters: profile-editor.tsx decides which row an error is
+ * about from it ("Button 2: …", and the word "link" when it's the link box rather than the words).
+ */
+function readCustomLinks(form: FormData): { links: CustomLink[] } | { error: string } {
+  const links: CustomLink[] = [];
+  for (let i = 0; i < MAX_CUSTOM_LINKS; i++) {
+    const label = tidyLinkLabel(form.get(`link_label_${i}`));
+    const rawUrl = String(form.get(`link_url_${i}`) ?? "").trim();
+    if (!label && !rawUrl) continue;
+
+    const n = i + 1;
+    if (!label) return { error: `Button ${n}: add the words to show on the button, for example Book a quote.` };
+    if (labelLength(label) > CUSTOM_LINK_LABEL_MAX) {
+      return { error: `Button ${n}: keep the words on the button to ${CUSTOM_LINK_LABEL_MAX} characters or fewer.` };
+    }
+    if (!rawUrl) return { error: `Button ${n}: add the link this button goes to, starting https://` };
+    const url = safeUrl(rawUrl);
+    if (!url) return { error: `Button ${n}: the link must start with https://` };
+    if (url.length > CUSTOM_LINK_URL_MAX) return { error: `Button ${n}: that link is too long.` };
+    links.push({ label, url });
+  }
+  return { links };
+}
 
 export async function saveProfile(_prev: SaveState, form: FormData): Promise<SaveState> {
   const user = await getUser();
@@ -62,6 +98,9 @@ export async function saveProfile(_prev: SaveState, form: FormData): Promise<Sav
   });
   if ("error" in bankResult) return { status: "error", message: bankResult.error };
 
+  const customLinks = readCustomLinks(form);
+  if ("error" in customLinks) return { status: "error", message: customLinks.error };
+
   const hidden = form.getAll("hidden").map(String).filter((f): f is HideableField => f in HIDEABLE_FIELDS);
 
   const { error } = await supabase
@@ -82,6 +121,7 @@ export async function saveProfile(_prev: SaveState, form: FormData): Promise<Sav
       socials,
       pay_links: payLinks,
       bank: bankResult.bank,
+      custom_links: customLinks.links,
       hidden_fields: hidden,
     })
     .eq("id", current.id);
