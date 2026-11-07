@@ -23,8 +23,8 @@ export type Currency = "GBP" | "EUR";
 // Cards go by Royal Mail. EUR prices are rounded equivalents.
 // Consumer prices must include VAT once registered.
 export const PRICES = {
-  GBP: { card: 0, goldCard: 35, start: 30, monthly: 6.99 },
-  EUR: { card: 0, goldCard: 39, start: 36, monthly: 8.99 },
+  GBP: { card: 0, goldCard: 35, start: 19.99, monthly: 6.99 },
+  EUR: { card: 0, goldCard: 39, start: 23.99, monthly: 8.99 },
 } as const satisfies Record<Currency, Record<string, number>>;
 
 export type PriceKey = keyof (typeof PRICES)["GBP"];
