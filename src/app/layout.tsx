@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "./site-url";
 import "./globals.css";
 
@@ -19,7 +20,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Counts page visits without cookies or personal data, so we can see where visitors drop off. */}
+        <Analytics />
+      </body>
     </html>
   );
 }

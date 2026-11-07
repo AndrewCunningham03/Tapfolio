@@ -12,7 +12,7 @@ export default function PrivacyPage() {
   return (
     <div className={`${styles.wrap} ${styles.narrow} ${styles.legal}`}>
       <h1>Privacy policy</h1>
-      <p>Last updated: 5 November 2026</p>
+      <p>Last updated: 7 November 2026</p>
 
       <h2>Who we are</h2>
       <p>
@@ -85,6 +85,11 @@ export default function PrivacyPage() {
       <h2>Cookies</h2>
       <p>
         We use a cookie only to keep you signed in to your dashboard. We do not use cookies for tracking or advertising.
+      </p>
+      <p>
+        We count visits to our pages with Vercel Web Analytics. It does not use cookies, does not follow you across
+        other sites, and does not store anything that identifies you. We use the totals to see which pages people visit,
+        so we can make the site clearer.
       </p>
     </div>
   );
