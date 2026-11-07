@@ -3,6 +3,8 @@
 import { refresh } from "next/cache";
 import { getUser, isAdmin } from "@/lib/auth";
 import { createBatch, MAX_PER_MATERIAL } from "@/lib/batches";
+import { cancelOrderBilling } from "@/lib/billing-admin";
+import { getStripe } from "@/lib/stripe";
 import { assignStockCard, createCardForOrder, ORDER_STATUSES, type OrderStatus } from "@/lib/orders";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -81,6 +83,26 @@ export async function makeCard(orderId: number): Promise<AdminResult> {
     return result.alreadyExisted
       ? { ok: true, message: `This order already has card ${result.cardId}.` }
       : { ok: true, message: `Card ${result.cardId} created and linked to /${result.slug}.` };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : "Something went wrong." };
+  }
+}
+
+/** Cancel a paid order's subscription in Stripe (and optionally refund the first payment). */
+export async function cancelSubscription(orderId: number, refund: boolean): Promise<AdminResult> {
+  try {
+    const db = await adminDb();
+    const stripe = getStripe();
+    if (!stripe) return { ok: false, message: "Stripe isn't configured." };
+    const { data: order } = await db
+      .from("card_orders")
+      .select("id, user_id, stripe_customer_id, card_price, currency")
+      .eq("id", orderId)
+      .maybeSingle();
+    if (!order) return { ok: false, message: "Order not found." };
+    const result = await cancelOrderBilling(stripe, db, order, { refund });
+    refresh();
+    return result;
   } catch (err) {
     return { ok: false, message: err instanceof Error ? err.message : "Something went wrong." };
   }

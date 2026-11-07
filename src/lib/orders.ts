@@ -31,6 +31,8 @@ export type CardOrder = {
   created_at: string;
   // Set for orders paid through Stripe Checkout.
   user_id: string | null;
+  stripe_session_id: string | null;
+  stripe_customer_id: string | null;
   shipping_address: ShippingDetails | null;
 };
 
