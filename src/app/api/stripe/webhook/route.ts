@@ -63,7 +63,13 @@ async function recordSubscription(db: Db, sub: Stripe.Subscription) {
       stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer.id,
       stripe_subscription_id: sub.id,
       status: sub.status,
-      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      // Cancelled straight away: the paid period ends now, not when it would have run out.
+      current_period_end:
+        sub.status === "canceled" && sub.ended_at
+          ? new Date(sub.ended_at * 1000).toISOString()
+          : periodEnd
+            ? new Date(periodEnd * 1000).toISOString()
+            : null,
       past_due_since: pastDueSince,
     },
     { onConflict: "user_id" },

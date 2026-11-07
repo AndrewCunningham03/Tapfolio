@@ -7,7 +7,7 @@ import type { CardOrder, OrderStatus } from "@/lib/orders";
 import { CARD_URL_BASE, formatPrice } from "@/lib/site";
 import { CardBack, CardFront } from "../design/card-preview";
 import { loadLogoFromUrl, makeMask, tint } from "../design/logo";
-import { assignCard, makeCard, setOrderStatus, type AdminResult } from "./actions";
+import { assignCard, cancelSubscription, makeCard, setOrderStatus, type AdminResult } from "./actions";
 import styles from "../marketing.module.css";
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
@@ -65,6 +65,9 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
   const [result, setResult] = useState<AdminResult | null>(null);
   const [stockId, setStockId] = useState("");
   const run = (fn: () => Promise<AdminResult>) => start(async () => setResult(await fn()));
+  // Cancelling billing moves real money, so it asks twice: open the panel, then confirm.
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [refund, setRefund] = useState(false);
 
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
@@ -256,6 +259,59 @@ export function OrderRow({ order, logoUrl, card }: { order: CardOrder; logoUrl?:
             </>
           )}
         </div>
+        {order.stripe_customer_id && (
+          <div className={styles.adminActions}>
+            {!confirmCancel ? (
+              <button
+                type="button"
+                className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`}
+                disabled={pending}
+                onClick={() => setConfirmCancel(true)}
+              >
+                Cancel billing in Stripe…
+              </button>
+            ) : (
+              <div
+                className={`${styles.notice} ${styles.formError}`}
+                role="group"
+                aria-label="Confirm cancelling billing"
+              >
+                <p>
+                  <strong>Stop billing {order.name}?</strong> No more payments will be taken and their page pauses now.
+                  Setting the status to Cancelled does not do this by itself.
+                </p>
+                <label>
+                  <input type="checkbox" checked={refund} onChange={(e) => setRefund(e.target.checked)} /> Also refund
+                  their first payment ({formatPrice(Number(order.card_price), order.currency)})
+                </label>
+                <div className={styles.adminActions}>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnSmall}`}
+                    disabled={pending}
+                    onClick={() =>
+                      run(async () => {
+                        const r = await cancelSubscription(order.id, refund);
+                        if (r.ok) setConfirmCancel(false);
+                        return r;
+                      })
+                    }
+                  >
+                    {pending ? "Working…" : "Yes, cancel billing now"}
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.ghost} ${styles.btnSmall}`}
+                    disabled={pending}
+                    onClick={() => setConfirmCancel(false)}
+                  >
+                    Keep it
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {result && (
           <p className={result.ok ? styles.adminOk : styles.fieldError} role="status">
             {result.message}
