@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Local copy of the card templates for the owner
 Card templates/
+
+# Promo video maker for the owner
+Promo video/
